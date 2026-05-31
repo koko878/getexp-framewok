@@ -20,6 +20,7 @@ tested code, so each new app starts at "build the feature".
 | --- | --- |
 | Doctrine | [`CLAUDE.md`](CLAUDE.md), [`docs/golden-path.md`](docs/golden-path.md) |
 | Docs hub | [`docs/README.md`](docs/README.md) |
+| Working with Claude Code | [`docs/working-with-claude-code.md`](docs/working-with-claude-code.md) |
 | High-level design | [`docs/high-level-design.md`](docs/high-level-design.md) |
 | Usage reference | [`docs/reference.md`](docs/reference.md) |
 | Shared building blocks (TS) | [`packages/core`](packages/core) — `@getexp/core` |

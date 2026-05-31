@@ -97,12 +97,31 @@ uv run ruff check . && uv run mypy python/getexp-core/getexp_core
 ## When you (Claude) build a new app here
 
 1. Run `pnpm create-app` and pick the template (`api-ts`, `api-py`, `web`,
-   `mobile`).
-2. Import building blocks from `@getexp/core` / `getexp_core`. If something is
+   `mobile`). This also writes `apps/<name>/CLAUDE.md` and registers the app in
+   `getexp.json`.
+2. Read `apps/<name>/CLAUDE.md` — it carries that app's tech choices and any
+   overrides, layered on top of this doctrine.
+3. Import building blocks from `@getexp/core` / `getexp_core`. If something is
    missing, add it **to the core package with tests**, then use it — so the
    next app benefits too.
-3. Model the app on the matching `apps/reference-api-*` service.
-4. Keep `pnpm check` (and the Python equivalents) green. CI enforces it.
-5. Any deviation from the frozen stack requires a new ADR in `docs/adr/`.
+4. Model the app on the matching `apps/reference-api-*` service.
+5. Keep `pnpm check` (and the Python equivalents) green. CI enforces it.
 
-See `docs/golden-path.md` for the full rationale.
+## Configuring tech choices (how you parametrize)
+
+The framework is **monorepo + strict, with per-app overrides**. Choices live at
+three levels:
+
+| Level | Where | Sets |
+| --- | --- | --- |
+| Project | `getexp.json` | Standing defaults (owner, default storage adapters) + the app registry. `create-app` reads these. |
+| App | `apps/<name>/CLAUDE.md` | This app's profile and **overrides**. The frozen stack applies unless a line here justifies a deviation. |
+| Runtime | `apps/<name>/.env` | Adapter selection by connection URL (`DATABASE_URL`, `s3://…`, `azblob://…`), ports, log level. |
+
+**Strict + per-app override rule:** stay on the frozen stack by default. A
+per-app deviation is allowed only if it is written, with a one-line
+justification, in that app's `CLAUDE.md` "Overrides" section. A change to the
+framework-wide defaults requires a new ADR in `docs/adr/`.
+
+See `docs/golden-path.md` for the rationale and
+`docs/working-with-claude-code.md` for the end-to-end workflow.

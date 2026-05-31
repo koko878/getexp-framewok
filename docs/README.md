@@ -12,7 +12,10 @@ use it" → "why it's built this way".
 3. **[high-level-design.md](high-level-design.md)** — the architecture: system
    context, layers, building-blocks catalog, request lifecycle, resilience,
    scaffolding & CI flow, deployment view, roadmap (with diagrams).
-4. **[reference.md](reference.md)** — usage guide: every building block with
+4. **[working-with-claude-code.md](working-with-claude-code.md)** — the
+   day-to-day workflow: how Claude auto-loads the doctrine, and how to
+   parametrize your tech choices (project / per-app / runtime).
+5. **[reference.md](reference.md)** — usage guide: every building block with
    TypeScript + Python examples, plus how to create an app and extend the core.
 
 ## Conventions

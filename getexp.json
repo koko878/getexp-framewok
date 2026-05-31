@@ -1,0 +1,16 @@
+{
+  "project": "getexp",
+  "usageModel": "monorepo",
+  "policy": "strict-with-per-app-override",
+  "defaults": {
+    "owner": "platform",
+    "storage": {
+      "relational": "postgres",
+      "blob": "s3"
+    }
+  },
+  "apps": [
+    { "name": "reference-api-ts", "template": "api-ts" },
+    { "name": "reference-api-py", "template": "api-py" }
+  ]
+}
