@@ -11,3 +11,4 @@ export * from './http.ts';
 export * from './idempotency.ts';
 export * from './logger.ts';
 export * from './result.ts';
+export * from './storage.ts';

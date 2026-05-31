@@ -34,6 +34,8 @@ debugging foundations that already work.
 | Type checking | tsc (strict) | mypy (strict) |
 | Logging | Pino (via `@getexp/core`) | structlog (via `getexp_core`) |
 | HTTP client | `@getexp/core` HttpClient | `getexp_core` HttpClient |
+| Relational DB | Postgres via Drizzle | Postgres via SQLAlchemy 2.0 + Alembic |
+| Object storage | S3 API / Azure Blob (behind `BlobStore`) | S3 API / Azure Blob (behind `BlobStore`) |
 | Observability | OpenTelemetry | OpenTelemetry |
 
 Versions are **pinned**. Upgrading a core dependency is a deliberate act,
@@ -58,6 +60,10 @@ projects we adopt):
 - **Idempotency keys** — safe retries for mutating endpoints (Stripe pattern).
   (`withIdempotency`)
 - **Health & readiness probes** — every service exposes `/health` and `/ready`.
+- **Storage via ports & adapters** — depend on the `Repository` / `BlobStore`
+  ports, never a driver or cloud SDK directly. The adapter is chosen at boot by
+  a connection URL, so apps run unchanged on AWS, Azure, GCP, on-prem or local
+  (see `docs/adr/0004-storage-ports-and-adapters.md`).
 
 ## Repository layout
 

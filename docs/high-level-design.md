@@ -134,6 +134,7 @@ Python snake_case). Detailed API + examples in [`reference.md`](reference.md).
 | **Config** | 12-factor, validated at boot | `loadConfig` (Zod), `env` helpers | `load_config` (Pydantic), `ConfigError` |
 | **HttpClient** | Resilient outbound calls | `HttpClient` (timeout/retry/breaker) | `HttpClient` (timeout/retry/breaker) |
 | **Idempotency** | Safe retries (Stripe) | `withIdempotency`, `InMemoryIdempotencyStore` | `with_idempotency`, `InMemoryIdempotencyStore` |
+| **Storage** | Infra-agnostic persistence | `Repository`, `BlobStore`, `HealthCheck` (+ in-memory) | `Repository`, `BlobStore`, `HealthCheck` (+ in-memory) |
 
 **Design invariant:** if a capability exists in one language's core, it should
 exist in the other with the same semantics. New capability → add to the core
@@ -266,7 +267,48 @@ paved road.
 
 ---
 
-## 11. Runtime & deployment view
+## 11. Storage — ports & adapters (infra-agnostic)
+
+App code depends on **ports** (interfaces in the core), never on a driver or
+cloud SDK. Concrete **adapters** are chosen at boot by a connection URL, so the
+same image runs on AWS, Azure, GCP, on-prem or a laptop unchanged. Full
+rationale in [ADR 0004](adr/0004-storage-ports-and-adapters.md).
+
+```mermaid
+graph TB
+    app["App code (handlers, services)"]
+    subgraph ports["Ports — @getexp/core / getexp_core"]
+      repo["Repository&lt;T,Id&gt;"]
+      blob["BlobStore"]
+      hc["HealthCheck"]
+    end
+    app --> repo
+    app --> blob
+    app --> hc
+
+    repo --> pg["postgres:// → Postgres adapter<br/>(Drizzle / SQLAlchemy)"]
+    repo --> mem1["in-memory (tests)"]
+    blob --> s3["s3:// → S3 adapter<br/>(AWS S3 · R2 · MinIO · GCS)"]
+    blob --> az["azblob:// → Azure Blob adapter"]
+    blob --> mem2["in-memory (tests)"]
+
+    pg --- rds["RDS · Azure PG · Cloud SQL · Neon"]
+    s3 --- s3infra["S3 · R2 · MinIO"]
+    az --- azinfra["Azure Blob · Azurite"]
+```
+
+- **One URL scheme → one adapter**, picked at the composition root.
+- **Portable protocols, not proprietary APIs**: Postgres wire protocol spans
+  every managed Postgres; the S3 API spans S3/R2/MinIO/GCS; Azure Blob has its
+  own adapter under the same `BlobStore` port.
+- **In-memory adapters** ship in the core → tests need no containers.
+- **`/ready` aggregates `HealthCheck`s**, so a service is ready only when its
+  storage answers.
+
+Implemented today: the ports + in-memory adapters (`storage` module, both
+cores). Vendor adapter packages are on the roadmap (§15).
+
+## 12. Runtime & deployment view
 
 - **TS services** run via `tsx` (dev and container) or are bundled
   (esbuild/tsup) for production; a single Node 22 process per service.
@@ -283,7 +325,7 @@ paved road.
 
 ---
 
-## 12. Quality attributes (non-functional)
+## 13. Quality attributes (non-functional)
 
 | Attribute | Mechanism |
 | --- | --- |
@@ -296,7 +338,7 @@ paved road.
 
 ---
 
-## 13. Key decisions (ADRs)
+## 14. Key decisions (ADRs)
 
 - [0001 — Frozen stack choices](adr/0001-stack-choices.md)
 - [0002 — Monorepo with source-first internal packages](adr/0002-monorepo.md)
@@ -304,7 +346,7 @@ paved road.
 
 ---
 
-## 14. Roadmap
+## 15. Roadmap
 
 1. Wire OpenTelemetry into both reference apps (no-op without a collector).
 2. Add a **data-access** building block (Drizzle/Prisma · SQLAlchemy) and an

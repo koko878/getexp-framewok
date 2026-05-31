@@ -231,6 +231,59 @@ result = await with_idempotency(store, idempotency_key, op)
 
 Same key → cached response, side effect skipped. No key → always runs.
 
+### 7. Storage — ports & adapters (infra-agnostic)
+
+Depend on the **port**, not a driver or cloud SDK. The concrete adapter is
+chosen at boot by a connection URL, so the same code runs on any infra. The core
+ships the ports plus in-memory adapters; vendor adapters are optional packages
+(roadmap). See [ADR 0004](adr/0004-storage-ports-and-adapters.md).
+
+**Repository** — common-case CRUD over a collection:
+
+```ts
+import { InMemoryRepository, type Repository } from '@getexp/core';
+
+interface User { id: string; name: string; }
+
+// In tests/dev: in-memory. In prod: a Postgres adapter behind the same type.
+const users: Repository<User> = new InMemoryRepository<User>((u) => u.id);
+await users.create({ id: '1', name: 'Ada' });
+const u = await users.get('1');
+```
+
+```python
+from getexp_core import InMemoryRepository, Repository
+
+users: Repository[User, str] = InMemoryRepository(lambda u: u.id)
+await users.create(User(id="1", name="Ada"))
+```
+
+**BlobStore** — object storage (one port, S3 *and* Azure adapters):
+
+```ts
+import { InMemoryBlobStore, type BlobStore } from '@getexp/core';
+
+const blobs: BlobStore = new InMemoryBlobStore();
+await blobs.put('invoices/1.pdf', bytes, { contentType: 'application/pdf' });
+const url = await blobs.presignedUrl('invoices/1.pdf', { expiresInSeconds: 300 });
+```
+
+**HealthCheck** — make `/ready` reflect storage reality:
+
+```ts
+import { checkHealth, type HealthCheck } from '@getexp/core';
+
+const checks: HealthCheck[] = [/* db adapter, blob adapter, … */];
+app.get('/ready', async (_req, reply) => {
+  const report = await checkHealth(checks);
+  reply.status(report.healthy ? 200 : 503).send(report);
+});
+```
+
+Adapter selection by URL scheme: `postgres://` (Postgres), `s3://` (S3/R2/MinIO),
+`azblob://` (Azure Blob), `sqlite://` / in-memory (tests). Blessed
+implementations: Drizzle (TS) / SQLAlchemy + Alembic (Python) for relational.
+
 ---
 
 ## How to: create a new app

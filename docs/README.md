@@ -27,6 +27,8 @@ use it" → "why it's built this way".
   internal packages.
 - **[adr/0003-observability.md](adr/0003-observability.md)** — OpenTelemetry +
   Jaeger.
+- **[adr/0004-storage-ports-and-adapters.md](adr/0004-storage-ports-and-adapters.md)**
+  — infra-agnostic storage (Postgres, S3, Azure Blob).
 
 ## Lineage
 
