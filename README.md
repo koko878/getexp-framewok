@@ -19,6 +19,9 @@ tested code, so each new app starts at "build the feature".
 | Area | Location |
 | --- | --- |
 | Doctrine | [`CLAUDE.md`](CLAUDE.md), [`docs/golden-path.md`](docs/golden-path.md) |
+| Docs hub | [`docs/README.md`](docs/README.md) |
+| High-level design | [`docs/high-level-design.md`](docs/high-level-design.md) |
+| Usage reference | [`docs/reference.md`](docs/reference.md) |
 | Shared building blocks (TS) | [`packages/core`](packages/core) — `@getexp/core` |
 | Shared building blocks (Python) | [`python/getexp-core`](python/getexp-core) — `getexp_core` |
 | Reference apps | [`apps/reference-api-ts`](apps/reference-api-ts) (Fastify), [`apps/reference-api-py`](apps/reference-api-py) (FastAPI) |
