@@ -1,0 +1,76 @@
+import { StyleSheet } from 'react-native';
+
+export const c = {
+  bg: '#f7f7f8',
+  card: '#ffffff',
+  border: '#e5e7eb',
+  text: '#111827',
+  muted: '#6b7280',
+  primary: '#2563eb',
+  ok: '#15803d',
+  warn: '#b45309',
+  danger: '#b91c1c',
+  dark: '#111827',
+};
+
+export const STATUT_COLOR: Record<string, string> = {
+  brouillon: c.muted,
+  soumis: c.warn,
+  prototype_pret_admin: '#7c3aed',
+  prototype_genere: '#2563eb',
+  revision_demandee: c.danger,
+  prototype_valide: c.ok,
+  cadrage_technique: '#0891b2',
+  pret_a_packager: '#0d9488',
+  certifie: '#15803d',
+};
+
+export const t = StyleSheet.create({
+  app: { flex: 1, backgroundColor: c.bg },
+  header: {
+    paddingTop: 52,
+    paddingBottom: 12,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  brand: { fontSize: 18, fontWeight: '700', color: c.text },
+  body: { padding: 20, gap: 12 },
+  h2: { fontSize: 20, fontWeight: '700', color: c.text },
+  para: { color: '#374151' },
+  muted: { color: c.muted },
+  error: { color: c.danger, paddingHorizontal: 20, paddingBottom: 8 },
+  card: {
+    backgroundColor: c.card,
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: c.border,
+    gap: 4,
+  },
+  cardTitle: { fontSize: 16, fontWeight: '600', color: c.text },
+  badge: { fontWeight: '700', fontSize: 12, textTransform: 'uppercase' },
+  field: { gap: 4 },
+  label: { fontWeight: '600', color: c.text },
+  input: {
+    backgroundColor: c.card,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    padding: 10,
+    color: c.text,
+  },
+  inputMultiline: { minHeight: 70, textAlignVertical: 'top' },
+  journal: { backgroundColor: c.dark, borderRadius: 10, padding: 12, gap: 2 },
+  journalLine: { color: '#d1d5db', fontSize: 12, fontFamily: 'monospace' },
+  progress: { color: c.muted, fontSize: 12, fontWeight: '600' },
+  rolePill: {
+    borderWidth: 1,
+    borderColor: c.primary,
+    borderRadius: 999,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+  },
+  rolePillText: { color: c.primary, fontWeight: '700', fontSize: 12 },
+});

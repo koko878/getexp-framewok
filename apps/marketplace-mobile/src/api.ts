@@ -8,6 +8,7 @@ export interface UseCase {
   probleme?: string;
   objectif?: string;
   utilisateurs?: string;
+  kpis?: string[];
 }
 
 export type Statut =
@@ -43,7 +44,13 @@ async function req<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  listProjets: () => req<Projet[]>('/projets'),
+  listProjets: (opts: { mine?: boolean; statut?: Statut } = {}) => {
+    const qs = new URLSearchParams();
+    if (opts.mine) qs.set('mine', 'true');
+    if (opts.statut) qs.set('statut', opts.statut);
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return req<Projet[]>(`/projets${suffix}`);
+  },
   createProjet: (useCase: UseCase, statut: Statut) =>
     req<Projet>('/projets', { method: 'POST', body: JSON.stringify({ useCase, statut }) }),
   getProjet: (id: string) => req<Projet>(`/projets/${id}`),
