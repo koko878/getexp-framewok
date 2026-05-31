@@ -18,6 +18,14 @@ use it" → "why it's built this way".
 5. **[reference.md](reference.md)** — usage guide: every building block with
    TypeScript + Python examples, plus how to create an app and extend the core.
 
+## Building apps
+
+- **[app-spec-template.md](app-spec-template.md)** — capture an app's business +
+  graphical decisions here, then hand it to the builder agent.
+- **`.claude/agents/getexp-app-builder.md`** — the dedicated Claude Code subagent
+  that turns a spec into a running prototype, then a production app, on the
+  framework.
+
 ## Conventions
 
 - **[conventions/typescript.md](conventions/typescript.md)**

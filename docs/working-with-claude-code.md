@@ -103,6 +103,34 @@ PORT=8000
 - *"Add a `rate-limiter` building block to the core (both languages) with tests,
   then use it in `apps/billing-api`."*
 
+## Building whole apps with the `getexp-app-builder` agent
+
+For building a full app (not a one-off edit), delegate to the dedicated subagent
+in `.claude/agents/getexp-app-builder.md`. The split of roles:
+
+- **You + the main session** handle the *business and graphical* thinking — what
+  the app is, its entities, endpoints, screens. Capture it in a spec
+  (`docs/app-spec-template.md` → `docs/specs/<app>.md`).
+- **The `getexp-app-builder` agent** takes that spec and *builds*: scaffolds with
+  `create-app`, wires the building blocks and storage ports, writes tests, and
+  keeps the gates green. It runs autonomously and reports back.
+
+It works in two explicit stages — ask for one at a time:
+
+```text
+# 1) prove the idea
+"Use getexp-app-builder to build a PROTOTYPE from docs/specs/billing.md"
+        → scaffolds, in-memory storage, the main flow runs locally
+
+# 2) make it real
+"Use getexp-app-builder to take apps/billing-api to the PRODUCTION stage"
+        → real storage via env URLs, full validation, tests, migrations
+```
+
+Typical end-to-end loop: discuss the idea with the main session → fill the spec
+→ run the agent for a prototype → review the running prototype → run the agent
+again for production.
+
 ## When Claude wants to step off the path
 
 If a task needs something the frozen stack doesn't cover, Claude should either
