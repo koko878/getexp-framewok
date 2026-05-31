@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  typescript:
+    name: TypeScript (lint · types · tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Lint & format (Biome)
+        run: pnpm lint
+      - name: Type-check
+        run: pnpm -r typecheck
+      - name: Test
+        run: pnpm -r test
+
+  python:
+    name: Python (lint · types · tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+      - run: uv sync --all-packages
+      - name: Lint (Ruff)
+        run: uv run ruff check .
+      - name: Format check (Ruff)
+        run: uv run ruff format --check .
+      - name: Type-check (mypy)
+        run: uv run mypy python/getexp-core/getexp_core
+      - name: Test
+        run: uv run pytest

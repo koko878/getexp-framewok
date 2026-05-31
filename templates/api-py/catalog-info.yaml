@@ -1,0 +1,11 @@
+# Backstage Software Catalog descriptor (Spotify).
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: __APP_NAME__
+  annotations:
+    getexp.dev/golden-path: api-py
+spec:
+  type: service
+  lifecycle: experimental
+  owner: unknown

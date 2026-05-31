@@ -1,0 +1,80 @@
+"""getexp_core — shared building blocks for every GetExp Python app."""
+
+from getexp_core.config import ConfigError, load_config
+from getexp_core.errors import (
+    AppError,
+    ConflictError,
+    ForbiddenError,
+    InternalError,
+    NotFoundError,
+    ProblemDetails,
+    RateLimitedError,
+    UnauthorizedError,
+    ValidationError,
+    to_app_error,
+)
+from getexp_core.http import (
+    CircuitOpenError,
+    HttpClient,
+    HttpClientOptions,
+    RetryOptions,
+)
+from getexp_core.idempotency import (
+    IdempotencyStore,
+    InMemoryIdempotencyStore,
+    StoredResponse,
+    with_idempotency,
+)
+from getexp_core.logger import configure_logging, get_logger, with_request_id
+from getexp_core.result import (
+    Err,
+    Ok,
+    Result,
+    err,
+    from_awaitable,
+    from_callable,
+    is_err,
+    is_ok,
+    map_ok,
+    ok,
+    unwrap,
+    unwrap_or,
+)
+
+__all__ = [
+    "AppError",
+    "CircuitOpenError",
+    "ConfigError",
+    "ConflictError",
+    "Err",
+    "ForbiddenError",
+    "HttpClient",
+    "HttpClientOptions",
+    "IdempotencyStore",
+    "InMemoryIdempotencyStore",
+    "InternalError",
+    "NotFoundError",
+    "Ok",
+    "ProblemDetails",
+    "RateLimitedError",
+    "Result",
+    "RetryOptions",
+    "StoredResponse",
+    "UnauthorizedError",
+    "ValidationError",
+    "configure_logging",
+    "err",
+    "from_awaitable",
+    "from_callable",
+    "get_logger",
+    "is_err",
+    "is_ok",
+    "load_config",
+    "map_ok",
+    "ok",
+    "to_app_error",
+    "unwrap",
+    "unwrap_or",
+    "with_idempotency",
+    "with_request_id",
+]

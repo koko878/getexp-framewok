@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: reference-api-ts
+  description: Canonical Fastify service demonstrating the GetExp Golden Path.
+  annotations:
+    getexp.dev/golden-path: api-ts
+spec:
+  type: service
+  lifecycle: production
+  owner: platform
