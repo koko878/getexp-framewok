@@ -29,6 +29,10 @@
     {
       "name": "marketplace-api",
       "template": "api-ts"
+    },
+    {
+      "name": "marketplace-mobile",
+      "template": "mobile"
     }
   ]
 }

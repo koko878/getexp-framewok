@@ -44,6 +44,7 @@ export default function Home() {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: load is stable for this prototype
   useEffect(() => {
     void load(filter);
   }, [filter]);

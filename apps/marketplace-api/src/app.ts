@@ -1,8 +1,15 @@
 import { randomUUID } from 'node:crypto';
-import { loggerOptions, ServiceUnavailableError, toAppError, ValidationError } from '@getexp/core';
+import {
+  InMemoryRepository,
+  loggerOptions,
+  ServiceUnavailableError,
+  toAppError,
+  ValidationError,
+} from '@getexp/core';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { type GenerateFn, generatePrototype } from './agent.ts';
 import { config } from './config.ts';
+import { type Projet, ProjetService, registerProjetRoutes } from './projets.ts';
 import { useCaseSchema } from './types.ts';
 
 export interface AppDeps {
@@ -17,6 +24,10 @@ export function buildApp(deps: AppDeps = {}): FastifyInstance {
     logger: loggerOptions({ level: config.LOG_LEVEL, base: { service: config.SERVICE_NAME } }),
     genReqId: (req) => (req.headers['x-request-id'] as string) ?? randomUUID(),
   });
+
+  // Persistence via the Repository port — in-memory for the prototype, swapped
+  // for a Postgres/Supabase adapter at the production stage with no route changes.
+  const projets = new ProjetService(new InMemoryRepository<Projet>((p) => p.id));
 
   app.addHook('onRequest', async (request, reply) => {
     reply.header('x-request-id', request.id);
@@ -70,6 +81,8 @@ export function buildApp(deps: AppDeps = {}): FastifyInstance {
     const { html, journal } = await generate(parsed.data, (m) => request.log.debug({ step: m }));
     return { html, journal };
   });
+
+  registerProjetRoutes(app, projets);
 
   return app;
 }

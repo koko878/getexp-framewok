@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "marketplace-mobile",
+    "slug": "marketplace-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true
+  }
+}

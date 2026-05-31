@@ -61,3 +61,13 @@ into `apps/`.
   `ServiceUnavailableError` (503) to both cores.
 - ⬜ **Mobile app** — Expo onto the `mobile` template (cadrage → liste → détail).
 - ⬜ **Data layer** — Supabase behind the `Repository` port (+ BlobStore for files).
+
+### Update — mobile + data done (prototype)
+
+- ✅ **Data layer** — `Projet` persistence behind the `Repository` port in
+  `marketplace-api` (`src/projets.ts`, in-memory adapter): `POST/GET/GET :id
+  /PATCH /projets`, statut lifecycle, owner filter. 4 tests.
+- ✅ **Mobile app** — `apps/marketplace-mobile` (Expo) ports the accueil →
+  cadrage → détail flow, calling `marketplace-api`. Typechecks.
+- ⬜ Remaining: real Postgres/Supabase adapter (production), auth, admin & file
+  screens, the LLM cadrage assistant.

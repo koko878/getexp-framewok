@@ -1,0 +1,24 @@
+{
+  "name": "marketplace-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "App.tsx",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@getexp/core": "workspace:*",
+    "expo": "56.0.8",
+    "expo-status-bar": "~3.0.0",
+    "react": "19.2.6",
+    "react-native": "0.85.3",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.15",
+    "typescript": "5.9.3"
+  }
+}
