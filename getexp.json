@@ -10,7 +10,21 @@
     }
   },
   "apps": [
-    { "name": "reference-api-ts", "template": "api-ts" },
-    { "name": "reference-api-py", "template": "api-py" }
+    {
+      "name": "reference-api-ts",
+      "template": "api-ts"
+    },
+    {
+      "name": "reference-api-py",
+      "template": "api-py"
+    },
+    {
+      "name": "expenses-api",
+      "template": "api-ts"
+    },
+    {
+      "name": "expenses-web",
+      "template": "web"
+    }
   ]
 }

@@ -1,0 +1,12 @@
+# Backstage Software Catalog descriptor (Spotify). Makes this service
+# discoverable the day we stand up a developer portal.
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: expenses-api
+  annotations:
+    getexp.dev/golden-path: api-ts
+spec:
+  type: service
+  lifecycle: experimental
+  owner: unknown
