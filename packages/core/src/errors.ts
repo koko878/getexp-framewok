@@ -85,6 +85,12 @@ export class InternalError extends AppError {
   override readonly isPublic = false;
 }
 
+/** A dependency or required configuration is unavailable; the caller may retry. */
+export class ServiceUnavailableError extends AppError {
+  readonly code = 'service_unavailable';
+  readonly httpStatus = 503;
+}
+
 export function isAppError(e: unknown): e is AppError {
   return e instanceof AppError;
 }

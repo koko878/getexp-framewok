@@ -49,3 +49,15 @@ framework so it follows the doctrine in the repo-root `CLAUDE.md`.
 Prefer **scaffold-then-port** (clean framework app, move logic in) over a raw
 copy, so the result is on the paved road rather than a foreign codebase dropped
 into `apps/`.
+
+---
+
+## Status
+
+- ✅ **Backend API** — done: `apps/marketplace-api` (Fastify) ports the Express
+  backend onto `@getexp/core` (validated config, Problem Details incl. 503,
+  structured logs, request id). Agentic Claude loop ported in `src/agent.ts`
+  (Anthropic SDK — see app Overrides). 5 tests, runs live. Added
+  `ServiceUnavailableError` (503) to both cores.
+- ⬜ **Mobile app** — Expo onto the `mobile` template (cadrage → liste → détail).
+- ⬜ **Data layer** — Supabase behind the `Repository` port (+ BlobStore for files).

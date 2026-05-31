@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { InternalError, NotFoundError, toAppError, ValidationError } from './errors.ts';
+import {
+  InternalError,
+  NotFoundError,
+  ServiceUnavailableError,
+  toAppError,
+  ValidationError,
+} from './errors.ts';
 
 describe('errors', () => {
   it('exposes a stable problem-details contract', () => {
@@ -25,5 +31,12 @@ describe('errors', () => {
     expect(toAppError(new NotFoundError('x'))).toBeInstanceOf(NotFoundError);
     expect(toAppError('plain string')).toBeInstanceOf(InternalError);
     expect(toAppError(new Error('raw'))).toBeInstanceOf(InternalError);
+  });
+
+  it('exposes a public 503 for unavailable dependencies', () => {
+    const pd = new ServiceUnavailableError('Anthropic key not configured').toProblemDetails();
+    expect(pd.status).toBe(503);
+    expect(pd.type).toBe('service_unavailable');
+    expect(pd.detail).toBe('Anthropic key not configured');
   });
 });

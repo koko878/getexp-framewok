@@ -87,6 +87,13 @@ class InternalError(AppError):
     is_public = False
 
 
+class ServiceUnavailableError(AppError):
+    """A dependency or required configuration is unavailable; the caller may retry."""
+
+    code = "service_unavailable"
+    http_status = 503
+
+
 def to_app_error(exc: object) -> AppError:
     """Normalize any value into an AppError."""
     if isinstance(exc, AppError):

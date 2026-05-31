@@ -25,6 +25,10 @@
     {
       "name": "expenses-web",
       "template": "web"
+    },
+    {
+      "name": "marketplace-api",
+      "template": "api-ts"
     }
   ]
 }
