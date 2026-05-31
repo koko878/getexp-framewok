@@ -1,49 +1,35 @@
-# expenses-web — notes de frais (web)
+# expenses-web — notes de frais (Next.js, full-stack)
 
-GetExp Golden Path web app (Next.js, App Router). Talks to `expenses-api`.
+**Self-contained**: the UI *and* the API live here. The expense endpoints are
+Next route handlers (`app/api/...`) that reuse `@getexp/core` (validation,
+Problem Details, the `Repository` storage port, in-memory adapter). So this app
+**deploys as ONE service** — no separate backend to host.
 
-## Run it locally
+## Test it from your phone (no terminal) — Vercel
 
-Two terminals, from the repo root:
+1. On your phone browser, go to **vercel.com** and sign in **with GitHub**.
+2. **Add New… → Project**, and authorize access to `koko878/getexp-framewok`.
+3. Import the repo, then in the configuration:
+   - **Branch**: `claude/dev-framework-design-TQHSM`
+   - **Root Directory**: tap *Edit* and pick **`apps/expenses-web`**
+   - Framework Preset: **Next.js** (auto-detected); leave build/install as default
+     (Vercel installs the pnpm workspace automatically).
+4. Tap **Deploy**. After ~1–2 min you get a public URL
+   **`https://<project>.vercel.app`** — open it on your phone: you'll see the
+   list (2 sample expenses), the submit form, and approve/reject.
 
-```bash
-# Terminal 1 — the API (Fastify)
-PORT=8000 pnpm --filter expenses-api start        # http://localhost:8000
+> The prototype uses **in-memory** storage, so data may reset between serverless
+> instances. Real persistence (Postgres + S3/Azure) is the PRODUCTION stage.
 
-# Terminal 2 — the web (Next.js)
-pnpm --filter expenses-web dev                     # http://localhost:3000
-```
+Every push to that branch redeploys automatically.
 
-Open **http://localhost:3000**: submit an expense, filter by status, approve /
-reject. The web points at the API via `NEXT_PUBLIC_API_URL` (default
-`http://localhost:8000`, see `.env.example`).
-
-## Get a temporary public link to share
-
-The web calls the API from the **browser**, so expose **both** ports. Easiest,
-no install (pure npm):
-
-```bash
-# two more terminals, once the API + web are running
-npx localtunnel --port 8000        # → https://<random>.loca.lt   (the API)
-npx localtunnel --port 3000        # → https://<random>.loca.lt   (the web)
-```
-
-Start the web pointed at the API's public URL so the browser can reach it:
+## Run it locally (when you have a terminal)
 
 ```bash
-NEXT_PUBLIC_API_URL=https://<api-subdomain>.loca.lt pnpm --filter expenses-web dev
+pnpm install
+pnpm --filter expenses-web dev        # http://localhost:3000  (UI + /api together)
 ```
 
-Alternative tunnel (Cloudflare, no account):
-
-```bash
-npx cloudflared tunnel --url http://localhost:3000   # → https://<random>.trycloudflare.com
-npx cloudflared tunnel --url http://localhost:8000
-```
-
-Share the **web** URL. Tunnels are temporary — they live only while the command
-runs. For a durable URL, deploy the web (Vercel) and the API (any container
-host); ask Claude to generate the deploy artifacts.
-
-See the repo-root `CLAUDE.md` and `docs/working-with-claude-code.md`.
+`NEXT_PUBLIC_API_URL` is empty by default (same-origin `/api` route handlers).
+Set it to point the UI at the standalone Fastify service (`apps/expenses-api`)
+instead. See the repo-root `CLAUDE.md` and `docs/working-with-claude-code.md`.

@@ -2,7 +2,8 @@
 
 import { type FormEvent, useEffect, useState } from 'react';
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+// Same-origin Next route handlers by default; point elsewhere with NEXT_PUBLIC_API_URL.
+const API = process.env.NEXT_PUBLIC_API_URL ?? '';
 const CATEGORIES = ['travel', 'meals', 'lodging', 'supplies', 'other'] as const;
 const STATUSES = ['all', 'pending', 'approved', 'rejected'] as const;
 
@@ -33,7 +34,7 @@ export default function Home() {
     setError(null);
     try {
       const qs = status === 'all' ? '' : `?status=${status}`;
-      const res = await fetch(`${API}/expenses${qs}`);
+      const res = await fetch(`${API}/api/expenses${qs}`);
       if (!res.ok) throw new Error(`API ${res.status}`);
       setExpenses(await res.json());
     } catch (e) {
@@ -57,7 +58,7 @@ export default function Home() {
       category: String(form.get('category')),
       spentAt: String(form.get('spentAt')),
     };
-    const res = await fetch(`${API}/expenses`, {
+    const res = await fetch(`${API}/api/expenses`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'idempotency-key': crypto.randomUUID() },
       body: JSON.stringify(body),
@@ -77,7 +78,7 @@ export default function Home() {
       init.headers = { 'content-type': 'application/json' };
       init.body = JSON.stringify({ comment: 'rejected from web' });
     }
-    await fetch(`${API}/expenses/${id}/${action}`, init);
+    await fetch(`${API}/api/expenses/${id}/${action}`, init);
     void load(filter);
   }
 
