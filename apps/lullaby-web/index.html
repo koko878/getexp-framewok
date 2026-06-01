@@ -181,19 +181,21 @@
       const STEPS=['gs0','gs1','gs2','gs3'];
       let STORY=null;
 
-      // Repli LOCAL qui utilise VRAIMENT les idées tapées (pas une histoire figée).
+      // Repli LOCAL : traite le texte du parent comme un THÈME (pas comme un nom),
+      // et tisse une histoire douce et cohérente autour de ce thème.
       function localFallback(seed){
-        const mots=seed.split(/[,;.\n]+/).map(s=>s.trim()).filter(Boolean);
-        const heros=mots[0]||'un petit héros';
-        const lieu=mots[1]||'un endroit doux et calme';
-        const quete=mots.slice(2).join(', ')||'une belle aventure pleine de tendresse';
+        const theme=seed.replace(/\s+/g,' ').trim().replace(/[.。]+$/,'');
+        // mots significatifs (>3 lettres) pour un titre court et lisible
+        const stop=new Set(['une','un','des','les','qui','que','dans','avec','pour','sur','sous','par','est','sont','combattent','histoire','petit','petite','grand']);
+        const kw=theme.toLowerCase().split(/[^a-zàâäéèêëîïôöùûüç]+/i).filter(w=>w.length>3&&!stop.has(w));
+        const sujet=kw.slice(0,3).join(', ')||'une aventure pleine de tendresse';
         const Cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-        return {title:`L'histoire de ${heros}`,
+        return {title:Cap(kw[0]||'Une histoire')+' au pays des rêves',
           paras:[
-            `Il était une fois ${heros}, qui vivait tout près de ${lieu}. La nuit tombait doucement, et les étoiles s'allumaient une à une dans le ciel.`,
-            `${Cap(heros)} avait un petit rêve : ${quete}. Alors, sur la pointe des pieds, il s'avança dans la nuit tiède, le cœur léger comme une plume.`,
-            `En chemin, le vent chantait tout bas et la lune souriait. Chaque pas faisait un petit bruit doux, et tout autour, le monde semblait s'endormir paisiblement.`,
-            `Après bien des merveilles, ${heros} comprit que le plus beau des trésors, c'était d'être au chaud, en sécurité, entouré de douceur. Un grand bâillement lui échappa.`,
+            `Il était une fois une histoire toute douce, née d'une jolie idée : « ${theme} ». La nuit tombait sur le monde, et les étoiles s'allumaient une à une, comme de petites lanternes.`,
+            `Dans cette histoire vivait un personnage curieux et gentil. Ce soir-là, il pensait à ${sujet}, et son cœur battait doucement, léger comme une plume portée par le vent.`,
+            `Pas à pas, il avança dans la nuit tiède. Le vent chantait tout bas, la lune souriait, et chaque petit bruit semblait murmurer : « tout va bien, tout est calme ».`,
+            `Au bout du chemin, il comprit que le plus beau des trésors, c'était d'être au chaud, en sécurité, entouré de douceur. Un grand bâillement lui échappa, tout doucement.`,
             `Alors il ferma les yeux, bercé par le silence du soir. Et toi aussi, ferme les yeux… tout doucement… bonne nuit, petit cœur. 🌙`,
           ]};
       }
@@ -214,30 +216,31 @@
           `Ton tendre, rythme lent, fin paisible qui invite au sommeil. Donne d'abord un titre court sur la première ligne, puis l'histoire en paragraphes courts. Aucun commentaire, aucune note.`;
       }
 
-      // 1) tente le POST (format chat, plus fiable) ; 2) repli GET ; sinon throw.
+      const MODELS=['openai','mistral','llama'];
+      async function tryFetch(opts){
+        const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),28000);
+        try{
+          const res=await fetch(opts.url,{...opts.init,signal:ctrl.signal});
+          if(!res.ok) return null;
+          const t=await res.text();
+          return (t&&t.trim().length>=60)?t:null;
+        }catch(_){return null;} finally{clearTimeout(to);}
+      }
+      // Essaie plusieurs modèles, en POST puis GET. Renvoie l'histoire ou throw.
       async function callLLM(seed){
         const prompt=makePrompt(seed);
-        // -- tentative POST --
-        try{
-          const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),30000);
-          const res=await fetch('https://text.pollinations.ai/',{
-            method:'POST',
-            headers:{'content-type':'application/json'},
-            body:JSON.stringify({messages:[{role:'user',content:prompt}],model:'openai',seed:Math.floor(Math.random()*1e6)}),
-            signal:ctrl.signal,
-          });
-          clearTimeout(to);
-          if(res.ok){const t=await res.text(); if(t&&t.trim().length>=40) return parseStory(t,seed);}
-        }catch(_){/* on tente le GET */}
-        // -- repli GET --
-        const url='https://text.pollinations.ai/'+encodeURIComponent(prompt)+
-          '?model=openai&seed='+Math.floor(Math.random()*1e6);
-        const ctrl2=new AbortController(); const to2=setTimeout(()=>ctrl2.abort(),30000);
-        const res2=await fetch(url,{signal:ctrl2.signal}); clearTimeout(to2);
-        if(!res2.ok) throw new Error('HTTP '+res2.status);
-        const txt=await res2.text();
-        if(!txt||txt.trim().length<40) throw new Error('réponse vide');
-        return parseStory(txt,seed);
+        for(const model of MODELS){
+          const s=Math.floor(Math.random()*1e6);
+          // POST (format chat)
+          let t=await tryFetch({url:'https://text.pollinations.ai/',init:{
+            method:'POST',headers:{'content-type':'application/json'},
+            body:JSON.stringify({messages:[{role:'user',content:prompt}],model,seed,private:true})
+          }});
+          // GET en repli
+          if(!t) t=await tryFetch({url:'https://text.pollinations.ai/'+encodeURIComponent(prompt)+`?model=${model}&seed=${s}`});
+          if(t) return parseStory(t,seed);
+        }
+        throw new Error('aucun modèle disponible');
       }
 
       async function generate(){
@@ -245,19 +248,23 @@
         show('loading');
         STEPS.forEach(id=>document.getElementById(id).classList.remove('on'));
         let i=0;const iv=setInterval(()=>{if(i<STEPS.length)document.getElementById(STEPS[i]).classList.add('on');i++;},700);
+        let source='ia';
         try{
           STORY=await callLLM(seed);
         }catch(e){
-          STORY=localFallback(seed); // utilise quand même TES idées
+          STORY=localFallback(seed); // utilise quand même TES idées comme thème
+          source='offline';
           setTimeout(()=>toast('🌙 IA indisponible — histoire bâtie sur vos idées'),400);
         }finally{ clearInterval(iv); STEPS.forEach(id=>document.getElementById(id).classList.add('on')); }
-        reveal();
+        reveal(source);
       }
       window.generate=generate;
 
-      function reveal(){
+      function reveal(source){
         document.getElementById('sTitle').textContent=STORY.title;
-        document.getElementById('sMeta').textContent=`🌙 Conte de ~${dur} min · voix douce`;
+        document.getElementById('sMeta').textContent = source==='offline'
+          ? `🌙 ~${dur} min · ✨ version locale (IA non joignable)`
+          : `🌙 ~${dur} min · ✦ écrite par l'IA`;
         document.getElementById('sText').innerHTML=STORY.paras.map(p=>`<p>${p}</p>`).join('');
         queue=[];qi=0;
         show('play');
