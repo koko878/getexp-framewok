@@ -299,10 +299,16 @@
           if(!playing||puterPi>=STORY.paras.length){playing=false;highlight(-1);setUI();return;}
           highlight(puterPi);
           try{
-            const audio=await puter.ai.txt2speech(STORY.paras[puterPi].slice(0,2900),'fr-FR');
+            // Moteur NEURAL d'AWS Polly + voix française « Léa » = bien plus humain
+            // que le moteur "standard" par défaut. Repli neural→standard si besoin.
+            const text=STORY.paras[puterPi].slice(0,2900);
+            let audio;
+            try{ audio=await puter.ai.txt2speech(text,{language:'fr-FR',voice:'Lea',engine:'neural'}); }
+            catch(_){ audio=await puter.ai.txt2speech(text,{language:'fr-FR',voice:'Lea'}); }
             if(!playing)return;
             puterAudio=audio;
-            audio.onended=()=>{if(!playing)return;puterPi++;setTimeout(next,500);};
+            audio.playbackRate=0.96; // légèrement ralenti, plus apaisant
+            audio.onended=()=>{if(!playing)return;puterPi++;setTimeout(next,550);};
             audio.play();
           }catch(e){ toast('Voix naturelle KO — bascule sur « Douce »'); playing=false; vi=1; setVoice(1); startSpeak(); }
         };
