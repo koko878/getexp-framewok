@@ -33,10 +33,6 @@
     {
       "name": "marketplace-mobile",
       "template": "mobile"
-    },
-    {
-      "name": "lullaby-api",
-      "template": "api-ts"
     }
   ]
 }

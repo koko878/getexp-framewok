@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NutriCEO · Le cerveau du dirigeant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#0d1117;--panel:#151b24;--panel2:#1b2230;--line:#28313f;--ink:#eaf0f7;--muted:#8a98ad;
+        --emerald:#34d399;--emerald-d:#10b981;--gold:#e7b24c;--blue:#5aa9ff;--violet:#a78bfa;--coral:#f3766a;
+        --radius:15px;--shadow:0 10px 34px -16px rgba(0,0,0,.7);
+      }
+      *{box-sizing:border-box;}
+      body{margin:0;background:radial-gradient(1100px 600px at 85% -10%,#15321f 0%,transparent 55%),var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+      h1,h2,h3,.serif{font-family:'Sora',system-ui,sans-serif;letter-spacing:-.01em;}
+      .app{display:flex;min-height:100vh;}
+      aside{width:238px;background:#0b0f15;border-right:1px solid var(--line);padding:18px 13px;position:sticky;top:0;height:100vh;flex-shrink:0;}
+      .brand{display:flex;align-items:center;gap:11px;padding:6px 8px 16px;}
+      .brand .nm{font-family:'Sora';font-weight:700;font-size:20px;}.brand .nm b{color:var(--emerald);}
+      .logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--emerald),var(--emerald-d));display:grid;place-content:center;font-size:20px;flex-shrink:0;box-shadow:0 0 18px -3px var(--emerald);}
+      .nav{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;color:var(--muted);font-weight:600;font-size:14px;cursor:pointer;margin-bottom:3px;}
+      .nav:hover{background:var(--panel2);color:var(--ink);}
+      .nav.active{background:linear-gradient(90deg,rgba(52,211,153,.16),transparent);color:var(--emerald);}
+      .nav .ic{width:18px;text-align:center;}
+      aside .ft{position:absolute;bottom:14px;left:13px;right:13px;font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;}
+      main{flex:1;min-width:0;}
+      .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 24px;border-bottom:1px solid var(--line);background:rgba(13,17,23,.82);backdrop-filter:blur(8px);position:sticky;top:0;z-index:10;}
+      .topbar h1{font-size:20px;margin:0;}.topbar .sub{color:var(--muted);font-size:13px;}
+      .content{padding:22px 24px 48px;}
+      .grid{display:grid;gap:15px;}
+      @media(min-width:760px){.k4{grid-template-columns:repeat(4,1fr);}.c2{grid-template-columns:2fr 1fr;}}
+      .card{background:linear-gradient(180deg,var(--panel),#11161e);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+      .kpi .k{color:var(--muted);font-size:13px;font-weight:600;}.kpi .v{font-family:'Sora';font-size:30px;font-weight:700;margin-top:5px;}
+      .delta{font-size:12px;font-weight:700;margin-top:5px;color:var(--emerald);}
+      h3.cap{font-size:16px;margin:0 0 3px;}.muted{color:var(--muted);font-size:13px;}
+      .btn{border:0;border-radius:10px;padding:10px 15px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;display:inline-flex;gap:8px;align-items:center;}
+      .btn-em{background:linear-gradient(135deg,var(--emerald),var(--emerald-d));color:#06281c;}
+      .btn-ghost{background:var(--panel2);border:1px solid var(--line);color:var(--ink);}
+      .btn-sm{padding:7px 11px;font-size:12.5px;border-radius:8px;}
+      .view{display:none;}.view.active{display:block;animation:fade .3s ease;}
+      @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+      .av{width:34px;height:34px;border-radius:50%;display:grid;place-content:center;font-weight:800;font-size:13px;color:#06281c;flex-shrink:0;}
+      .role{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);}
+      .cap-item{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);}
+      .cap-item:last-child{border:0;}
+      .att{display:inline-flex;gap:6px;align-items:center;font-size:11.5px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px 8px;margin:4px 5px 0 0;}
+      .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;margin:6px 0 4px;}
+      .flow .step{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 13px;font-size:12.5px;text-align:center;min-width:96px;}
+      .flow .step .e{font-size:18px;display:block;}
+      .flow .ar{color:var(--emerald);font-weight:800;}
+      .docgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;}
+      .doc{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px;cursor:pointer;transition:.15s;}
+      .doc:hover{border-color:var(--emerald);transform:translateY(-2px);}
+      .doc .ft2{font-size:11px;color:var(--muted);margin-top:8px;display:flex;justify-content:space-between;}
+      .chip{font-size:11px;border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:6px 12px;color:var(--muted);cursor:pointer;}
+      .chip.on{background:var(--emerald);color:#06281c;border-color:var(--emerald);}
+      .search{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--ink);font-size:15px;}
+      /* chat */
+      .chatwrap{display:flex;flex-direction:column;height:calc(100vh - 150px);}
+      .msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:4px;}
+      .msg{max-width:80%;padding:12px 14px;border-radius:14px;font-size:14.5px;line-height:1.5;}
+      .msg.u{align-self:flex-end;background:linear-gradient(135deg,var(--emerald),var(--emerald-d));color:#06281c;border-bottom-right-radius:4px;}
+      .msg.a{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px;}
+      .msg .src{margin-top:8px;font-size:11.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:7px;}
+      .composer{display:flex;gap:8px;margin-top:12px;}
+      .composer input{flex:1;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--ink);font-size:15px;}
+      .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:#06281c;color:#d8ffe9;border:1px solid var(--emerald);padding:12px 18px;border-radius:999px;font-weight:700;font-size:13px;opacity:0;transition:.35s;z-index:120;max-width:90%;text-align:center;}
+      .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+      .path{font-family:ui-monospace,monospace;font-size:12px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px 8px;color:var(--emerald);}
+      .mobile-only{display:none;}@media(max-width:760px){aside{display:none;}.mobile-only{display:inline-flex;}.content{padding:15px;}.chatwrap{height:calc(100vh - 200px);}}
+      .mmenu{display:none;position:fixed;top:58px;right:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;z-index:90;min-width:230px;box-shadow:var(--shadow);}
+      .mmenu.show{display:block;}.mmenu .mi2{padding:12px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink);}
+      .mmenu .mi2:hover{background:var(--panel2);color:var(--emerald);}
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside>
+        <div class="brand"><span class="logo">🧠</span><div class="nm">Nutri<b>CEO</b></div></div>
+        <div class="nav active" data-tab="cockpit"><span class="ic">🧭</span> Cockpit</div>
+        <div class="nav" data-tab="captures"><span class="ic">📥</span> Captures &amp; mentions</div>
+        <div class="nav" data-tab="kb"><span class="ic">📚</span> Base de connaissance</div>
+        <div class="nav" data-tab="chat"><span class="ic">💬</span> Demander à NutriCEO</div>
+        <div class="nav" data-tab="reglages"><span class="ic">⚙️</span> Réglages</div>
+        <div class="ft">🔒 100% local · sur le PC du CEO<br/>Aucune donnée ne quitte la machine.</div>
+      </aside>
+      <main>
+        <div class="topbar">
+          <div><h1 id="ttl">Cockpit</h1><div class="sub" id="sub">Votre socle de connaissance, vivant</div></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-ghost btn-sm mobile-only" onclick="toggleMenu()">☰</button>
+            <button class="btn btn-em btn-sm" onclick="simulate()">＋ Simuler une mention</button>
+          </div>
+        </div>
+        <div class="mmenu" id="mmenu"></div>
+        <div class="content">
+
+          <!-- COCKPIT -->
+          <section class="view active" id="cockpit">
+            <div class="grid k4">
+              <div class="card kpi"><div class="k">Documents captés</div><div class="v" id="kDocs">0</div><div class="delta" id="kDocsD">socle vivant</div></div>
+              <div class="card kpi"><div class="k">Contributeurs C-level</div><div class="v" id="kContrib">0</div><div class="delta">via mention</div></div>
+              <div class="card kpi"><div class="k">Cette semaine</div><div class="v" id="kWeek">0</div><div class="delta">nouveaux apports</div></div>
+              <div class="card kpi"><div class="k">Sujets couverts</div><div class="v" id="kTopics">0</div><div class="delta">cartographiés</div></div>
+            </div>
+            <div class="grid c2" style="margin-top:15px">
+              <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center"><h3 class="cap">🧠 Briefing du jour</h3><button class="btn btn-ghost btn-sm" onclick="brief()">↻ Régénérer</button></div>
+                <div class="muted">Synthèse générée à partir de votre socle local.</div>
+                <div id="briefing" style="margin-top:12px;line-height:1.65;font-size:14.5px"></div>
+              </div>
+              <div class="card">
+                <h3 class="cap">Top contributeurs</h3>
+                <div id="topContrib" style="margin-top:8px"></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:15px">
+              <h3 class="cap">🆕 Derniers apports au socle</h3>
+              <div id="recent"></div>
+            </div>
+          </section>
+
+          <!-- CAPTURES -->
+          <section class="view" id="captures">
+            <div class="card">
+              <h3 class="cap">Comment ça marche</h3>
+              <div class="muted">Un C-level partage un fichier au CEO et ajoute la mention. <span class="path" id="tagShow">@pour-le-ceo</span> — openclaw capture tout en local.</div>
+              <div class="flow">
+                <div class="step"><span class="e">📧</span>Mail d'un C-level<br/><b>+ mention</b></div>
+                <span class="ar">→</span>
+                <div class="step"><span class="e">🤖</span>openclaw<br/>détecte & copie</div>
+                <span class="ar">→</span>
+                <div class="step"><span class="e">📁</span>Dossier local<br/><span class="path">…/Knowledge</span></div>
+                <span class="ar">→</span>
+                <div class="step"><span class="e">🧠</span>NutriCEO<br/>exploite</div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:15px">
+              <div style="display:flex;justify-content:space-between;align-items:center"><h3 class="cap">📥 Mails captés</h3><button class="btn btn-em btn-sm" onclick="simulate()">＋ Simuler une mention</button></div>
+              <div id="capList"></div>
+            </div>
+          </section>
+
+          <!-- KB -->
+          <section class="view" id="kb">
+            <input class="search" id="kbSearch" placeholder="🔎 Rechercher dans le socle (ex : budget, churn, recrutement…)" oninput="renderKB()"/>
+            <div style="display:flex;gap:7px;flex-wrap:wrap;margin:12px 0" id="kbChips"></div>
+            <div class="docgrid" id="kbGrid"></div>
+          </section>
+
+          <!-- CHAT -->
+          <section class="view" id="chat">
+            <div class="chatwrap">
+              <div class="msgs" id="msgs"></div>
+              <div class="composer">
+                <input id="q" placeholder="Demandez à votre socle… (ex : où en est le budget Q3 ?)" onkeydown="if(event.key==='Enter')ask()"/>
+                <button class="btn btn-em" onclick="ask()">Envoyer</button>
+              </div>
+              <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px" id="suggests"></div>
+            </div>
+          </section>
+
+          <!-- REGLAGES -->
+          <section class="view" id="reglages">
+            <div class="grid c2">
+              <div class="card">
+                <h3 class="cap">Capture par mention</h3>
+                <div class="muted" style="margin-bottom:8px">Le mot-clé que les C-levels ajoutent dans leur mail.</div>
+                <input class="search" id="tagInput" value="@pour-le-ceo" oninput="document.getElementById('tagShow').textContent=this.value||'@pour-le-ceo'"/>
+                <h3 class="cap" style="margin-top:16px">Dossier local (socle)</h3>
+                <div class="path" style="display:block;margin-top:6px">C:\\Users\\CEO\\NutriCEO\\Knowledge</div>
+                <p class="muted" style="margin-top:8px">🔒 Tout est stocké et exploité <b>localement</b> — confidentialité totale, conforme au secret des affaires.</p>
+              </div>
+              <div class="card">
+                <h3 class="cap">Connecteurs e-mail</h3>
+                <div style="display:grid;gap:9px;margin-top:8px">
+                  <label class="att" style="justify-content:space-between;padding:10px 12px"><span>📧 Outlook / Microsoft 365</span><input type="checkbox" checked/></label>
+                  <label class="att" style="justify-content:space-between;padding:10px 12px"><span>✉️ Gmail / Google Workspace</span><input type="checkbox" checked/></label>
+                  <label class="att" style="justify-content:space-between;padding:10px 12px"><span>📎 Dépôt manuel de fichiers</span><input type="checkbox"/></label>
+                </div>
+                <h3 class="cap" style="margin-top:16px">Formats indexés</h3>
+                <div style="margin-top:6px">
+                  <span class="att">📄 PDF</span><span class="att">📊 Excel</span><span class="att">📝 Word</span><span class="att">📑 PPT</span><span class="att">✉️ .eml</span><span class="att">🖼️ Images (OCR)</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const $=id=>document.getElementById(id);
+      const ROLES={CFO:['#34d399','Directeur Financier'],COO:['#5aa9ff','Directeur des Opérations'],CMO:['#a78bfa','Directeur Marketing'],CTO:['#e7b24c','Directeur Technique'],CHRO:['#f3766a','DRH'],CSO:['#22d3ee','Directeur Commercial']};
+      const FILETYPE={pdf:'📄',xlsx:'📊',docx:'📝',pptx:'📑',eml:'✉️',png:'🖼️'};
+      // socle initial (captures cumulées)
+      let captures=[
+        {role:'CFO',who:'Karim Z.',subject:'Budget prévisionnel Q3 — version validée',topic:'Finance',ts:'il y a 2 h',atts:[['Budget_Q3_2026.xlsx','xlsx'],['Note_treso.pdf','pdf']]},
+        {role:'CMO',who:'Salma B.',subject:'Bilan campagne acquisition — résultats',topic:'Marketing',ts:'hier',atts:[['Campagne_Q2_resultats.pptx','pptx']]},
+        {role:'COO',who:'Omar T.',subject:'Plan de production & délais fournisseurs',topic:'Opérations',ts:'il y a 2 j',atts:[['Plan_prod.xlsx','xlsx'],['Contrat_fournisseur.pdf','pdf']]},
+        {role:'CHRO',who:'Nadia R.',subject:'Plan de recrutement & turnover',topic:'RH',ts:'il y a 3 j',atts:[['Recrutement_2026.docx','docx']]},
+        {role:'CSO',who:'Yassine L.',subject:'Pipeline commercial & churn clients',topic:'Ventes',ts:'il y a 4 j',atts:[['Pipeline.xlsx','xlsx'],['Analyse_churn.pdf','pdf']]},
+      ];
+      const SCENARIOS=[
+        {role:'CFO',who:'Karim Z.',subject:'Clôture mensuelle — écarts budgétaires',topic:'Finance',atts:[['Cloture_mai.xlsx','xlsx']]},
+        {role:'CMO',who:'Salma B.',subject:'Refonte de la marque — recommandations',topic:'Marketing',atts:[['Branding_v6.pdf','pdf'],['Moodboard.png','png']]},
+        {role:'CTO',who:'Hicham A.',subject:'Roadmap produit & dette technique',topic:'Produit',atts:[['Roadmap_S2.pptx','pptx']]},
+        {role:'COO',who:'Omar T.',subject:'Optimisation de la supply chain',topic:'Opérations',atts:[['Supply_chain.pdf','pdf']]},
+        {role:'CHRO',who:'Nadia R.',subject:'Enquête engagement collaborateurs',topic:'RH',atts:[['Engagement_2026.pdf','pdf']]},
+        {role:'CSO',who:'Yassine L.',subject:'Top 10 comptes stratégiques',topic:'Ventes',atts:[['Comptes_cles.xlsx','xlsx']]},
+      ];
+      let kbFilter='Tous';
+
+      // ---- nav ----
+      const navs=document.querySelectorAll('.nav');const TT={cockpit:['Cockpit','Votre socle de connaissance, vivant'],captures:['Captures & mentions','Le flux qui nourrit votre socle'],kb:['Base de connaissance','Tout ce que vos C-levels ont partagé'],chat:['Demander à NutriCEO','Réponses sourcées depuis votre socle'],reglages:['Réglages','Mention, dossier local & connecteurs']};
+      function show(t){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===t));navs.forEach(n=>n.classList.toggle('active',n.dataset.tab===t));$('ttl').textContent=TT[t][0];$('sub').textContent=TT[t][1];const mm=$('mmenu');if(mm)mm.classList.remove('show');window.scrollTo({top:0,behavior:'smooth'});}
+      window.show=show;navs.forEach(n=>n.onclick=()=>show(n.dataset.tab));
+      const MI=[['cockpit','🧭 Cockpit'],['captures','📥 Captures & mentions'],['kb','📚 Base de connaissance'],['chat','💬 Demander à NutriCEO'],['reglages','⚙️ Réglages']];
+      $('mmenu').innerHTML=MI.map(m=>`<div class="mi2" onclick="show('${m[0]}')">${m[1]}</div>`).join('');
+      window.toggleMenu=()=>$('mmenu').classList.toggle('show');
+      function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+      // ---- helpers ----
+      const initials=n=>n.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+      function docsFromCaptures(){const d=[];captures.forEach(c=>c.atts.forEach(a=>d.push({name:a[0],type:a[1],who:c.who,role:c.role,topic:c.topic,subject:c.subject})));return d;}
+
+      // ---- cockpit ----
+      function renderCockpit(){
+        const docs=docsFromCaptures();
+        const contrib=[...new Set(captures.map(c=>c.who))];
+        const topics=[...new Set(captures.map(c=>c.topic))];
+        $('kDocs').textContent=docs.length;$('kContrib').textContent=contrib.length;
+        $('kWeek').textContent=captures.length;$('kTopics').textContent=topics.length;
+        // top contributeurs
+        const byWho={};captures.forEach(c=>byWho[c.who]=(byWho[c.who]||0)+c.atts.length);
+        $('topContrib').innerHTML=Object.entries(byWho).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([w,n])=>{const c=captures.find(x=>x.who===w);const col=ROLES[c.role][0];return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)"><span class="av" style="background:${col}">${initials(w)}</span><div style="flex:1"><b style="font-size:14px">${w}</b> <span class="role">${c.role}</span></div><b>${n} doc.</b></div>`;}).join('');
+        // recent
+        $('recent').innerHTML=captures.slice(0,4).map(c=>capRow(c)).join('');
+        brief();
+      }
+      function brief(){
+        const topics=[...new Set(captures.map(c=>c.topic))];
+        const last=captures[0];
+        $('briefing').innerHTML=`Bonjour 👋 Votre socle compte <b>${docsFromCaptures().length} documents</b> partagés par <b>${[...new Set(captures.map(c=>c.who))].length} dirigeants</b>, couvrant ${topics.map(t=>`<b>${t}</b>`).join(', ')}.<br/><br/>
+          🔴 <b>À regarder en priorité</b> : « ${last.subject} » (${last.role}, ${last.ts}).<br/>
+          💡 <b>Tendance</b> : la <b>${topics[0]}</b> et les <b>${topics[1]||'Ventes'}</b> concentrent le plus d'apports récents.<br/>
+          ✅ Posez vos questions dans <b>« Demander à NutriCEO »</b> — les réponses citent les documents sources.`;
+      }
+      window.brief=brief;
+
+      function capRow(c){
+        const col=ROLES[c.role][0];
+        return `<div class="cap-item"><span class="av" style="background:${col}">${initials(c.who)}</span><div style="flex:1"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="font-size:14.5px">${c.subject}</b><span class="role">${c.role} · ${c.who}</span><span class="muted" style="font-size:12px">${c.ts||'à l\'instant'}</span></div><div>${c.atts.map(a=>`<span class="att">${FILETYPE[a[1]]||'📎'} ${a[0]}</span>`).join('')}</div><div class="muted" style="font-size:11.5px;margin-top:5px">✓ copié par openclaw dans <span class="path">…/Knowledge/${c.topic}</span></div></div></div>`;
+      }
+      function renderCaptures(){$('capList').innerHTML=captures.map(capRow).join('');}
+
+      // ---- kb ----
+      function renderKB(){
+        const docs=docsFromCaptures();
+        const topics=['Tous',...new Set(docs.map(d=>d.topic))];
+        $('kbChips').innerHTML=topics.map(t=>`<span class="chip ${kbFilter===t?'on':''}" onclick="setKbFilter('${t}')">${t}</span>`).join('');
+        const q=($('kbSearch').value||'').toLowerCase();
+        const list=docs.filter(d=>(kbFilter==='Tous'||d.topic===kbFilter)&&(!q||d.name.toLowerCase().includes(q)||d.subject.toLowerCase().includes(q)||d.topic.toLowerCase().includes(q)));
+        $('kbGrid').innerHTML=list.length?list.map(d=>`<div class="doc" onclick="toast('📄 Ouverture de ${d.name} (démo)')"><div style="font-size:24px">${FILETYPE[d.type]||'📎'}</div><b style="font-size:13.5px;display:block;margin-top:6px">${d.name}</b><div class="muted" style="font-size:12px;margin-top:3px">${d.subject}</div><div class="ft2"><span>${d.role} · ${d.who}</span><span class="role">${d.topic}</span></div></div>`).join(''):'<p class="muted">Aucun document ne correspond.</p>';
+      }
+      window.setKbFilter=t=>{kbFilter=t;renderKB();};
+
+      // ---- chat (synthèse locale sourcée) ----
+      const SUG=['Où en est le budget Q3 ?','Quels sont les risques RH ?','Résume la stratégie marketing','Quels comptes clients sont à risque ?'];
+      let msgs=[{r:'a',t:'Bonjour 👋 Je suis NutriCEO. Je réponds à partir des documents que vos C-levels ont partagés. Posez-moi une question.',src:''}];
+      function renderChat(){
+        $('msgs').innerHTML=msgs.map(m=>`<div class="msg ${m.r}">${m.t}${m.src?`<div class="src">📎 Sources : ${m.src}</div>`:''}</div>`).join('');
+        $('suggests').innerHTML=SUG.map(s=>`<span class="chip" onclick="askText('${s.replace(/'/g,"\\\\'")}')">${s}</span>`).join('');
+        $('msgs').scrollTop=$('msgs').scrollHeight;
+      }
+      function answerFor(qq){
+        const q=qq.toLowerCase();const docs=docsFromCaptures();
+        const pick=kw=>docs.filter(d=>kw.some(k=>(d.topic+d.subject+d.name).toLowerCase().includes(k)));
+        let topic='',ans='',used=[];
+        if(/budget|finance|trésor|tréso|clôture|cloture/.test(q)){used=pick(['finance','budget','tréso','clôture','cloture']);ans="D'après les documents financiers du CFO, le budget Q3 est validé ; un point de trésorerie et la clôture mensuelle signalent quelques écarts à surveiller. Recommandation : valider les arbitrages avant fin de mois.";}
+        else if(/rh|recrut|turnover|engagement|collaborateur/.test(q)){used=pick(['rh','recrut','engagement']);ans="Côté RH (CHRO), le plan de recrutement 2026 est lancé et une enquête d'engagement vient d'être partagée. Point de vigilance : le turnover sur certains postes clés.";}
+        else if(/marketing|marque|brand|campagne|acquisition/.test(q)){used=pick(['marketing','brand','campagne']);ans="Le marketing (CMO) a partagé le bilan de la campagne d'acquisition et des recommandations de refonte de marque. Les résultats Q2 servent de base aux arbitrages budgétaires.";}
+        else if(/client|churn|vente|commercial|pipeline|compte/.test(q)){used=pick(['vente','churn','pipeline','compte']);ans="Côté commercial (CSO), le pipeline et une analyse de churn sont disponibles, ainsi que le top des comptes stratégiques. Priorité : sécuriser les comptes à risque identifiés.";}
+        else if(/produit|roadmap|technique|dette/.test(q)){used=pick(['produit','roadmap','technique']);ans="Le CTO a partagé la roadmap produit S2 et un point sur la dette technique à arbitrer face aux nouvelles fonctionnalités.";}
+        else if(/opération|operation|production|supply|fournisseur/.test(q)){used=pick(['opération','operation','production','supply']);ans="Les opérations (COO) couvrent le plan de production, les délais fournisseurs et une optimisation de la supply chain.";}
+        else {used=docs.slice(0,3);ans="Voici ce que votre socle contient de plus pertinent. Précisez un thème (finance, RH, marketing, ventes, produit, opérations) pour une synthèse ciblée.";}
+        const src=used.slice(0,3).map(d=>d.name).join(', ')||'socle complet';
+        return {ans,src};
+      }
+      function ask(){const v=$('q').value.trim();if(!v)return;askText(v);$('q').value='';}
+      window.ask=ask;
+      window.askText=v=>{
+        msgs.push({r:'u',t:v});renderChat();
+        setTimeout(()=>{const{ans,src}=answerFor(v);msgs.push({r:'a',t:ans,src});renderChat();},450);
+      };
+
+      // ---- simulate mention ----
+      function simulate(){
+        const s=SCENARIOS[Math.floor(Math.random()*SCENARIOS.length)];
+        captures.unshift({...s,ts:'à l\'instant'});
+        renderAll();
+        const nAtt=s.atts.length;
+        toast(`🤖 openclaw a capté le mail de ${s.who} (${s.role}) → ${nAtt} pièce${nAtt>1?'s':''} copiée${nAtt>1?'s':''} dans …/Knowledge/${s.topic}`);
+      }
+      window.simulate=simulate;
+
+      function renderAll(){renderCockpit();renderCaptures();renderKB();renderChat();}
+      renderAll();
+    </script>
+  </body>
+</html>
