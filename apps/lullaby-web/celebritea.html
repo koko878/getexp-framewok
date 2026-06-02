@@ -77,6 +77,11 @@
       .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-weight:700;font-size:13.5px;opacity:0;transition:.35s;z-index:120;}
       .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
       .mobile-only{display:none;}@media(max-width:760px){aside{display:none;}.mobile-only{display:inline-flex;}.content{padding:14px;}}
+          .mmenu{display:none;position:fixed;top:60px;right:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px;z-index:90;min-width:230px;}
+      .mmenu.show{display:block;animation:fade .2s ease;}
+      .mmenu .mi2{display:flex;gap:10px;align-items:center;padding:12px 12px;border-radius:10px;font-weight:600;font-size:14.5px;color:var(--ink);cursor:pointer;}
+      .mmenu .mi2:hover{background:var(--cream);color:var(--green-d);}
+      .mscrim{display:none;position:fixed;inset:0;z-index:85;}.mscrim.show{display:block;}
     </style>
   </head>
   <body>
@@ -104,9 +109,11 @@
       <main>
         <div class="topbar">
           <div><h1 id="ttl">Tableau de bord</h1><div class="sub" id="sub">Service · aujourd'hui</div></div>
-          <div style="display:flex;gap:8px;align-items:center"><button class="btn btn-ghost btn-sm mobile-only" onclick="cycle()">☰</button><span class="muted" style="font-size:12.5px">👤 Salma</span></div>
+          <div style="display:flex;gap:8px;align-items:center"><button class="btn btn-ghost btn-sm mobile-only" onclick="toggleMenu()">☰ Menu</button><span class="muted" style="font-size:12.5px">👤 Salma</span></div>
         </div>
-        <div class="content">
+        <div class="mscrim" id="mscrim" onclick="toggleMenu()"></div>
+          <div class="mmenu" id="mmenu"></div>
+          <div class="content">
           <section class="view active" id="dashboard">
             <div class="grid k4">
               <div class="card kpi"><div class="k">Ventes du jour</div><div class="v" id="kVentes">0 DH</div><div class="delta up">▲ 12% vs hier</div></div>
@@ -208,9 +215,11 @@
       window.doLogin=doLogin;
       const T={dashboard:['Tableau de bord','Service · aujourd\'hui'],salle:['Salle & réservations','12 tables · temps réel'],commande:['Commande',''],factures:['Factures & paiements','TVA 10% · MAD'],stocks:['Stocks & approvisionnements','Suivi temps réel']};
       const navs=document.querySelectorAll('.nav');
-      function show(t){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===t));navs.forEach(n=>n.classList.toggle('active',n.dataset.tab===t));if(T[t]){$('ttl').textContent=T[t][0];$('sub').textContent=T[t][1];}window.scrollTo({top:0,behavior:'smooth'});}
+      function show(t){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===t));navs.forEach(n=>n.classList.toggle('active',n.dataset.tab===t));if(T[t]){$('ttl').textContent=T[t][0];$('sub').textContent=T[t][1];}window.scrollTo({top:0,behavior:'smooth'});const mm=$('mmenu');if(mm){mm.classList.remove('show');$('mscrim').classList.remove('show');}}
       window.show=show;navs.forEach(n=>n.onclick=()=>show(n.dataset.tab));
-      const ORD=['dashboard','salle','factures','stocks'];let ci=0;window.cycle=()=>{ci=(ci+1)%ORD.length;show(ORD[ci]);};
+      const MITEMS=[['dashboard','📊 Tableau de bord'],['salle','🍵 Salle & réservations'],['factures','🧾 Factures & paiements'],['stocks','📦 Stocks & appro']];
+      $('mmenu').innerHTML=MITEMS.map(m=>'<div class="mi2" onclick="show(\''+m[0]+'\')">'+m[1]+'</div>').join('');
+      window.toggleMenu=()=>{$('mmenu').classList.toggle('show');$('mscrim').classList.toggle('show');};
       function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900);}
       window.closeModal=id=>$(id).classList.remove('show');
 
