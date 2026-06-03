@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NutriPLM — Cycle de vie produit · OCP Nutricrops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#0e2a1b; --ink-2:#15402a; --green:#0c8a43; --green-d:#076a32;
+    --lime:#7cc043; --paper:#f1f5ef; --card:#fff; --line:#e3eadf; --line-2:#eef1ec;
+    --txt:#16241c; --muted:#5f6f63; --muted-2:#8a988d;
+    --erp:#2563eb; --amber:#e0892e; --red:#df5238; --blue:#2e6cf0;
+    --shadow:0 1px 2px rgba(14,42,27,.05),0 8px 26px rgba(14,42,27,.07);
+    --shadow-lg:0 24px 60px rgba(14,42,27,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Inter",system-ui,sans-serif;color:var(--txt);background:var(--paper);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .dsp{font-family:"Sora",sans-serif}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:14px;color:var(--txt)}
+
+  .app{display:flex;min-height:100vh}
+  .side{width:250px;flex:0 0 250px;background:var(--ink);color:#cfe0d4;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{display:flex;align-items:center;gap:11px;padding:20px 20px 16px}
+  .brand .logo{width:40px;height:40px;flex:0 0 40px}
+  .brand h1{font-size:18px;color:#fff;font-weight:700;letter-spacing:.2px}
+  .brand .tag{font-size:10px;color:#7fa790;letter-spacing:.16em;text-transform:uppercase;margin-top:2px}
+  .nav{padding:8px 12px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+  .nav .lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5e7a68;padding:14px 12px 6px}
+  .nav button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:10px 12px;border-radius:9px;color:#bcd0c2;font-size:13.5px;font-weight:500;transition:.15s}
+  .nav button svg{width:18px;height:18px;flex:0 0 18px;opacity:.85}
+  .nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav button.active{background:var(--green);color:#fff;font-weight:600}
+  .nav button.active svg{opacity:1}
+  .nav .badge{margin-left:auto;font-size:11px;font-weight:700;background:var(--amber);color:#fff;border-radius:20px;padding:1px 7px;min-width:20px;text-align:center}
+  .side-foot{margin-top:auto;padding:15px;border-top:1px solid rgba(255,255,255,.08);font-size:11.5px;color:#7fa790}
+  .side-foot .erp{display:flex;align-items:center;gap:7px;color:#d6e6db;font-weight:500;margin-bottom:4px}
+  .side-foot .dot{width:7px;height:7px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 3px rgba(124,192,67,.2)}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .top{display:flex;align-items:center;gap:14px;padding:15px 28px;background:rgba(241,245,239,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .top .ttl{flex:1;min-width:0}
+  .top .ttl h2{font-size:20px;font-weight:600;letter-spacing:-.2px}
+  .top .ttl p{font-size:12.5px;color:var(--muted);margin-top:1px}
+  .burger{display:none}
+  .who{display:flex;align-items:center;gap:10px}
+  .who .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+  .who .nm{font-size:13px;font-weight:600;line-height:1.15}
+  .who .rl{font-size:11.5px;color:var(--muted)}
+  @media(max-width:560px){.who .meta{display:none}}
+
+  .content{padding:24px 28px 60px;max-width:1240px;width:100%}
+  .view{display:none;animation:fade .35s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:9px;font-size:13.5px;font-weight:600;background:var(--green);color:#fff;transition:.13s}
+  .btn:hover{background:var(--green-d);box-shadow:var(--shadow)}
+  .btn:active{transform:translateY(1px)}
+  .btn svg{width:16px;height:16px}
+  .btn.ghost{background:#fff;color:var(--txt);border:1px solid var(--line)}
+  .btn.ghost:hover{background:#fafcf9;box-shadow:var(--shadow)}
+  .btn.erp{background:var(--erp)}.btn.erp:hover{background:#1d50c9}
+  .btn.dark{background:var(--ink)}.btn.dark:hover{background:var(--ink-2)}
+  .btn.sm{padding:6px 11px;font-size:12.5px;border-radius:8px}
+
+  .grid{display:grid;gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+  .card.pad{padding:20px}
+  .kpis{grid-template-columns:repeat(4,1fr)}
+  .kpi{padding:18px;position:relative;overflow:hidden}
+  .kpi .k-top{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;font-weight:600}
+  .kpi .k-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+  .kpi .k-ic svg{width:16px;height:16px}
+  .kpi .k-val{font-size:33px;font-weight:600;letter-spacing:-1px;margin-top:11px;line-height:1}
+  .kpi .k-sub{font-size:12px;color:var(--muted);margin-top:6px}
+  .trend-up{color:var(--green);font-weight:600}.trend-dn{color:var(--red);font-weight:600}
+  .ring{position:absolute;right:-22px;top:-22px;width:88px;height:88px;border-radius:50%;opacity:.07}
+
+  .row2{grid-template-columns:1.4fr 1fr}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+  .sec-h h3{font-size:16px;font-weight:600}
+  .sec-h .hint{font-size:12px;color:var(--muted)}
+
+  /* stage chip */
+  .stg{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap}
+  .stg .sd{width:7px;height:7px;border-radius:50%}
+
+  /* portfolio */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+  .seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;overflow-x:auto;max-width:100%}
+  .seg button{padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+  .seg button.on{background:var(--ink);color:#fff}
+  .seg button .ct{opacity:.7;margin-left:4px}
+  .sel{padding:9px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:500;cursor:pointer}
+  .search{flex:1;min-width:170px;position:relative}
+  .search input{width:100%;padding:9px 13px 9px 36px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted-2)}
+
+  .prod-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  .prod{padding:18px;cursor:pointer;transition:transform .12s,box-shadow .15s,border-color .15s;position:relative}
+  .prod:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--lime)}
+  .prod .ph{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .prod .npk{font-family:"Sora";font-size:13px;font-weight:700;color:var(--green-d);background:#e7f3ea;padding:3px 9px;border-radius:7px}
+  .prod h4{font-size:16px;font-weight:600;margin:12px 0 3px}
+  .prod .gm{font-size:12px;color:var(--muted)}
+  .prod .meta{display:flex;gap:14px;margin-top:14px;font-size:11.5px;color:var(--muted)}
+  .prod .meta b{display:block;color:var(--txt);font-size:13px;font-weight:600;font-family:"Sora"}
+  .qbar{height:6px;border-radius:4px;background:var(--line-2);overflow:hidden;margin-top:5px}
+  .qbar i{display:block;height:100%;border-radius:4px}
+  .gates{display:flex;gap:5px;margin-top:14px;padding-top:13px;border-top:1px solid var(--line-2)}
+  .gate{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:#f4f7f2;color:var(--muted)}
+  .gate .gd{width:7px;height:7px;border-radius:50%;background:var(--muted-2)}
+  .gate.ok{background:#e7f3ea;color:var(--green-d)}.gate.ok .gd{background:var(--green)}
+  .gate.no{background:#fdeee6;color:#b8651d}.gate.no .gd{background:var(--amber)}
+  .erp-tag{position:absolute;top:14px;right:14px}
+  .erp-pill{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:20px}
+  .erp-pill.on{background:#e6effe;color:var(--erp)}
+  .erp-pill.off{background:#f4f7f2;color:var(--muted-2)}
+
+  /* kanban */
+  .kan{display:flex;gap:14px;overflow-x:auto;padding-bottom:14px}
+  .kcol{flex:0 0 270px;background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;max-height:74vh}
+  .kcol-h{padding:13px 15px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0}
+  .kcol-h .kn{font-weight:600;font-size:13.5px}
+  .kcol-h .kc{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted);background:#f4f7f2;border-radius:20px;padding:1px 8px}
+  .kcol-b{padding:11px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+  .kcard{border:1px solid var(--line);border-radius:11px;padding:12px;cursor:pointer;transition:.12s;background:#fff}
+  .kcard:hover{box-shadow:var(--shadow);border-color:var(--lime);transform:translateY(-2px)}
+  .kcard .knpk{font-family:"Sora";font-size:11.5px;font-weight:700;color:var(--green-d)}
+  .kcard h5{font-size:13.5px;font-weight:600;margin:5px 0 8px}
+  .kcard .kg{display:flex;gap:4px}
+  .kdot{width:18px;height:18px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff}
+
+  /* product detail */
+  .pd-head{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+  .pd-ic{width:60px;height:60px;border-radius:15px;background:linear-gradient(135deg,var(--green),var(--green-d));display:flex;align-items:center;justify-content:center;color:#fff;font-family:"Sora";font-weight:700;font-size:13px;text-align:center;line-height:1.1;flex:0 0 60px}
+  .pd-head h3{font-size:22px;font-weight:600}
+  .pd-head .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .pd-cols{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+  .stat-row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 0}
+  .ministat{flex:1;min-width:120px;border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+  .ministat .v{font-size:20px;font-weight:600;font-family:"Sora"}
+  .ministat .l{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .bom td{padding:9px 10px;border-bottom:1px solid var(--line-2);font-size:13px}
+  .bom th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-2);padding:8px 10px;border-bottom:1px solid var(--line)}
+  .doc{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+  .doc:last-child{border:none}
+  .doc .di{width:30px;height:30px;border-radius:8px;background:#f4f7f2;display:flex;align-items:center;justify-content:center;flex:0 0 30px}
+  .doc .di svg{width:15px;height:15px;color:var(--muted)}
+  .doc .ds{margin-left:auto;font-size:11.5px;font-weight:600}
+  .doc .ds.ok{color:var(--green)}.doc .ds.miss{color:var(--amber)}
+  .timeline{position:relative;padding-left:22px}
+  .timeline::before{content:"";position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--line)}
+  .tl{position:relative;padding:0 0 16px}
+  .tl::before{content:"";position:absolute;left:-19px;top:3px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--muted-2)}
+  .tl.done::before{background:var(--green);border-color:var(--green)}
+  .tl.curr::before{background:var(--amber);border-color:var(--amber);box-shadow:0 0 0 4px rgba(224,137,46,.18)}
+  .tl .tt{font-size:13.5px;font-weight:600}
+  .tl .td{font-size:11.5px;color:var(--muted)}
+
+  /* ERP sync view */
+  .erp-flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center;padding:8px 0}
+  .erp-node{text-align:center;padding:16px 20px;border-radius:14px;min-width:150px}
+  .erp-node.plm{background:#e7f3ea;border:1.5px solid var(--lime)}
+  .erp-node.sys{background:#e6effe;border:1.5px solid #aecbfb}
+  .erp-node .en-t{font-weight:700;font-family:"Sora";font-size:15px}
+  .erp-node .en-s{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .erp-arrow{display:flex;flex-direction:column;align-items:center;color:var(--erp);font-size:11px;font-weight:600;padding:0 6px}
+  .erp-arrow svg{width:46px;height:24px}
+  .maprow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+  .maprow .mf{flex:1;font-weight:500}
+  .maprow .ma{color:var(--erp)}
+  .maprow .me{flex:1;font-family:"Sora";font-size:12.5px;color:var(--muted)}
+  .synclog{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line-2);font-size:13px}
+  .synclog:last-child{border:none}
+  .synclog .si{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:0 0 28px}
+
+  /* feed */
+  .feed{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-2)}
+  .feed:last-child{border:none}
+  .feed .fa{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:0 0 30px}
+  .feed .ft{font-size:13px}.feed .ft b{font-weight:600}
+  .feed .fd{font-size:11.5px;color:var(--muted-2);margin-top:1px}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(14,42,27,.5);backdrop-filter:blur(3px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:34px 16px;overflow-y:auto}
+  .scrim.open{display:flex}
+  .modal{background:#fff;border-radius:17px;box-shadow:var(--shadow-lg);width:100%;max-width:560px;animation:pop .28s cubic-bezier(.2,.9,.3,1.1)}
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  .m-head{padding:20px 24px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+  .m-head h3{font-size:18px;font-weight:600}
+  .m-head p{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .m-x{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 32px}
+  .m-x:hover{background:var(--line-2)}
+  .m-body{padding:22px 24px;display:flex;flex-direction:column;gap:15px}
+  .m-foot{padding:16px 24px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;background:#fafcf9;border-radius:0 0 17px 17px;flex-wrap:wrap}
+  .fld label{display:block;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  .fld input,.fld select,.fld textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;transition:.15s}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(12,138,67,.1)}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .gate-pick{display:flex;flex-direction:column;gap:9px}
+  .gate-opt{display:flex;align-items:center;gap:11px;padding:12px 14px;border:1px solid var(--line);border-radius:11px}
+  .gate-opt .go-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex:0 0 34px}
+  .gate-opt .go-t{flex:1}.gate-opt .go-t b{font-weight:600;font-size:13.5px}.gate-opt .go-t div{font-size:11.5px;color:var(--muted)}
+  .switch{width:42px;height:24px;border-radius:20px;background:var(--line);position:relative;cursor:pointer;transition:.2s;flex:0 0 42px}
+  .switch.on{background:var(--green)}
+  .switch i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+  .switch.on i{left:21px}
+
+  /* toast */
+  .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:100;display:flex;flex-direction:column;gap:10px}
+  .toast{display:flex;align-items:center;gap:11px;background:var(--ink);color:#fff;padding:13px 17px;border-radius:11px;box-shadow:var(--shadow-lg);font-size:13.5px;font-weight:500;animation:slideIn .3s ease;max-width:380px}
+  .toast .ti{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 22px}
+  .toast .ti svg{width:13px;height:13px}
+  @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+
+  .mob-menu{display:none}
+  @media(max-width:920px){
+    .side{display:none}
+    .burger{display:flex;width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff}
+    .burger svg{width:20px;height:20px}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .row2,.pd-cols{grid-template-columns:1fr}
+    .content{padding:18px 14px 60px}.top{padding:12px 14px}
+    .frow{grid-template-columns:1fr}
+    .mob-menu{position:fixed;top:58px;left:12px;right:12px;background:var(--ink);border-radius:14px;box-shadow:var(--shadow-lg);z-index:60;padding:8px;flex-direction:column;gap:2px;display:none}
+    .mob-menu.open{display:flex}
+    .mob-menu button{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:9px;color:#bcd0c2;font-weight:500;text-align:left}
+    .mob-menu button.active{background:var(--green);color:#fff}
+    .mob-menu button svg{width:18px;height:18px}
+    .mob-menu .badge{margin-left:auto;font-size:11px;font-weight:700;background:var(--amber);color:#fff;border-radius:20px;padding:1px 7px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="11" fill="#0c8a43"/>
+        <path d="M20 8c-6 4-9 8-9 13a9 9 0 0 0 18 0c0-5-3-9-9-13z" fill="#7cc043"/>
+        <path d="M20 11v18M20 18c-2.5-1-4-2.5-5-4.5M20 22c2.5-1 4-2.5 5-4.5" stroke="#0e2a1b" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <div><h1 class="dsp">NutriPLM</h1><div class="tag">OCP Nutricrops</div></div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="lbl">Pilotage</div>
+      <button data-v="cockpit" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Cockpit</span></button>
+      <button data-v="portfolio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg><span>Portefeuille produits</span></button>
+      <button data-v="lifecycle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span>Cycle de vie (gates)</span><span class="badge" id="nav-gates">0</span></button>
+      <div class="lbl">Industrialisation</div>
+      <button data-v="production"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 20h20M4 20V9l5 3V9l5 3V6l5 3v11"/></svg><span>Production</span></button>
+      <button data-v="erp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="7" cy="7" r="0"/></svg><span>Intégration ERP</span></button>
+      <div class="lbl">Données</div>
+      <button data-v="quality"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Qualité des données</span></button>
+    </nav>
+    <div class="side-foot">
+      <div class="erp"><span class="dot"></span>ERP connecté · SAP S/4</div>
+      Hébergement Maroc · Synchro temps réel
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <button class="burger" id="burger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="ttl"><h2 id="pg-title">Cockpit</h2><p id="pg-sub">Pilotage du cycle de vie produit</p></div>
+      <div class="who">
+        <div class="meta" style="text-align:right"><div class="nm">Salma Bennani</div><div class="rl">Cheffe de produit · R&D</div></div>
+        <div class="av">SB</div>
+      </div>
+    </div>
+    <div class="mob-menu" id="mmenu"></div>
+    <div class="content">
+
+      <!-- COCKPIT -->
+      <section class="view active" id="v-cockpit">
+        <div class="grid kpis" id="kpis"></div>
+        <div class="grid row2" style="margin-top:18px">
+          <div class="card pad">
+            <div class="sec-h"><h3>Pipeline produits par étape</h3><span class="hint">cycle de vie en cours</span></div>
+            <div style="height:250px"><canvas id="chPipe"></canvas></div>
+          </div>
+          <div class="card pad">
+            <div class="sec-h"><h3>Time-to-market</h3><span class="hint">mois, par lancement</span></div>
+            <div style="height:250px"><canvas id="chTtm"></canvas></div>
+          </div>
+        </div>
+        <div class="grid row2" style="margin-top:18px">
+          <div class="card pad">
+            <div class="sec-h"><h3>🔔 Gates en attente d'arbitrage</h3><span class="hint">R&D · Marketing · Production</span></div>
+            <div id="gateList"></div>
+          </div>
+          <div class="card pad">
+            <div class="sec-h"><h3>Coordination des équipes</h3><span class="hint">activité récente</span></div>
+            <div id="feedList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PORTFOLIO -->
+      <section class="view" id="v-portfolio">
+        <div class="filters">
+          <div class="seg" id="segStage"></div>
+          <select class="sel" id="filterTeam"></select>
+          <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" placeholder="Rechercher (nom, formule NPK…)" oninput="renderPortfolio()"/></div>
+          <button class="btn" onclick="openNewProduct()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Nouveau produit</button>
+        </div>
+        <div class="grid prod-grid" id="prodGrid"></div>
+      </section>
+
+      <!-- PRODUCT DETAIL -->
+      <section class="view" id="v-product"></section>
+
+      <!-- LIFECYCLE KANBAN -->
+      <section class="view" id="v-lifecycle">
+        <div class="sec-h" style="margin-bottom:16px">
+          <div><h3 style="font-size:18px">Cycle de vie — stage-gate</h3><span class="hint">Chaque passage d'étape exige la validation des équipes concernées</span></div>
+          <div style="display:flex;gap:14px;font-size:12px;color:var(--muted)">
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:4px;background:var(--blue);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:8px;font-weight:700">R</span>R&D</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:4px;background:#c0567a;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:8px;font-weight:700">M</span>Marketing</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:14px;border-radius:4px;background:var(--amber);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:8px;font-weight:700">P</span>Production</span>
+          </div>
+        </div>
+        <div class="kan" id="kanban"></div>
+      </section>
+
+      <!-- PRODUCTION -->
+      <section class="view" id="v-production">
+        <div class="grid kpis" id="prodKpis" style="grid-template-columns:repeat(3,1fr)"></div>
+        <div class="card pad" style="margin-top:18px">
+          <div class="sec-h"><h3>Lots de production & conformité</h3><span class="hint">données remontées de l'ERP</span></div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+              <thead><tr id="batchHead"></tr></thead>
+              <tbody id="batchBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ERP -->
+      <section class="view" id="v-erp">
+        <div class="card pad">
+          <div class="erp-flow">
+            <div class="erp-node plm"><div class="en-t">NutriPLM</div><div class="en-s">Spécifications, BOM, versions</div></div>
+            <div class="erp-arrow"><span>Articles · Nomenclatures</span><svg viewBox="0 0 46 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h38M34 6l8 6-8 6"/></svg><span style="color:var(--muted)">Statut, lots</span><svg viewBox="0 0 46 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:rotate(180deg)"><path d="M2 12h38M34 6l8 6-8 6"/></svg></div>
+            <div class="erp-node sys"><div class="en-t" style="color:var(--erp)">SAP S/4HANA</div><div class="en-s">Production, achats, stocks</div></div>
+          </div>
+        </div>
+        <div class="grid row2" style="margin-top:18px">
+          <div class="card pad">
+            <div class="sec-h"><h3>Synchronisation des produits</h3><span class="hint">PLM → ERP</span></div>
+            <div id="erpSync"></div>
+          </div>
+          <div class="card pad">
+            <div class="sec-h"><h3>Correspondance des champs</h3></div>
+            <div id="erpMap"></div>
+            <div class="sec-h" style="margin-top:20px"><h3>Journal de synchronisation</h3></div>
+            <div id="erpLog"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUALITY -->
+      <section class="view" id="v-quality">
+        <div class="grid row2">
+          <div class="card pad">
+            <div class="sec-h"><h3>Indice de qualité des données</h3><span class="hint">complétude des fiches</span></div>
+            <div style="height:250px"><canvas id="chQual"></canvas></div>
+          </div>
+          <div class="card pad">
+            <div class="sec-h"><h3>Fiches à compléter</h3><span class="hint">champs obligatoires manquants</span></div>
+            <div id="qualList"></div>
+          </div>
+        </div>
+        <div class="card pad" style="margin-top:18px">
+          <div class="sec-h"><h3>🔗 Analyse d'impact — « où est utilisé »</h3><span class="hint">une matière première change ? on sait quels produits sont touchés</span></div>
+          <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">Sélectionnez une matière première pour voir tous les produits qui l'utilisent — indispensable avant un changement de fournisseur ou de spécification.</p>
+          <select class="sel" id="impactSel" style="margin-bottom:14px"></select>
+          <div id="impactList"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"><div id="modalHost"></div></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ===================== DONNÉES ===================== */
+const TODAY = new Date("2026-06-03");
+const STAGES = [
+  {k:"ideation",        l:"Idéation",            c:"#8a94a6"},
+  {k:"formulation",     l:"Formulation R&D",     c:"#2e6cf0"},
+  {k:"essais",          l:"Essais agronomiques", c:"#7cc043"},
+  {k:"homologation",    l:"Homologation",        c:"#7048b8"},
+  {k:"industrialisation",l:"Industrialisation",  c:"#e0892e"},
+  {k:"lancement",       l:"Lancement",           c:"#0c8a43"},
+  {k:"commercialise",   l:"Commercialisé",       c:"#076a32"},
+];
+const stIdx = k => STAGES.findIndex(s=>s.k===k);
+const stById = k => STAGES.find(s=>s.k===k);
+
+const TEAMS = {
+  rd:  {l:"R&D",        s:"R", c:"#2e6cf0"},
+  mkt: {l:"Marketing",  s:"M", c:"#c0567a"},
+  prod:{l:"Production", s:"P", c:"#e0892e"},
+};
+
+const MATS = ["Acide phosphorique","Ammoniac","Chlorure de potassium","Sulfate de potassium","Urée","Oligo-éléments (Zn)","Acide sulfurique","Bore","Agent anti-mottant"];
+
+let PRODUCTS = [
+  {id:"p1", code:"NC-1428", nom:"NPK 14-28-14 Premium", npk:"14-28-14", gamme:"Engrais de fond", marche:"Céréales · Maroc",
+   stage:"commercialise", owner:"prod", quality:98, ttmTarget:14, ttm:11, version:"v3.1", erp:true, erpId:"ART-100428",
+   bom:[["Acide phosphorique",38],["Ammoniac",22],["Chlorure de potassium",28],["Agent anti-mottant",2]],
+   docs:[["Fiche technique",1],["Fiche de données de sécurité",1],["Dossier d'homologation",1],["Étude agronomique",1]],
+   gates:{rd:1,mkt:1,prod:1},
+   hist:[["Commercialisé sur 4 régions","2026-02-10","prod"],["Validation gate industrialisation","2025-11-04","prod"]]},
+
+  {id:"p2", code:"NC-2020", nom:"NPK 20-20-20 Soluble", npk:"20-20-20", gamme:"Fertigation", marche:"Maraîchage · Export",
+   stage:"industrialisation", owner:"prod", quality:88, ttmTarget:13, ttm:9, version:"v2.0", erp:true, erpId:"ART-102020",
+   bom:[["Acide phosphorique",26],["Urée",30],["Sulfate de potassium",34],["Oligo-éléments (Zn)",4]],
+   docs:[["Fiche technique",1],["Fiche de données de sécurité",1],["Dossier d'homologation",1],["Étude agronomique",0]],
+   gates:{rd:1,mkt:1,prod:0},
+   hist:[["Transfert en industrialisation","2026-05-02","prod"],["Gate essais validé","2026-03-15","rd"]]},
+
+  {id:"p3", code:"NC-ZN12", nom:"Engrais Zinc-enrichi", npk:"12-08-16+Zn", gamme:"Spécialité oligo", marche:"Sols carencés · Maroc",
+   stage:"essais", owner:"rd", quality:74, ttmTarget:15, ttm:6, version:"v1.2", erp:false, erpId:null,
+   bom:[["Acide phosphorique",24],["Ammoniac",18],["Sulfate de potassium",30],["Oligo-éléments (Zn)",10],["Bore",2]],
+   docs:[["Fiche technique",1],["Fiche de données de sécurité",1],["Dossier d'homologation",0],["Étude agronomique",1]],
+   gates:{rd:1,mkt:0,prod:0},
+   hist:[["Essais champ en cours (3 sites)","2026-05-20","rd"],["Formulation figée","2026-04-01","rd"]]},
+
+  {id:"p4", code:"NC-LIB1", nom:"Engrais à libération contrôlée", npk:"18-06-12", gamme:"Innovation", marche:"Arboriculture",
+   stage:"formulation", owner:"rd", quality:58, ttmTarget:18, ttm:4, version:"v0.4", erp:false, erpId:null,
+   bom:[["Acide phosphorique",30],["Urée",26],["Chlorure de potassium",22],["Agent anti-mottant",6]],
+   docs:[["Fiche technique",1],["Fiche de données de sécurité",0],["Dossier d'homologation",0],["Étude agronomique",0]],
+   gates:{rd:0,mkt:0,prod:0},
+   hist:[["Brevet d'enrobage déposé","2026-04-22","rd"],["Lancement projet R&D","2026-02-01","rd"]]},
+
+  {id:"p5", code:"NC-BIO1", nom:"Biostimulant racinaire", npk:"05-10-05", gamme:"Biosolutions", marche:"Maraîchage bio",
+   stage:"ideation", owner:"mkt", quality:32, ttmTarget:20, ttm:1, version:"v0.1", erp:false, erpId:null,
+   bom:[["Acide phosphorique",14],["Sulfate de potassium",18],["Oligo-éléments (Zn)",6]],
+   docs:[["Fiche technique",0],["Fiche de données de sécurité",0],["Dossier d'homologation",0],["Étude agronomique",0]],
+   gates:{rd:0,mkt:0,prod:0},
+   hist:[["Opportunité marché identifiée","2026-05-28","mkt"]]},
+
+  {id:"p6", code:"NC-DAP", nom:"DAP Granulé Standard", npk:"18-46-00", gamme:"Engrais de fond", marche:"Grandes cultures",
+   stage:"commercialise", owner:"prod", quality:96, ttmTarget:12, ttm:10, version:"v5.2", erp:true, erpId:"ART-104600",
+   bom:[["Acide phosphorique",46],["Ammoniac",30],["Agent anti-mottant",2]],
+   docs:[["Fiche technique",1],["Fiche de données de sécurité",1],["Dossier d'homologation",1],["Étude agronomique",1]],
+   gates:{rd:1,mkt:1,prod:1},
+   hist:[["Mise à jour formule v5.2","2026-01-18","rd"]]},
+
+  {id:"p7", code:"NC-HOM3", nom:"NPK 15-15-15 Universel", npk:"15-15-15", gamme:"Polyvalent", marche:"Multi-cultures",
+   stage:"homologation", owner:"rd", quality:82, ttmTarget:14, ttm:8, version:"v1.0", erp:false, erpId:null,
+   bom:[["Acide phosphorique",30],["Ammoniac",20],["Chlorure de potassium",30],["Oligo-éléments (Zn)",2]],
+   docs:[["Fiche technique",1],["Fiche de données de sécurité",1],["Dossier d'homologation",1],["Étude agronomique",1]],
+   gates:{rd:1,mkt:1,prod:0},
+   hist:[["Dépôt dossier homologation ONSSA","2026-05-12","rd"],["Gate essais validé","2026-04-20","rd"]]},
+
+  {id:"p8", code:"NC-LANC", nom:"NPK 10-20-20 Olivier", npk:"10-20-20", gamme:"Spécialité culture", marche:"Oléiculture · Maroc",
+   stage:"lancement", owner:"mkt", quality:91, ttmTarget:13, ttm:12, version:"v1.0", erp:true, erpId:"ART-102020B",
+   bom:[["Acide phosphorique",34],["Ammoniac",16],["Sulfate de potassium",34],["Bore",2]],
+   docs:[["Fiche technique",1],["Fiche de données de sécurité",1],["Dossier d'homologation",1],["Étude agronomique",1]],
+   gates:{rd:1,mkt:1,prod:1},
+   hist:[["Plan de lancement commercial validé","2026-05-25","mkt"],["Premiers lots produits","2026-05-10","prod"]]},
+];
+
+let FEED = [
+  {team:"prod", who:"Y. Amrani", act:"a validé le gate Production de", prod:"NPK 14-28-14 Premium", d:"il y a 2 h"},
+  {team:"rd",   who:"S. Bennani", act:"a figé la formulation de", prod:"Engrais à libération contrôlée", d:"il y a 5 h"},
+  {team:"mkt",  who:"H. Idrissi", act:"a ajouté l'étude marché de", prod:"Biostimulant racinaire", d:"hier"},
+  {team:"rd",   who:"K. Saidi",  act:"a déposé le dossier d'homologation de", prod:"NPK 15-15-15 Universel", d:"hier"},
+  {team:"prod", who:"Y. Amrani", act:"a synchronisé vers l'ERP", prod:"NPK 20-20-20 Soluble", d:"il y a 2 j"},
+];
+
+/* ===================== HELPERS ===================== */
+const $ = s => document.querySelector(s);
+const qcolor = q => q>=90?"#0c8a43":q>=70?"#7cc043":q>=50?"#e0892e":"#df5238";
+function toast(msg,kind){
+  const t=document.createElement("div");t.className="toast";
+  const bg=kind==="erp"?"#2563eb":"#0c8a43";
+  t.innerHTML=`<span class="ti" style="background:${bg}"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span><span>${msg}</span>`;
+  $("#toasts").appendChild(t);
+  setTimeout(()=>{t.style.opacity="0";t.style.transform="translateX(30px)";t.style.transition="all .3s";setTimeout(()=>t.remove(),300);},3300);
+}
+const teamDot = k => `<span class="kdot" style="background:${TEAMS[k].c}">${TEAMS[k].s}</span>`;
+// which gates are required at a product's current stage (to advance)
+function reqGates(stage){
+  const i=stIdx(stage);
+  if(i<=stIdx("formulation")) return ["rd"];
+  if(i<=stIdx("essais")) return ["rd","mkt"];
+  if(i<=stIdx("homologation")) return ["rd","mkt"];
+  return ["rd","mkt","prod"];
+}
+const gatesPending = p => p.stage!=="commercialise" && reqGates(p.stage).some(g=>!p.gates[g]);
+const countPendingGates = () => PRODUCTS.filter(gatesPending).length;
+
+/* ===================== KPIs / COCKPIT ===================== */
+function renderKpis(){
+  const active = PRODUCTS.filter(p=>p.stage!=="commercialise").length;
+  const launched = PRODUCTS.filter(p=>["commercialise","lancement"].includes(p.stage));
+  const avgTtm = (launched.reduce((s,p)=>s+p.ttm,0)/launched.length).toFixed(1);
+  const avgTarget = (launched.reduce((s,p)=>s+p.ttmTarget,0)/launched.length).toFixed(1);
+  const ttmGain = Math.round((1-avgTtm/avgTarget)*100);
+  const avgQ = Math.round(PRODUCTS.reduce((s,p)=>s+p.quality,0)/PRODUCTS.length);
+  const cards=[
+    {t:"Time-to-market moyen",v:avgTtm+" mois",sub:`objectif ${avgTarget} mois`,tr:`▼ -${ttmGain}% de délai`,up:true,c:"#0c8a43",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
+    {t:"Qualité des données",v:avgQ+"%",sub:"complétude des fiches",tr:"▲ +25% vs N-1",up:true,c:"#2e6cf0",ic:'<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/>'},
+    {t:"Produits en cycle",v:active,sub:`${PRODUCTS.length} produits au total`,tr:"▲ 3 nouveaux",up:true,c:"#7cc043",ic:'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>'},
+    {t:"Gates en attente",v:countPendingGates(),sub:"arbitrage inter-équipes",tr:"R&D · Mkt · Prod",up:true,c:"#e0892e",ic:'<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>'},
+  ];
+  $("#kpis").innerHTML = cards.map(c=>`
+    <div class="card kpi"><div class="ring" style="background:${c.c}"></div>
+      <div class="k-top"><span class="k-ic" style="background:${c.c}1a;color:${c.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${c.ic}</svg></span>${c.t}</div>
+      <div class="k-val dsp">${c.v}</div>
+      <div class="k-sub"><span class="trend-up">${c.tr}</span> · ${c.sub}</div>
+    </div>`).join("");
+  const g=countPendingGates();
+  $("#nav-gates").textContent=g; $("#nav-gates").style.display=g?"":"none";
+}
+
+let chPipe,chTtm,chQual;
+function renderCharts(){
+  const counts = STAGES.map(s=>PRODUCTS.filter(p=>p.stage===s.k).length);
+  if(chPipe)chPipe.destroy();
+  chPipe=new Chart($("#chPipe"),{type:"bar",
+    data:{labels:STAGES.map(s=>s.l),datasets:[{data:counts,backgroundColor:STAGES.map(s=>s.c),borderRadius:7}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{stepSize:1},grid:{color:"#eef1ec"}},x:{ticks:{font:{size:10},maxRotation:40,minRotation:40},grid:{display:false}}}}});
+
+  const launched = PRODUCTS.filter(p=>["commercialise","lancement"].includes(p.stage)).sort((a,b)=>b.ttm-a.ttm);
+  if(chTtm)chTtm.destroy();
+  chTtm=new Chart($("#chTtm"),{type:"bar",
+    data:{labels:launched.map(p=>p.npk),datasets:[
+      {label:"Réalisé",data:launched.map(p=>p.ttm),backgroundColor:"#0c8a43",borderRadius:6},
+      {label:"Objectif",data:launched.map(p=>p.ttmTarget),backgroundColor:"#dfe7da",borderRadius:6}]},
+    options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",font:{size:11}}}},
+      scales:{x:{grid:{color:"#eef1ec"},ticks:{callback:v=>v+"m"}},y:{grid:{display:false}}}}});
+}
+
+function renderGateList(){
+  const pend = PRODUCTS.filter(gatesPending).sort((a,b)=>stIdx(b.stage)-stIdx(a.stage));
+  if(!pend.length){$("#gateList").innerHTML=`<div style="padding:24px;text-align:center;color:var(--muted)">Aucun gate en attente. Tous les produits sont alignés ✓</div>`;return;}
+  $("#gateList").innerHTML = pend.map(p=>{
+    const need = reqGates(p.stage).filter(g=>!p.gates[g]);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-2)">
+      <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px">${p.nom}</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px"><span class="stg" style="background:${stById(p.stage).c}1a;color:${stById(p.stage).c}"><span class="sd" style="background:${stById(p.stage).c}"></span>${stById(p.stage).l}</span> · en attente : ${need.map(g=>TEAMS[g].l).join(", ")}</div></div>
+      <button class="btn ghost sm" onclick="openProduct('${p.id}')">Examiner</button>
+    </div>`;
+  }).join("");
+}
+function renderFeed(){
+  $("#feedList").innerHTML = FEED.map(f=>`
+    <div class="feed"><div class="fa" style="background:${TEAMS[f.team].c}">${TEAMS[f.team].s}</div>
+      <div><div class="ft"><b>${f.who}</b> ${f.act} <b>${f.prod}</b></div><div class="fd">${TEAMS[f.team].l} · ${f.d}</div></div></div>`).join("");
+}
+
+/* ===================== PORTFOLIO ===================== */
+let fStage="all";
+function renderSegStage(){
+  const opts=[["all","Tous"],...STAGES.map(s=>[s.k,s.l])];
+  $("#segStage").innerHTML=opts.map(([k,l])=>{
+    const n=k==="all"?PRODUCTS.length:PRODUCTS.filter(p=>p.stage===k).length;
+    return `<button class="${fStage===k?'on':''}" onclick="fStage='${k}';renderSegStage();renderPortfolio()">${l}<span class="ct">${n}</span></button>`;
+  }).join("");
+}
+function renderTeamFilter(){
+  const cur=$("#filterTeam")?$("#filterTeam").value:"all";
+  $("#filterTeam").innerHTML=`<option value="all">Toutes les équipes</option>`+Object.entries(TEAMS).map(([k,t])=>`<option value="${k}" ${cur===k?'selected':''}>${t.l}</option>`).join("");
+  $("#filterTeam").onchange=renderPortfolio;
+}
+function renderPortfolio(){
+  const q=($("#q").value||"").toLowerCase(); const ft=$("#filterTeam").value;
+  let list=PRODUCTS.filter(p=>{
+    if(fStage!=="all"&&p.stage!==fStage)return false;
+    if(ft!=="all"&&p.owner!==ft)return false;
+    if(q&&!(p.nom.toLowerCase().includes(q)||p.npk.toLowerCase().includes(q)||p.code.toLowerCase().includes(q)))return false;
+    return true;
+  }).sort((a,b)=>stIdx(b.stage)-stIdx(a.stage));
+  if(!list.length){$("#prodGrid").innerHTML=`<div style="padding:40px;text-align:center;color:var(--muted);grid-column:1/-1">Aucun produit pour ce filtre.</div>`;return;}
+  $("#prodGrid").innerHTML=list.map(p=>{
+    const st=stById(p.stage);
+    const gts=reqGates(p.stage).map(g=>`<div class="gate ${p.gates[g]?'ok':'no'}"><span class="gd"></span>${TEAMS[g].l}</div>`).join("");
+    return `<div class="card prod" onclick="openProduct('${p.id}')">
+      <div class="erp-tag">${p.erp?'<span class="erp-pill on">⟲ ERP</span>':'<span class="erp-pill off">non lié</span>'}</div>
+      <div class="ph"><span class="npk">${p.npk}</span></div>
+      <h4>${p.nom}</h4><div class="gm">${p.code} · ${p.gamme} · ${p.marche}</div>
+      <div style="margin-top:13px"><span class="stg" style="background:${st.c}1a;color:${st.c}"><span class="sd" style="background:${st.c}"></span>${st.l}</span></div>
+      <div class="meta">
+        <div>Qualité données<b style="color:${qcolor(p.quality)}">${p.quality}%</b><div class="qbar"><i style="width:${p.quality}%;background:${qcolor(p.quality)}"></i></div></div>
+        <div>Time-to-market<b>${p.ttm} / ${p.ttmTarget} m</b></div>
+      </div>
+      <div class="gates">${gts}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ===================== PRODUCT DETAIL ===================== */
+let curProd=null;
+function openProduct(id){ curProd=id; go("product"); renderProduct(); }
+function renderProduct(){
+  const p=PRODUCTS.find(x=>x.id===curProd); const st=stById(p.stage);
+  const nextStage = stIdx(p.stage)<STAGES.length-1 ? STAGES[stIdx(p.stage)+1] : null;
+  const canAdvance = nextStage && reqGates(p.stage).every(g=>p.gates[g]);
+  $("#pg-title").textContent=p.nom; $("#pg-sub").textContent=p.code+" · "+p.gamme;
+  const timeline = STAGES.map((s,i)=>{
+    const cur=s.k===p.stage; const done=i<stIdx(p.stage);
+    const h=p.hist.find(x=>false);
+    return `<div class="tl ${done?'done':cur?'curr':''}"><div class="tt">${s.l}</div><div class="td">${cur?'Étape actuelle · '+st.l:done?'Franchie':'À venir'}</div></div>`;
+  }).join("");
+  const gateBlock = reqGates(p.stage).map(g=>`
+    <div class="gate-opt">
+      <div class="go-ic" style="background:${TEAMS[g].c}">${TEAMS[g].s}</div>
+      <div class="go-t"><b>Validation ${TEAMS[g].l}</b><div>${p.gates[g]?'Approuvé':'En attente d’approbation'}</div></div>
+      <div class="switch ${p.gates[g]?'on':''}" onclick="toggleGate('${p.id}','${g}')"><i></i></div>
+    </div>`).join("");
+  $("#v-product").innerHTML=`
+    <button class="btn ghost sm" onclick="go('portfolio')" style="margin-bottom:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Portefeuille</button>
+    <div class="pd-head">
+      <div class="pd-ic">${p.npk}</div>
+      <div style="flex:1;min-width:0">
+        <h3 class="dsp">${p.nom}</h3>
+        <div class="sub">${p.code} · ${p.gamme} · ${p.marche} · ${p.version}</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span class="stg" style="background:${st.c}1a;color:${st.c}"><span class="sd" style="background:${st.c}"></span>${st.l}</span>
+          ${p.erp?'<span class="erp-pill on">⟲ Synchronisé ERP · '+p.erpId+'</span>':'<span class="erp-pill off">non lié à l’ERP</span>'}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${canAdvance?`<button class="btn" onclick="advance('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Passer à « ${nextStage.l} »</button>`:""}
+        ${!p.erp&&stIdx(p.stage)>=stIdx("industrialisation")?`<button class="btn erp" onclick="pushErp('${p.id}')">⟲ Pousser vers ERP</button>`:""}
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="ministat"><div class="v" style="color:${qcolor(p.quality)}">${p.quality}%</div><div class="l">Qualité des données</div></div>
+      <div class="ministat"><div class="v">${p.ttm} / ${p.ttmTarget}<span style="font-size:13px;color:var(--muted)"> mois</span></div><div class="l">Time-to-market</div></div>
+      <div class="ministat"><div class="v">${reqGates(p.stage).filter(g=>p.gates[g]).length}/${reqGates(p.stage).length}</div><div class="l">Gates validés</div></div>
+      <div class="ministat"><div class="v">${p.bom.length}</div><div class="l">Composants (BOM)</div></div>
+    </div>
+    <div class="pd-cols" style="margin-top:18px">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card pad">
+          <div class="sec-h"><h3>Composition / Nomenclature (BOM)</h3><span class="hint">% massique</span></div>
+          <table class="bom" style="width:100%;border-collapse:collapse">
+            <thead><tr><th>Matière première</th><th style="text-align:right">Dosage</th><th style="text-align:right">Part</th></tr></thead>
+            <tbody>${p.bom.map(([m,pct])=>`<tr><td>${m}</td><td style="text-align:right;font-family:Sora">${pct}%</td><td style="text-align:right;width:120px"><div class="qbar"><i style="width:${pct*1.6}%;background:var(--lime)"></i></div></td></tr>`).join("")}</tbody>
+          </table>
+        </div>
+        <div class="card pad">
+          <div class="sec-h"><h3>Validation des équipes — gate ${st.l}</h3></div>
+          <div class="gate-pick">${gateBlock}</div>
+          ${canAdvance?`<div style="margin-top:12px;padding:11px 14px;background:#e7f3ea;border-radius:10px;font-size:13px;color:var(--green-d);font-weight:500">✓ Toutes les validations sont réunies — le produit peut passer à l'étape suivante.</div>`:`<div style="margin-top:12px;padding:11px 14px;background:#fdf3ea;border-radius:10px;font-size:13px;color:#b8651d;font-weight:500">En attente de validation pour franchir le gate.</div>`}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card pad">
+          <div class="sec-h"><h3>Documents</h3></div>
+          ${p.docs.map(([d,ok])=>`<div class="doc"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div>${d}</div><div class="ds ${ok?'ok':'miss'}">${ok?'✓ Validé':'À fournir'}</div></div>`).join("")}
+        </div>
+        <div class="card pad">
+          <div class="sec-h"><h3>Cycle de vie</h3></div>
+          <div class="timeline">${timeline}</div>
+        </div>
+      </div>
+    </div>`;
+}
+function toggleGate(id,g){
+  const p=PRODUCTS.find(x=>x.id===id); p.gates[g]=p.gates[g]?0:1;
+  if(p.gates[g]){ FEED.unshift({team:g,who:TEAMS[g].l,act:"a validé le gate de",prod:p.nom,d:"à l'instant"}); toast(`Gate ${TEAMS[g].l} validé pour ${p.nom}`); }
+  renderProduct(); renderKpis(); renderGateList(); renderFeed(); renderPortfolio(); renderKanban();
+}
+function advance(id){
+  const p=PRODUCTS.find(x=>x.id===id); const ni=stIdx(p.stage)+1;
+  p.stage=STAGES[ni].k; p.gates={rd:0,mkt:0,prod:0};
+  p.hist.unshift([`Passage à l'étape ${STAGES[ni].l}`,TODAY.toISOString().slice(0,10),p.owner]);
+  if(p.stage==="industrialisation"&&!p.erp){ toast("Étape Industrialisation atteinte — pensez à synchroniser vers l'ERP",""); }
+  toast(`${p.nom} → ${STAGES[ni].l}`);
+  renderProduct(); renderAll();
+}
+function pushErp(id){
+  const p=PRODUCTS.find(x=>x.id===id); p.erp=true; p.erpId="ART-"+Math.floor(100000+Math.random()*899999);
+  FEED.unshift({team:"prod",who:"Système",act:"a synchronisé vers l'ERP",prod:p.nom,d:"à l'instant"});
+  toast(`${p.nom} synchronisé vers SAP S/4 (${p.erpId})`,"erp");
+  renderProduct(); renderAll();
+}
+
+/* ===================== KANBAN ===================== */
+function renderKanban(){
+  $("#kanban").innerHTML=STAGES.map(s=>{
+    const items=PRODUCTS.filter(p=>p.stage===s.k);
+    const cards=items.map(p=>`
+      <div class="kcard" onclick="openProduct('${p.id}')">
+        <div class="knpk">${p.npk}</div><h5>${p.nom}</h5>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="kg">${reqGates(p.stage).map(g=>`<span class="kdot" style="background:${p.gates[g]?TEAMS[g].c:'#cdd6cf'}">${TEAMS[g].s}</span>`).join("")}</div>
+          <span style="margin-left:auto;font-size:11px;font-weight:700;color:${qcolor(p.quality)}">${p.quality}%</span>
+        </div>
+      </div>`).join("") || `<div style="padding:14px;text-align:center;color:var(--muted-2);font-size:12px">—</div>`;
+    return `<div class="kcol">
+      <div class="kcol-h"><span class="sd" style="width:9px;height:9px;border-radius:50%;background:${s.c};display:inline-block"></span><span class="kn">${s.l}</span><span class="kc">${items.length}</span></div>
+      <div class="kcol-b">${cards}</div></div>`;
+  }).join("");
+}
+
+/* ===================== PRODUCTION ===================== */
+const BATCHES=[
+  {lot:"L-26-0418",prod:"NPK 14-28-14 Premium",site:"Jorf Lasfar",qte:"1 240 t",conf:99.2,statut:"Conforme"},
+  {lot:"L-26-0431",prod:"DAP Granulé Standard",site:"Jorf Lasfar",qte:"2 050 t",conf:98.7,statut:"Conforme"},
+  {lot:"L-26-0440",prod:"NPK 20-20-20 Soluble",site:"Safi",qte:"380 t",conf:96.1,statut:"Conforme"},
+  {lot:"L-26-0447",prod:"NPK 10-20-20 Olivier",site:"Safi",qte:"610 t",conf:94.8,statut:"Sous surveillance"},
+  {lot:"L-26-0452",prod:"NPK 14-28-14 Premium",site:"Jorf Lasfar",qte:"980 t",conf:99.5,statut:"Conforme"},
+];
+function renderProduction(){
+  const totT = "5 260 t";
+  const avgConf=(BATCHES.reduce((s,b)=>s+b.conf,0)/BATCHES.length).toFixed(1);
+  const k=[
+    {t:"Tonnage produit (mois)",v:totT,c:"#0c8a43"},
+    {t:"Conformité moyenne",v:avgConf+"%",c:"#2e6cf0"},
+    {t:"Lots ce mois",v:BATCHES.length+" lots",c:"#e0892e"},
+  ];
+  $("#prodKpis").innerHTML=k.map(c=>`<div class="card kpi"><div class="ring" style="background:${c.c}"></div><div class="k-top">${c.t}</div><div class="k-val dsp" style="color:${c.c}">${c.v}</div><div class="k-sub">données issues de l'ERP · temps réel</div></div>`).join("");
+  $("#batchHead").innerHTML=["Lot","Produit","Site","Quantité","Conformité","Statut"].map(h=>`<th style="text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-2);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--line)">${h}</th>`).join("");
+  $("#batchBody").innerHTML=BATCHES.map(b=>`
+    <tr style="border-bottom:1px solid var(--line-2)">
+      <td style="padding:12px;font-family:Sora;font-weight:600">${b.lot}</td>
+      <td style="padding:12px">${b.prod}</td>
+      <td style="padding:12px;color:var(--muted)">${b.site}</td>
+      <td style="padding:12px;font-family:Sora">${b.qte}</td>
+      <td style="padding:12px"><b style="color:${b.conf>=96?'#0c8a43':'#e0892e'}">${b.conf}%</b></td>
+      <td style="padding:12px"><span class="stg" style="background:${b.statut==='Conforme'?'#e7f3ea':'#fdf3ea'};color:${b.statut==='Conforme'?'#076a32':'#b8651d'}"><span class="sd" style="background:${b.statut==='Conforme'?'#0c8a43':'#e0892e'}"></span>${b.statut}</span></td>
+    </tr>`).join("");
+}
+
+/* ===================== ERP ===================== */
+function renderErp(){
+  const synced=PRODUCTS.filter(p=>p.erp);
+  const eligible=PRODUCTS.filter(p=>stIdx(p.stage)>=stIdx("industrialisation"));
+  $("#erpSync").innerHTML=eligible.map(p=>`
+    <div class="synclog"><div class="si" style="background:${p.erp?'#e6effe':'#fdf3ea'}">${p.erp?'<svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.4" style="width:15px;height:15px"><path d="M20 6 9 17l-5-5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="#e0892e" stroke-width="2.4" style="width:15px;height:15px"><path d="M12 8v5M12 16h.01"/></svg>'}</div>
+      <div style="flex:1"><div style="font-weight:600;font-size:13.5px">${p.nom}</div><div style="font-size:11.5px;color:var(--muted)">${p.erp?'Article '+p.erpId+' · synchronisé':'Éligible — non synchronisé'}</div></div>
+      ${p.erp?'<span class="erp-pill on">⟲ À jour</span>':`<button class="btn erp sm" onclick="pushErp('${p.id}')">Synchroniser</button>`}
+    </div>`).join("");
+  const maps=[["Code produit","MATNR (n° article)"],["Formule NPK","Caractéristique CLAS"],["Nomenclature BOM","STKO / STPO"],["Fiche de sécurité","DMS document"],["Statut cycle de vie","Statut article MM"],["Site de production","WERKS (division)"]];
+  $("#erpMap").innerHTML=maps.map(([f,e])=>`<div class="maprow"><span class="mf">${f}</span><span class="ma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span><span class="me">${e}</span></div>`).join("");
+  const logs=[["NPK 20-20-20 Soluble","Article + nomenclature créés","il y a 2 j","ok"],["DAP Granulé Standard","Mise à jour BOM v5.2","il y a 4 j","ok"],["NPK 10-20-20 Olivier","Statut → Lancement","il y a 5 j","ok"],["NPK 15-15-15 Universel","En attente d'homologation","—","wait"]];
+  $("#erpLog").innerHTML=logs.map(([p,a,d,s])=>`<div class="synclog"><div class="si" style="background:${s==='ok'?'#e7f3ea':'#f4f7f2'}">${s==='ok'?'<svg viewBox="0 0 24 24" fill="none" stroke="#0c8a43" stroke-width="2.4" style="width:14px;height:14px"><path d="M20 6 9 17l-5-5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="#8a988d" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${p}</div><div style="font-size:11.5px;color:var(--muted)">${a}</div></div><div style="font-size:11.5px;color:var(--muted-2)">${d}</div></div>`).join("");
+}
+
+/* ===================== QUALITY ===================== */
+function renderQuality(){
+  const buckets={"90-100%":0,"70-89%":0,"50-69%":0,"<50%":0};
+  PRODUCTS.forEach(p=>{ p.quality>=90?buckets["90-100%"]++:p.quality>=70?buckets["70-89%"]++:p.quality>=50?buckets["50-69%"]++:buckets["<50%"]++; });
+  if(chQual)chQual.destroy();
+  chQual=new Chart($("#chQual"),{type:"doughnut",
+    data:{labels:Object.keys(buckets),datasets:[{data:Object.values(buckets),backgroundColor:["#0c8a43","#7cc043","#e0892e","#df5238"],borderWidth:3,borderColor:"#fff"}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:"64%",plugins:{legend:{position:"bottom",labels:{padding:13,usePointStyle:true,pointStyle:"circle",font:{size:12}}}}}});
+  const low=PRODUCTS.filter(p=>p.quality<90).sort((a,b)=>a.quality-b.quality);
+  $("#qualList").innerHTML=low.map(p=>{
+    const missing=p.docs.filter(d=>!d[1]).map(d=>d[0]);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line-2)">
+      <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px">${p.nom}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${missing.length?'Manque : '+missing.join(", "):'Champs descriptifs incomplets'}</div></div>
+      <div style="text-align:right;width:90px"><b style="color:${qcolor(p.quality)};font-family:Sora">${p.quality}%</b><div class="qbar"><i style="width:${p.quality}%;background:${qcolor(p.quality)}"></i></div></div>
+      <button class="btn ghost sm" onclick="openProduct('${p.id}')">Compléter</button>
+    </div>`;
+  }).join("");
+  // impact analysis
+  $("#impactSel").innerHTML=MATS.map(m=>`<option>${m}</option>`).join("");
+  $("#impactSel").onchange=renderImpact; renderImpact();
+}
+function renderImpact(){
+  const mat=$("#impactSel").value;
+  const used=PRODUCTS.filter(p=>p.bom.some(b=>b[0]===mat));
+  if(!used.length){$("#impactList").innerHTML=`<div style="color:var(--muted);padding:10px">Aucun produit n'utilise « ${mat} ».</div>`;return;}
+  $("#impactList").innerHTML=`<div style="font-size:13px;color:var(--muted);margin-bottom:10px"><b style="color:var(--txt)">${used.length} produit(s)</b> utilisent « ${mat} » — un changement les impacte :</div>`+
+    used.map(p=>{const pct=p.bom.find(b=>b[0]===mat)[1];return `<div style="display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line-2)">
+      <span class="npk" style="font-size:11px">${p.npk}</span>
+      <div style="flex:1"><b style="font-weight:600;font-size:13.5px">${p.nom}</b> <span style="color:var(--muted);font-size:12px">· ${stById(p.stage).l}</span></div>
+      <span style="font-family:Sora;font-weight:600">${pct}%</span>
+      <button class="btn ghost sm" onclick="openProduct('${p.id}')">Ouvrir</button></div>`;}).join("");
+}
+
+/* ===================== MODAL: NEW PRODUCT ===================== */
+const scrim=$("#scrim"),host=$("#modalHost");
+function closeModal(){scrim.classList.remove("open");host.innerHTML="";}
+scrim.addEventListener("click",e=>{if(e.target===scrim)closeModal();});
+function openNewProduct(){
+  host.innerHTML=`<div class="modal">
+    <div class="m-head"><div><h3>Nouveau produit</h3><p>Création de la fiche — étape Idéation</p></div><button class="m-x" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div class="m-body">
+      <div class="fld"><label>Nom du produit</label><input id="np-nom" placeholder="Ex. NPK 12-24-12 Betterave"/></div>
+      <div class="frow">
+        <div class="fld"><label>Formule NPK</label><input id="np-npk" placeholder="12-24-12"/></div>
+        <div class="fld"><label>Code</label><input id="np-code" placeholder="NC-XXXX"/></div>
+      </div>
+      <div class="frow">
+        <div class="fld"><label>Gamme</label><select id="np-gamme"><option>Engrais de fond</option><option>Fertigation</option><option>Spécialité oligo</option><option>Spécialité culture</option><option>Innovation</option><option>Biosolutions</option><option>Polyvalent</option></select></div>
+        <div class="fld"><label>Équipe pilote</label><select id="np-team"><option value="rd">R&D</option><option value="mkt">Marketing</option><option value="prod">Production</option></select></div>
+      </div>
+      <div class="fld"><label>Marché cible</label><input id="np-marche" placeholder="Ex. Maraîchage · Maroc"/></div>
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal()">Annuler</button><button class="btn" onclick="saveProduct()">Créer la fiche</button></div>
+  </div>`;
+  scrim.classList.add("open");
+}
+function saveProduct(){
+  const nom=$("#np-nom").value.trim(); if(!nom){toast("Indiquez le nom du produit");return;}
+  const p={id:"p"+Date.now(),code:$("#np-code").value||"NC-NEW",nom,npk:$("#np-npk").value||"00-00-00",
+    gamme:$("#np-gamme").value,marche:$("#np-marche").value||"À définir",stage:"ideation",owner:$("#np-team").value,
+    quality:28,ttmTarget:18,ttm:0,version:"v0.1",erp:false,erpId:null,
+    bom:[],docs:[["Fiche technique",0],["Fiche de données de sécurité",0],["Dossier d'homologation",0],["Étude agronomique",0]],
+    gates:{rd:0,mkt:0,prod:0},hist:[["Création de la fiche produit",TODAY.toISOString().slice(0,10),$("#np-team").value]]};
+  PRODUCTS.unshift(p);
+  FEED.unshift({team:p.owner,who:"Salma Bennani",act:"a créé la fiche de",prod:nom,d:"à l'instant"});
+  closeModal(); renderAll(); go("portfolio"); toast(`Produit « ${nom} » créé en Idéation`);
+}
+
+/* ===================== NAV ===================== */
+const TITLES={
+  cockpit:["Cockpit","Pilotage du cycle de vie produit"],
+  portfolio:["Portefeuille produits","Toutes les fiches et leur avancement"],
+  product:["Fiche produit",""],
+  lifecycle:["Cycle de vie (gates)","Passage d'étape par validation des équipes"],
+  production:["Production","Lots, tonnages et conformité (via ERP)"],
+  erp:["Intégration ERP","Synchronisation PLM ↔ SAP S/4HANA"],
+  quality:["Qualité des données","Complétude des fiches et analyse d'impact"],
+};
+function buildMobileMenu(){
+  $("#mmenu").innerHTML=[...document.querySelectorAll("#nav button")].map(b=>{
+    const v=b.dataset.v;const badge=v==="lifecycle"?`<span class="badge">${countPendingGates()}</span>`:"";
+    return `<button data-v="${v}" class="${b.classList.contains('active')?'active':''}">${b.querySelector('svg').outerHTML}<span>${b.querySelector('span').textContent}</span>${badge}</button>`;
+  }).join("");
+  $("#mmenu").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{go(b.dataset.v);$("#mmenu").classList.remove("open");}));
+}
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  $("#v-"+v).classList.add("active");
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  if(TITLES[v]&&v!=="product"){$("#pg-title").textContent=TITLES[v][0];$("#pg-sub").textContent=TITLES[v][1];}
+  buildMobileMenu(); window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("#nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.v)));
+$("#burger").addEventListener("click",()=>$("#mmenu").classList.toggle("open"));
+
+/* ===================== RENDER ALL ===================== */
+function renderAll(){
+  renderKpis(); renderCharts(); renderGateList(); renderFeed();
+  renderSegStage(); renderTeamFilter(); renderPortfolio();
+  renderKanban(); renderProduction(); renderErp(); renderQuality();
+  buildMobileMenu();
+}
+renderAll();
+</script>
+</body>
+</html>
