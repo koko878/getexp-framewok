@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Colza Conseil — Recommandations de fertilisation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  /* Design system: ui-ux-pro-max → "Agriculture/Farm Tech" palette + "Corporate Trust" type + flat style */
+  :root{
+    --green:#15803D; --green-d:#14532D; --green-2:#059669; --green-soft:#E2EFE7;
+    --amber:#D97706; --amber-soft:#FEF3C7;
+    --bg:#F0FDF4; --card:#FFFFFF; --fg:#0F172A; --muted:#64748B; --muted-2:#94A3B8;
+    --muted-bg:#F0F7F3; --border:#E2EFE7; --line:#EEF4EF; --red:#DC2626;
+    /* nutrient palette (distinct, accessible) */
+    --n:#15803D; --p:#7C3AED; --k:#DB2777; --s:#D97706; --b:#0891B2;
+    --sh:0 1px 2px rgba(15,23,42,.04); --sh-2:0 4px 16px rgba(20,83,45,.08);
+    --sh-lg:0 20px 50px rgba(20,83,45,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Source Sans 3",system-ui,sans-serif;color:var(--fg);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4,h5,.lex{font-family:"Lexend",sans-serif}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select{font-family:inherit;font-size:15px;color:var(--fg)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  /* ---------- Top bar ---------- */
+  .top{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--border)}
+  .top-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 24px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .logo{width:40px;height:40px;flex:0 0 40px}
+  .brand h1{font-size:18px;font-weight:700;letter-spacing:-.2px;line-height:1}
+  .brand .sub{font-size:11px;color:var(--muted);font-weight:500;margin-top:2px}
+  .tabs{display:flex;gap:2px;margin-left:8px}
+  .tabs button{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:9px;font-size:14px;font-weight:600;color:var(--muted);transition:.16s}
+  .tabs button svg{width:17px;height:17px}
+  .tabs button:hover{background:var(--muted-bg);color:var(--fg)}
+  .tabs button.active{background:var(--green);color:#fff}
+  .top-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+  .live{display:flex;align-items:center;gap:7px;background:#ECFDF3;border:1px solid #BBF7D0;color:var(--green-d);font-size:12px;font-weight:600;padding:5px 11px;border-radius:20px}
+  .live .pulse{width:8px;height:8px;border-radius:50%;background:var(--green-2);box-shadow:0 0 0 0 rgba(5,150,105,.5);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(5,150,105,.5)}70%{box-shadow:0 0 0 7px rgba(5,150,105,0)}100%{box-shadow:0 0 0 0 rgba(5,150,105,0)}}
+  .user{display:flex;align-items:center;gap:9px}
+  .user .av{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;font-family:Lexend}
+  .user .meta{font-size:12.5px;font-weight:600;line-height:1.15}.user .meta span{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+  .burger{display:none}
+  @media(max-width:560px){.user .meta,.live span.tx{display:none}}
+
+  .wrap{max-width:1240px;margin:0 auto;padding:26px 24px 70px}
+  .view{display:none;animation:fade .3s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---------- Buttons ---------- */
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;font-size:14.5px;font-weight:600;background:var(--green);color:#fff;transition:.14s}
+  .btn:hover{background:var(--green-d)}
+  .btn:active{transform:scale(.97)}
+  .btn svg{width:17px;height:17px}
+  .btn.amber{background:var(--amber)}.btn.amber:hover{background:#B45309}
+  .btn.ghost{background:#fff;color:var(--fg);border:1px solid var(--border)}
+  .btn.ghost:hover{background:var(--muted-bg)}
+  .btn.sm{padding:7px 13px;font-size:13px;border-radius:8px}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px}
+  .card.pad{padding:22px}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .sec-h h2{font-size:20px;font-weight:600;letter-spacing:-.3px}
+  .sec-h h3{font-size:16px;font-weight:600}
+  .sec-h .hint{font-size:13px;color:var(--muted)}
+  .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--green);background:#ECFDF3;padding:5px 11px;border-radius:7px;margin-bottom:10px}
+
+  /* ---------- Phase stepper ---------- */
+  .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+  .hero h2{font-size:25px;font-weight:700;letter-spacing:-.5px;line-height:1.15}
+  .hero p{color:var(--muted);font-size:14.5px;margin-top:6px;max-width:560px}
+  .stepper{display:flex;gap:0;overflow-x:auto;padding:6px 2px 14px;scrollbar-width:thin}
+  .step{flex:1;min-width:118px;position:relative;text-align:center;cursor:pointer;padding:0 6px}
+  .step .bar{height:5px;border-radius:4px;background:var(--green-soft);margin-bottom:12px;transition:.2s}
+  .step.on .bar,.step.done .bar{background:var(--green)}
+  .step .dot{width:38px;height:38px;border-radius:50%;background:#fff;border:2px solid var(--green-soft);display:flex;align-items:center;justify-content:center;margin:-28px auto 8px;transition:.2s;color:var(--muted)}
+  .step .dot svg{width:19px;height:19px}
+  .step.on .dot{border-color:var(--green);background:var(--green);color:#fff;transform:scale(1.08)}
+  .step.done .dot{border-color:var(--green);color:var(--green)}
+  .step .nm{font-family:Lexend;font-size:13px;font-weight:600;line-height:1.2}
+  .step.on .nm{color:var(--green-d)}
+  .step .bbch{font-size:11px;color:var(--muted-2);margin-top:2px}
+
+  .phase-grid{display:grid;grid-template-columns:1.05fr 1.35fr;gap:18px;align-items:start}
+  .phase-banner{background:linear-gradient(110deg,var(--green-d),var(--green));color:#fff;border-radius:16px;padding:22px;position:relative;overflow:hidden}
+  .phase-banner .leaf{position:absolute;right:-20px;bottom:-26px;width:130px;height:130px;opacity:.16}
+  .phase-banner .pp{font-size:12.5px;font-weight:600;color:#BBF7D0;text-transform:uppercase;letter-spacing:.05em}
+  .phase-banner h3{font-size:23px;font-weight:700;margin:6px 0 4px;letter-spacing:-.3px}
+  .phase-banner .per{font-size:13.5px;color:#D1FAE5}
+  .phase-banner .desc{font-size:14px;color:#ECFDF5;margin-top:14px;line-height:1.55}
+  .phase-banner .tip{display:flex;gap:9px;background:rgba(255,255,255,.12);border-radius:11px;padding:12px 14px;margin-top:16px;font-size:13px}
+  .phase-banner .tip svg{width:18px;height:18px;flex:0 0 18px;color:#FDE68A}
+
+  .needs h4{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.04em}
+  .need{display:flex;align-items:center;gap:13px;margin-bottom:15px}
+  .need .nic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:Lexend;font-weight:700;font-size:13px;flex:0 0 40px}
+  .need .nb{flex:1;min-width:0}
+  .need .nl{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px}
+  .need .nl b{font-weight:600}.need .nl .kg{color:var(--muted);font-weight:500}
+  .need .track{height:8px;border-radius:5px;background:var(--muted-bg);overflow:hidden}
+  .need .track i{display:block;height:100%;border-radius:5px;transition:width .4s}
+  .lvl-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.03em}
+
+  /* products */
+  .prod-list{display:flex;flex-direction:column;gap:13px}
+  .prod{display:flex;gap:15px;padding:16px;border:1px solid var(--border);border-radius:14px;cursor:pointer;transition:.15s;background:#fff}
+  .prod:hover{border-color:var(--green);box-shadow:var(--sh-2);transform:translateY(-2px)}
+  .prod .pic{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 52px}
+  .prod .pic svg{width:24px;height:24px}
+  .prod .pm{flex:1;min-width:0}
+  .prod .pt{font-family:Lexend;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .prod .star{font-size:10.5px;font-weight:700;background:var(--amber-soft);color:#92400E;padding:2px 8px;border-radius:20px;letter-spacing:.03em}
+  .prod .pd{font-size:13px;color:var(--muted);margin-top:3px}
+  .chips{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+  .chip{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:7px;background:var(--muted-bg);color:#475569;display:inline-flex;align-items:center;gap:5px}
+  .chip svg{width:12px;height:12px}
+  .prod .parr{align-self:center;color:var(--muted-2)}
+
+  /* uptake chart card */
+  .mini{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .ms{border:1px solid var(--border);border-radius:13px;padding:15px}
+  .ms .v{font-family:Lexend;font-size:22px;font-weight:700}
+  .ms .l{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+  /* catalogue */
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .cat{padding:18px;cursor:pointer;transition:.15s}
+  .cat:hover{border-color:var(--green);box-shadow:var(--sh-2);transform:translateY(-3px)}
+  .cat .ch{display:flex;gap:13px;align-items:flex-start}
+  .cat .pic{width:48px;height:48px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 48px}
+  .cat .pic svg{width:22px;height:22px}
+  .cat h4{font-size:16.5px;font-weight:600}
+  .cat .frm{font-size:12.5px;color:var(--muted)}
+  .npk-row{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+  .npk-b{flex:1;min-width:42px;text-align:center;border-radius:9px;padding:8px 4px;background:var(--muted-bg)}
+  .npk-b .v{font-family:Lexend;font-weight:700;font-size:16px}
+  .npk-b .l{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:1px}
+
+  /* carences */
+  .car-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+  .car{padding:0;overflow:hidden}
+  .car .top-band{padding:16px 18px;color:#fff;display:flex;align-items:center;gap:12px}
+  .car .top-band .ci{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-family:Lexend;font-weight:700}
+  .car .top-band h4{font-size:16px;font-weight:600;color:#fff}
+  .car .top-band .sm{font-size:12px;opacity:.85}
+  .car .cb{padding:16px 18px}
+  .car .cr{font-size:13.5px;display:flex;gap:9px;padding:7px 0}
+  .car .cr svg{width:16px;height:16px;flex:0 0 16px;margin-top:2px}
+  .car .corr{margin-top:12px;padding:11px 13px;border-radius:11px;background:var(--muted-bg);font-size:13px}
+  .car .corr b{font-weight:600}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .kpi{padding:18px;position:relative;overflow:hidden}
+  .kpi .ki{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .kpi .ki svg{width:18px;height:18px}
+  .kpi .v{font-family:Lexend;font-size:30px;font-weight:700;letter-spacing:-1px;line-height:1}
+  .kpi .l{font-size:13px;color:var(--muted);margin-top:5px}
+  .kpi .tr{font-size:12px;font-weight:600;margin-top:8px;display:inline-flex;align-items:center;gap:4px}
+  .up{color:var(--green)}
+
+  .cms-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .cms-row:last-child{border:none}
+  .cms-row .ci2{width:34px;height:34px;border-radius:9px;background:var(--muted-bg);display:flex;align-items:center;justify-content:center;flex:0 0 34px}
+  .cms-row .ci2 svg{width:16px;height:16px;color:var(--green)}
+  .badge-up{font-size:11.5px;font-weight:700;color:var(--green-d);background:#ECFDF3;padding:3px 9px;border-radius:20px}
+
+  /* calculator / plan */
+  .calc-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+  .field input,.field select{width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px;background:#fff;transition:.15s}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(21,128,61,.12)}
+  .field .unit{font-size:12px;color:var(--muted);margin-top:5px}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0}
+  .toggle-row .tl{font-size:13.5px;font-weight:500}
+  .sw{width:44px;height:25px;border-radius:20px;background:var(--border);position:relative;cursor:pointer;transition:.2s;flex:0 0 44px}
+  .sw.on{background:var(--green)}
+  .sw i{position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.2s}
+  .sw.on i{left:22px}
+  .plan-table{width:100%;border-collapse:collapse;font-size:14px}
+  .plan-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-2);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--border)}
+  .plan-table td{padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .plan-table tr:last-child td{border:none}
+  .plan-table .pn{font-weight:600}
+  .plan-total{display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--muted-bg);border-radius:13px;margin-top:14px}
+  .plan-total .tt{font-size:13px;color:var(--muted)}
+  .plan-total .tv{font-family:Lexend;font-size:24px;font-weight:700;color:var(--green-d)}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto}
+  .scrim.open{display:flex}
+  .modal{background:#fff;border-radius:18px;width:100%;max-width:620px;box-shadow:var(--sh-lg);animation:pop .26s cubic-bezier(.2,.9,.3,1.1);overflow:hidden}
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+  .m-hero{padding:22px 24px;color:#fff;position:relative}
+  .m-hero .mx{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:#fff}
+  .m-hero .mx svg{width:18px;height:18px}
+  .m-hero .mp{font-size:12px;font-weight:600;opacity:.85;text-transform:uppercase;letter-spacing:.05em}
+  .m-hero h3{font-size:23px;font-weight:700;margin-top:5px}
+  .m-hero .mf{font-size:13.5px;opacity:.9;margin-top:3px}
+  .m-body{padding:22px 24px;display:flex;flex-direction:column;gap:20px}
+  .m-body h5{font-size:12.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+  .ben{display:flex;gap:10px;padding:7px 0;font-size:14px}
+  .ben svg{width:18px;height:18px;color:var(--green);flex:0 0 18px;margin-top:1px}
+  .dose-box{background:var(--amber-soft);border:1px solid #FDE68A;border-radius:12px;padding:14px 16px}
+  .dose-box .dl{font-size:12px;font-weight:600;color:#92400E;text-transform:uppercase;letter-spacing:.04em}
+  .dose-box .dv{font-family:Lexend;font-size:19px;font-weight:700;color:#78350F;margin-top:3px}
+  .dose-box .dn{font-size:12.5px;color:#92400E;margin-top:4px}
+  .m-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:#FAFCFA}
+
+  /* toast */
+  .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:100;display:flex;flex-direction:column;gap:10px}
+  .toast{display:flex;align-items:center;gap:11px;background:var(--green-d);color:#fff;padding:13px 17px;border-radius:12px;box-shadow:var(--sh-lg);font-size:14px;font-weight:500;animation:sl .3s ease;max-width:360px}
+  .toast .ti{width:22px;height:22px;border-radius:50%;background:var(--green-2);display:flex;align-items:center;justify-content:center;flex:0 0 22px}
+  .toast .ti svg{width:13px;height:13px}
+  @keyframes sl{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+
+  .mob-menu{display:none}
+  @media(max-width:940px){
+    .tabs,.top-r .user .meta{display:none}
+    .burger{display:flex;width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center;border:1px solid var(--border);background:#fff}
+    .burger svg{width:20px;height:20px}
+    .phase-grid,.calc-grid{grid-template-columns:1fr}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .mini{grid-template-columns:1fr}
+    .wrap{padding:20px 16px 70px}
+    .mob-menu{position:absolute;top:64px;left:12px;right:12px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh-lg);z-index:60;padding:8px;flex-direction:column;gap:2px;display:none}
+    .mob-menu.open{display:flex}
+    .mob-menu button{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:9px;font-weight:600;color:var(--muted);text-align:left}
+    .mob-menu button svg{width:18px;height:18px}
+    .mob-menu button.active{background:var(--green);color:#fff}
+  }
+  @media print{.top,.tabs,.no-print,.toast-wrap{display:none!important}.view{display:none!important}.view.active{display:block!important}.wrap{padding:0}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <button class="burger" id="burger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="11" fill="#15803D"/>
+        <circle cx="20" cy="14" r="3.4" fill="#FACC15"/>
+        <circle cx="14.5" cy="18" r="3.4" fill="#FACC15"/>
+        <circle cx="25.5" cy="18" r="3.4" fill="#FACC15"/>
+        <circle cx="20" cy="20.5" r="2.6" fill="#D97706"/>
+        <path d="M20 23v9M20 28c-2.4 0-4-1.4-5-3M20 30c2.4 0 4-1.4 5-3" stroke="#ECFDF5" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+      <div><h1>Colza Conseil</h1><div class="sub">Fertilisation — France</div></div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-v="conseil" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 2v8M12 10c-3 0-5-2-5-5M12 10c3 0 5-2 5-5M5 13c0 4 3 7 7 7s7-3 7-7"/></svg>Conseil par phase</button>
+      <button data-v="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>Plan de fertilisation</button>
+      <button data-v="produits"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 9l9-6 9 6v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 21V12h6v9"/></svg>Produits</button>
+      <button data-v="carences"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Carences</button>
+      <button data-v="pilotage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>Pilotage</button>
+    </nav>
+    <div class="top-r">
+      <div class="live"><span class="pulse"></span><span class="tx">À jour · 12 juin 2026</span></div>
+      <div class="user"><div class="meta">Julien Moreau<span>Technico-commercial</span></div><div class="av">JM</div></div>
+    </div>
+  </div>
+  <div class="mob-menu" id="mmenu"></div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ CONSEIL PAR PHASE ============ -->
+  <section class="view active" id="v-conseil">
+    <div class="hero">
+      <div>
+        <span class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M12 2v8M5 13c0 4 3 7 7 7s7-3 7-7"/></svg>Itinéraire de fertilisation du colza</span>
+        <h2>Le bon nutriment, à la bonne phase.</h2>
+        <p>Sélectionnez le stade de croissance : la plateforme affiche les besoins en NPKS et oligo-éléments, puis les produits adaptés et leur mode d'application.</p>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-bottom:18px">
+      <div class="stepper" id="stepper"></div>
+    </div>
+
+    <div class="phase-grid">
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="phase-banner" id="phaseBanner"></div>
+        <div class="card pad needs">
+          <h4>Besoins de la culture sur cette phase</h4>
+          <div id="needsList"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <div class="card pad">
+          <div class="sec-h"><h3>Produits recommandés</h3><span class="hint">cliquez pour la fiche détaillée</span></div>
+          <div class="prod-list" id="phaseProds"></div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h"><h3>Courbe d'absorption sur le cycle</h3><span class="hint">N · S · Bore</span></div>
+          <div style="height:210px"><canvas id="chUptake"></canvas></div>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:10px">Le colza est un fort consommateur de <b style="color:var(--s)">soufre</b> et sensible au <b style="color:var(--b)">bore</b>. Le pic d'azote se situe à la montaison.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLAN DE FERTILISATION ============ -->
+  <section class="view" id="v-plan">
+    <div class="sec-h"><div><span class="eyebrow">Aide à la vente</span><h2>Plan de fertilisation chiffré</h2></div></div>
+    <div class="calc-grid">
+      <div class="card pad no-print">
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:16px">Paramètres de la parcelle</h3>
+        <div class="field"><label>Surface</label><input type="number" id="i-surface" value="50" min="1"/><div class="unit">hectares (ha)</div></div>
+        <div class="field"><label>Objectif de rendement</label><input type="number" id="i-rdt" value="38" min="10"/><div class="unit">quintaux/ha (q/ha)</div></div>
+        <div class="field"><label>Reliquat azoté sortie hiver</label><input type="number" id="i-reliquat" value="40" min="0"/><div class="unit">kg N/ha (pesée / réglette)</div></div>
+        <div class="toggle-row"><span class="tl">Inclure le bore foliaire</span><div class="sw on" id="sw-bore" onclick="this.classList.toggle('on');compute()"><i></i></div></div>
+        <div class="toggle-row"><span class="tl">Inclure le PKS de fond</span><div class="sw" id="sw-pks" onclick="this.classList.toggle('on');compute()"><i></i></div></div>
+        <button class="btn" style="width:100%;justify-content:center;margin-top:12px" onclick="compute()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Calculer le plan</button>
+      </div>
+      <div class="card pad">
+        <div class="sec-h">
+          <div><h3>Plan recommandé</h3><span class="hint" id="planSub"></span></div>
+          <button class="btn ghost sm no-print" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>Exporter la synthèse</button>
+        </div>
+        <div style="overflow-x:auto"><table class="plan-table"><thead><tr><th>Phase</th><th>Produit</th><th>Dose/ha</th><th>Quantité</th><th style="text-align:right">Coût</th></tr></thead><tbody id="planBody"></tbody></table></div>
+        <div class="plan-total"><div><div class="tt">Coût total du programme · <span id="ptHa"></span></div><div style="font-size:12.5px;color:var(--muted);margin-top:2px" id="ptDetail"></div></div><div class="tv" id="ptVal"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRODUITS ============ -->
+  <section class="view" id="v-produits">
+    <div class="sec-h"><div><span class="eyebrow">Gamme colza</span><h2>Catalogue produits</h2></div><span class="hint">Fiches toujours à jour — composition, bénéfices, dosage</span></div>
+    <div class="cat-grid" id="catGrid"></div>
+  </section>
+
+  <!-- ============ CARENCES ============ -->
+  <section class="view" id="v-carences">
+    <div class="sec-h"><div><span class="eyebrow">Diagnostic terrain</span><h2>Reconnaître & corriger les carences</h2></div><span class="hint">Symptômes visuels et correction par produit</span></div>
+    <div class="car-grid" id="carGrid"></div>
+  </section>
+
+  <!-- ============ PILOTAGE ============ -->
+  <section class="view" id="v-pilotage">
+    <div class="sec-h"><div><span class="eyebrow">Espace interne</span><h2>Pilotage de l'adoption</h2></div><span class="hint">Visible par les équipes commerciales</span></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="phase-grid" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Visites de la plateforme</h3><span class="hint">6 derniers mois</span></div>
+        <div style="height:240px"><canvas id="chVisits"></canvas></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Contenus agronomiques</h3><span class="badge-up">CMS léger — édition interne</span></div>
+        <div id="cmsList"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="scrim" id="scrim"><div id="modalHost"></div></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ================= DONNÉES AGRONOMIQUES ================= */
+const NUT = {
+  N:{l:"Azote (N)", c:"#15803D"},
+  P:{l:"Phosphore (P₂O₅)", c:"#7C3AED"},
+  K:{l:"Potasse (K₂O)", c:"#DB2777"},
+  S:{l:"Soufre (SO₃)", c:"#D97706"},
+  B:{l:"Bore (B)", c:"#0891B2"},
+};
+const LVL = v => v>=85?["Critique","#FEE2E2","#B91C1C"]:v>=65?["Élevé","#DCFCE7","#15803D"]:v>=40?["Moyen","#FEF3C7","#92400E"]:["Faible","#F1F5F9","#475569"];
+
+// products
+const PRODS = {
+  nps:{id:"nps", nom:"NPS 3.30.7S", star:"Produit phare", forme:"Granulé", mode:"Au semis (localisé)", c:"#15803D",
+    npk:{N:3,P:30,K:0,S:7}, prix:560, dose:150, doseU:"kg/ha",
+    desc:"Engrais starter riche en phosphore et soufre pour un démarrage racinaire vigoureux.",
+    ben:["Phosphore très disponible dès la levée — enracinement rapide","Soufre (SO₃) pour la synthèse des protéines, besoin clé du colza","Localisé au semis : efficience maximale, moins de pertes"],
+    doseNote:"120–180 kg/ha localisé au semis selon la richesse du sol en P₂O₅."},
+  pks:{id:"pks", nom:"PKS de fond", star:"", forme:"Granulé", mode:"Fond avant semis", c:"#7C3AED",
+    npk:{N:0,P:18,K:24,S:6}, prix:480, dose:200, doseU:"kg/ha",
+    desc:"Fumure de fond phosphore-potasse soufrée pour entretenir la fertilité de la parcelle.",
+    ben:["Reconstitue les réserves P₂O₅ / K₂O de la parcelle","Potasse pour la résistance au froid et la régulation hydrique","Apport de soufre dès le fond"],
+    doseNote:"150–250 kg/ha selon analyse de sol, avant le semis."},
+  sulfa:{id:"sulfa", nom:"Azote + Soufre 33S", star:"", forme:"Granulé", mode:"Reprise & montaison", c:"#D97706",
+    npk:{N:33,P:0,K:0,S:15}, prix:520, dose:0, doseU:"kg/ha",
+    desc:"Apport azoté de printemps couplé au soufre, au moment du pic d'absorption.",
+    ben:["Couvre le pic de besoin en azote à la montaison","Soufre indispensable : sans lui, l'azote est mal valorisé","Fractionnable reprise / montaison"],
+    doseNote:"Dose calculée par la méthode du bilan (réglette colza)."},
+  bore:{id:"bore", nom:"Bore foliaire", star:"Sécurité rendement", forme:"Liquide", mode:"Foliaire — montaison/floraison", c:"#0891B2",
+    npk:{N:0,P:0,K:0,S:0,B:11}, prix:9, prixU:"€/L", dose:1.5, doseU:"L/ha",
+    desc:"Correction du bore, oligo-élément critique pour la fécondation et la nouaison.",
+    ben:["Prévient l'avortement des fleurs et la coulure","Améliore la nouaison et le nombre de siliques","Application foliaire ciblée, rapide à corriger"],
+    doseNote:"1 à 2 L/ha en foliaire à la montaison, renouvelable à la floraison."},
+  mg:{id:"mg", nom:"Magnésie + Soufre", star:"", forme:"Granulé", mode:"Automne / reprise", c:"#DB2777",
+    npk:{N:0,P:0,K:0,S:32, Mg:16}, prix:300, dose:120, doseU:"kg/ha",
+    desc:"Magnésium et soufre pour la photosynthèse et la qualité de la chlorophylle.",
+    ben:["Magnésium = cœur de la molécule de chlorophylle","Soufre complémentaire pour les sols pauvres","Limite les carences de fin d'automne"],
+    doseNote:"100–150 kg/ha en sols carencés en magnésium."},
+};
+
+const PHASES = [
+  {k:"semis", nom:"Semis / Levée", bbch:"BBCH 00–09", per:"Août – Septembre", ic:'<path d="M12 2v6M9 5l3-3 3 3"/><circle cx="12" cy="16" r="5"/>',
+   desc:"Implantation et premières feuilles. L'enjeu : un enracinement rapide et une plante qui entre vigoureuse à l'automne. Le phosphore et le soufre sont déterminants dès ce stade.",
+   tip:"Un colza bien implanté à l'automne valorise mieux l'azote au printemps.",
+   needs:{P:90,S:60,N:35,K:50,B:20}, kg:{P:"≈ 45 u",S:"≈ 20 u",N:"30 u",K:"40 u",B:"—"},
+   prods:["nps","pks"]},
+  {k:"rosette", nom:"Rosette (4–6 f.)", bbch:"BBCH 14–16", per:"Octobre – Novembre", ic:'<path d="M12 12c0-3 2-5 5-5M12 12c0-3-2-5-5-5M12 12c0 3 2 5 5 5M12 12c0 3-2 5-5 5"/>',
+   desc:"Construction de la rosette avant l'hiver. Le colza accumule des réserves. Soufre et magnésium sécurisent une biomasse saine et résistante au froid.",
+   tip:"Une biomasse d'entrée hiver bien construite = base du rendement.",
+   needs:{P:55,S:65,N:45,K:55,B:30}, kg:{P:"30 u",S:"≈ 25 u",N:"40 u",K:"45 u",B:"—"},
+   prods:["mg","pks"]},
+  {k:"hiver", nom:"Entrée hiver", bbch:"BBCH 18–19", per:"Décembre – Janvier", ic:'<path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/>',
+   desc:"Repos végétatif. Peu d'absorption : on sécurise les réserves et on prépare le bilan azoté de sortie d'hiver (pesée / réglette).",
+   tip:"C'est le moment de peser le colza pour calibrer l'azote de printemps.",
+   needs:{P:15,S:20,N:10,K:20,B:10}, kg:{P:"—",S:"—",N:"—",K:"—",B:"—"},
+   prods:[]},
+  {k:"reprise", nom:"Reprise", bbch:"BBCH 30", per:"Février – Mars", ic:'<path d="M12 22V8M12 8c-3 0-5-2-5-5M12 8c3 0 5-2 5-5M5 14c0 4 3 7 7 7"/>',
+   desc:"Redémarrage de la végétation. L'azote et surtout le soufre deviennent prioritaires : un déficit en soufre bloque la valorisation de l'azote.",
+   tip:"Soufre en premier : sans S, l'azote apporté est gaspillé.",
+   needs:{N:80,S:85,P:35,K:45,B:35}, kg:{N:"≈ 60 u",S:"≈ 35 u",P:"20 u",K:"40 u",B:"—"},
+   prods:["sulfa","mg"]},
+  {k:"montaison", nom:"Montaison", bbch:"BBCH 31–39", per:"Mars – Avril", ic:'<path d="M12 22V4M12 4l-4 4M12 4l4 4M7 14h10"/>',
+   desc:"Pic d'absorption de l'azote et élongation des tiges. Le bore devient critique pour préparer la fécondation. Phase la plus exigeante du cycle.",
+   tip:"Apport de bore foliaire à la montaison = sécurité nouaison.",
+   needs:{N:95,S:75,B:80,P:40,K:55}, kg:{N:"≈ 90 u",S:"≈ 40 u",B:"1,5 L",P:"25 u",K:"50 u"},
+   prods:["sulfa","bore"]},
+  {k:"floraison", nom:"Floraison", bbch:"BBCH 60–69", per:"Avril – Mai", ic:'<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/>',
+   desc:"Floraison et nouaison. Le bore sécurise la fécondation et le nombre de siliques. Les apports azotés sont terminés ; on protège le potentiel.",
+   tip:"Un complément de bore à floraison limite la coulure des fleurs.",
+   needs:{B:85,N:50,S:55,P:30,K:45}, kg:{B:"1,5 L",N:"fin",S:"25 u",P:"—",K:"—"},
+   prods:["bore"]},
+  {k:"siliques", nom:"Siliques", bbch:"BBCH 70–79", per:"Mai – Juin", ic:'<path d="M12 2c-1 4-1 8 0 12M8 6c0 3 1 6 2 8M16 6c0 3-1 6-2 8M10 18h4"/>',
+   desc:"Remplissage des graines. La plante remobilise ses réserves : les besoins externes chutent. On évalue le programme avant récolte.",
+   tip:"Le rendement se construit maintenant à partir des réserves accumulées.",
+   needs:{N:25,S:30,P:20,K:30,B:25}, kg:{N:"—",S:"—",P:"—",K:"—",B:"—"},
+   prods:[]},
+];
+
+const CARENCES = [
+  {n:"S", nom:"Soufre", c:"#D97706", sym:["Jaunissement des jeunes feuilles (haut de la plante)","Feuilles cuillère, marbrures pâles","Pétales décolorés, blanchâtres"], impact:"Azote mal valorisé, chute du rendement et de la teneur en huile.", corr:"Azote + Soufre 33S à la reprise, ou Magnésie + Soufre."},
+  {n:"B", nom:"Bore", c:"#0891B2", sym:["Avortement des fleurs, coulure","Tiges creuses ou fendues","Siliques déformées, mal remplies"], impact:"Mauvaise fécondation : moins de siliques, perte directe de rendement.", corr:"Bore foliaire 1,5 L/ha à la montaison puis floraison."},
+  {n:"N", nom:"Azote", c:"#15803D", sym:["Jaunissement des feuilles âgées (bas de la plante)","Plante chétive, peu de ramifications","Coloration rouge/violacée des tiges"], impact:"Biomasse et nombre de siliques réduits, plafond de rendement abaissé.", corr:"Azote + Soufre 33S, dose calculée par bilan (réglette colza)."},
+  {n:"Mg", nom:"Magnésium", c:"#DB2777", sym:["Jaunissement entre les nervures (feuilles âgées)","Nervures restant vertes","Feuilles marbrées en automne"], impact:"Photosynthèse réduite, sensibilité accrue au froid.", corr:"Magnésie + Soufre 100–150 kg/ha à l'automne ou à la reprise."},
+];
+
+/* ================= HELPERS ================= */
+const $ = s => document.querySelector(s);
+function toast(msg){const t=document.createElement("div");t.className="toast";t.innerHTML=`<span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span><span>${msg}</span>`;$("#toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transform="translateX(30px)";t.style.transition="all .3s";setTimeout(()=>t.remove(),300);},3200);}
+const modeIcon = m => m.includes("foliaire")||m.includes("Foliaire")?'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>':m.includes("semis")||m.includes("Au semis")?'<circle cx="12" cy="14" r="5"/><path d="M12 2v5M9 5l3-2 3 2"/>':'<path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 4-5"/>';
+
+/* ================= CONSEIL PAR PHASE ================= */
+let curPhase=4; // montaison by default (most interesting)
+function renderStepper(){
+  $("#stepper").innerHTML=PHASES.map((p,i)=>`
+    <div class="step ${i===curPhase?'on':i<curPhase?'done':''}" onclick="curPhase=${i};renderPhase()">
+      <div class="bar"></div>
+      <div class="dot">${i<curPhase?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${p.ic}</svg>`}</div>
+      <div class="nm">${p.nom}</div><div class="bbch">${p.bbch}</div>
+    </div>`).join("");
+}
+function renderPhase(){
+  renderStepper();
+  const p=PHASES[curPhase];
+  $("#phaseBanner").innerHTML=`
+    <svg class="leaf" viewBox="0 0 24 24" fill="currentColor"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/></svg>
+    <div class="pp">${p.bbch} · ${p.per}</div>
+    <h3>${p.nom}</h3>
+    <div class="desc">${p.desc}</div>
+    <div class="tip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg><span>${p.tip}</span></div>`;
+  // needs
+  const order=["N","P","K","S","B"];
+  $("#needsList").innerHTML=order.map(k=>{
+    const v=p.needs[k]||0; const [tag,bg,fg]=LVL(v);
+    return `<div class="need">
+      <div class="nic" style="background:${NUT[k].c}">${k}</div>
+      <div class="nb">
+        <div class="nl"><b>${NUT[k].l}</b><span class="kg">${p.kg[k]||"—"} <span class="lvl-tag" style="background:${bg};color:${fg}">${tag}</span></span></div>
+        <div class="track"><i style="width:${v}%;background:${NUT[k].c}"></i></div>
+      </div></div>`;
+  }).join("");
+  // products
+  if(!p.prods.length){
+    $("#phaseProds").innerHTML=`<div style="padding:24px;text-align:center;color:var(--muted)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:34px;height:34px;opacity:.4;margin-bottom:8px"><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg><div>Phase à faible apport — pas d'intervention recommandée. On sécurise et on observe.</div></div>`;
+  } else {
+    $("#phaseProds").innerHTML=p.prods.map(id=>{const pr=PRODS[id];return `
+      <div class="prod" onclick="openProduct('${id}')">
+        <div class="pic" style="background:${pr.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${modeIcon(pr.mode)}</svg></div>
+        <div class="pm">
+          <div class="pt">${pr.nom}${pr.star?`<span class="star">${pr.star}</span>`:""}</div>
+          <div class="pd">${pr.desc}</div>
+          <div class="chips"><span class="chip">${pr.forme}</span><span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${modeIcon(pr.mode)}</svg>${pr.mode}</span></div>
+        </div>
+        <div class="parr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M9 18l6-6-6-6"/></svg></div>
+      </div>`;}).join("");
+  }
+}
+
+let chUptake;
+function renderUptake(){
+  if(chUptake)chUptake.destroy();
+  const labels=PHASES.map(p=>p.nom);
+  chUptake=new Chart($("#chUptake"),{type:"line",
+    data:{labels,datasets:[
+      {label:"Azote",data:PHASES.map(p=>p.needs.N||0),borderColor:NUT.N.c,backgroundColor:"transparent",tension:.4,borderWidth:3,pointRadius:0},
+      {label:"Soufre",data:PHASES.map(p=>p.needs.S||0),borderColor:NUT.S.c,backgroundColor:"transparent",tension:.4,borderWidth:3,pointRadius:0},
+      {label:"Bore",data:PHASES.map(p=>p.needs.B||0),borderColor:NUT.B.c,backgroundColor:"transparent",tension:.4,borderWidth:3,pointRadius:0,borderDash:[5,4]},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{intersect:false,mode:"index"},
+      plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",font:{size:11,family:"Source Sans 3"},padding:12}}},
+      scales:{y:{display:false,min:0,max:100},x:{grid:{display:false},ticks:{font:{size:9},maxRotation:40,minRotation:40}}}}});
+}
+
+/* ================= PRODUITS ================= */
+function renderCatalogue(){
+  $("#catGrid").innerHTML=Object.values(PRODS).map(pr=>`
+    <div class="card cat" onclick="openProduct('${pr.id}')">
+      <div class="ch">
+        <div class="pic" style="background:${pr.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${modeIcon(pr.mode)}</svg></div>
+        <div style="flex:1"><h4>${pr.nom}</h4><div class="frm">${pr.forme} · ${pr.mode}</div></div>
+      </div>
+      <div class="npk-row">
+        ${["N","P","K","S"].map(k=>`<div class="npk-b"><div class="v" style="color:${NUT[k].c}">${pr.npk[k]||0}</div><div class="l">${k==="P"?"P₂O₅":k==="K"?"K₂O":k==="S"?"SO₃":"N"}</div></div>`).join("")}
+      </div>
+      ${pr.star?`<div style="margin-top:13px"><span class="star" style="font-size:11px;font-weight:700;background:var(--amber-soft);color:#92400E;padding:3px 10px;border-radius:20px">${pr.star}</span></div>`:""}
+    </div>`).join("");
+}
+
+/* ================= MODAL PRODUIT ================= */
+const scrim=$("#scrim"),host=$("#modalHost");
+function closeModal(){scrim.classList.remove("open");host.innerHTML="";}
+scrim.addEventListener("click",e=>{if(e.target===scrim)closeModal();});
+function openProduct(id){
+  const pr=PRODS[id];
+  const npkCells=["N","P","K","S"].map(k=>`<div class="npk-b"><div class="v" style="color:${NUT[k].c}">${pr.npk[k]||0}</div><div class="l">${k==="P"?"P₂O₅":k==="K"?"K₂O":k==="S"?"SO₃":"N"}</div></div>`).join("");
+  host.innerHTML=`<div class="modal">
+    <div class="m-hero" style="background:linear-gradient(120deg,${pr.c},${pr.c}cc)">
+      <button class="mx" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <div class="mp">${pr.forme} · ${pr.mode}</div>
+      <h3>${pr.nom}</h3>
+      <div class="mf">${pr.desc}</div>
+    </div>
+    <div class="m-body">
+      <div>
+        <h5>Composition</h5>
+        <div class="npk-row">${npkCells}${pr.npk.B?`<div class="npk-b"><div class="v" style="color:${NUT.B.c}">${pr.npk.B}</div><div class="l">Bore</div></div>`:""}${pr.npk.Mg?`<div class="npk-b"><div class="v" style="color:#DB2777">${pr.npk.Mg}</div><div class="l">MgO</div></div>`:""}</div>
+      </div>
+      <div>
+        <h5>Bénéfices agronomiques</h5>
+        ${pr.ben.map(b=>`<div class="ben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>${b}</span></div>`).join("")}
+      </div>
+      <div class="dose-box">
+        <div class="dl">Dosage indicatif</div>
+        <div class="dv">${pr.dose?pr.dose+" "+pr.doseU:"Selon bilan azoté"}</div>
+        <div class="dn">${pr.doseNote}</div>
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="closeModal();go('plan');toast('Ajouté au plan de fertilisation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Ajouter au plan</button></div>
+  </div>`;
+  scrim.classList.add("open");
+}
+
+/* ================= CARENCES ================= */
+function renderCarences(){
+  $("#carGrid").innerHTML=CARENCES.map(c=>`
+    <div class="card car">
+      <div class="top-band" style="background:${c.c}">
+        <div class="ci">${c.n}</div>
+        <div><h4>Carence en ${c.nom}</h4><div class="sm">Diagnostic visuel</div></div>
+      </div>
+      <div class="cb">
+        ${c.sym.map(s=>`<div class="cr"><svg viewBox="0 0 24 24" fill="none" stroke="${c.c}" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><span>${s}</span></div>`).join("")}
+        <div class="corr"><b>Impact :</b> ${c.impact}<br><b style="color:var(--green-d)">Correction :</b> ${c.corr}</div>
+      </div>
+    </div>`).join("");
+}
+
+/* ================= PLAN / CALCULATEUR ================= */
+function compute(){
+  const surf=+$("#i-surface").value||0;
+  const rdt=+$("#i-rdt").value||0;
+  const reliquat=+$("#i-reliquat").value||0;
+  const bore=$("#sw-bore").classList.contains("on");
+  const pks=$("#sw-pks").classList.contains("on");
+  // N spring need (méthode bilan simplifiée): besoin total = rdt * 6.5 ; - automne(30) - reliquat
+  const Nbesoin=Math.max(0, Math.round(rdt*6.5 - 30 - reliquat));
+  const sulfaDose=Math.round(Nbesoin/0.33); // engrais N33
+  const rows=[];
+  rows.push({phase:"Semis",prod:PRODS.nps,dose:150});
+  if(pks) rows.push({phase:"Fond",prod:PRODS.pks,dose:200});
+  rows.push({phase:"Reprise + Montaison",prod:PRODS.sulfa,dose:sulfaDose,note:`pour ${Nbesoin} u N`});
+  if(bore) rows.push({phase:"Montaison",prod:PRODS.bore,dose:1.5});
+  let total=0;
+  $("#planBody").innerHTML=rows.map(r=>{
+    const pr=r.prod;
+    const isL=pr.doseU==="L/ha";
+    const qte=r.dose*surf;
+    const cost = isL ? qte*pr.prix : (qte/1000)*pr.prix; // L*€/L  |  T*€/T
+    total+=cost;
+    const qteTxt = isL ? qte.toLocaleString("fr-FR")+" L" : (qte/1000).toLocaleString("fr-FR",{maximumFractionDigits:2})+" T";
+    return `<tr>
+      <td>${r.phase}</td>
+      <td><div class="pn" style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:3px;background:${pr.c};display:inline-block"></span>${pr.nom}</div>${r.note?`<div style="font-size:11.5px;color:var(--muted)">${r.note}</div>`:""}</td>
+      <td>${r.dose} ${pr.doseU}</td>
+      <td>${qteTxt}</td>
+      <td style="text-align:right;font-weight:600">${Math.round(cost).toLocaleString("fr-FR")} €</td>
+    </tr>`;
+  }).join("");
+  $("#ptVal").textContent=Math.round(total).toLocaleString("fr-FR")+" €";
+  $("#ptHa").textContent=Math.round(total/surf).toLocaleString("fr-FR")+" €/ha";
+  $("#ptDetail").textContent=`${surf} ha · objectif ${rdt} q/ha · ${Nbesoin} u N de printemps`;
+  $("#planSub").textContent=`${surf} ha — objectif ${rdt} q/ha`;
+}
+
+/* ================= PILOTAGE ================= */
+let chVisits;
+function renderPilotage(){
+  const k=[
+    {l:"Adoption nouveaux produits",v:"+34%",ic:'<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>',c:"#15803D"},
+    {l:"Visites (30 j)",v:"2 480",ic:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',c:"#0891B2"},
+    {l:"Satisfaction équipes",v:"4,6/5",ic:'<path d="M12 2l3 7 7 .5-5.5 4.5L18 21l-6-4-6 4 1.5-7L2 9.5 9 9z"/>',c:"#D97706"},
+    {l:"Contenus à jour",v:"100%",ic:'<path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/>',c:"#7C3AED"},
+  ];
+  $("#kpis").innerHTML=k.map(c=>`<div class="card kpi">
+    <div class="ki" style="background:${c.c}1a;color:${c.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${c.ic}</svg></div>
+    <div class="v">${c.v}</div><div class="l">${c.l}</div>
+    <div class="tr up">▲ vs trimestre précédent</div></div>`).join("");
+  if(chVisits)chVisits.destroy();
+  chVisits=new Chart($("#chVisits"),{type:"bar",
+    data:{labels:["Janv","Févr","Mars","Avr","Mai","Juin"],datasets:[{data:[920,1140,1680,2100,2310,2480],backgroundColor:"#15803D",borderRadius:7,maxBarThickness:38}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:"#EEF4EF"},ticks:{font:{size:11}}},x:{grid:{display:false}}}}});
+  const contents=[
+    {t:"Itinéraire NPKS colza 2026",d:"Mis à jour il y a 2 jours",up:true},
+    {t:"Fiche produit — NPS 3.30.7S",d:"Mis à jour il y a 5 jours",up:true},
+    {t:"Guide carences soufre & bore",d:"Mis à jour il y a 1 semaine",up:true},
+    {t:"Dosages foliaires bore",d:"Révision programmée",up:false},
+  ];
+  $("#cmsList").innerHTML=contents.map(c=>`<div class="cms-row">
+    <div class="ci2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+    <div style="flex:1"><div style="font-weight:600;font-size:14px">${c.t}</div><div style="font-size:12px;color:var(--muted)">${c.d}</div></div>
+    ${c.up?'<span class="badge-up">À jour</span>':'<span class="badge-up" style="color:#92400E;background:#FEF3C7">À réviser</span>'}</div>`).join("");
+}
+
+/* ================= NAV ================= */
+const TABS=["conseil","plan","produits","carences","pilotage"];
+function buildMobileMenu(){
+  $("#mmenu").innerHTML=[...document.querySelectorAll("#tabs button")].map(b=>`<button data-v="${b.dataset.v}" class="${b.classList.contains('active')?'active':''}">${b.querySelector('svg').outerHTML}<span>${b.textContent}</span></button>`).join("");
+  $("#mmenu").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{go(b.dataset.v);$("#mmenu").classList.remove("open");}));
+}
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  $("#v-"+v).classList.add("active");
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  buildMobileMenu();
+  if(v==="conseil")renderUptake();
+  if(v==="pilotage")renderPilotage();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.v)));
+$("#burger").addEventListener("click",()=>$("#mmenu").classList.toggle("open"));
+
+/* ================= INIT ================= */
+renderPhase(); renderUptake(); renderCatalogue(); renderCarences(); compute(); buildMobileMenu();
+</script>
+</body>
+</html>
