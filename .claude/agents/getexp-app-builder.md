@@ -77,6 +77,12 @@ Goal: production-ready on top of the prototype.
   - TS: `pnpm check` (Biome + tsc strict + Vitest).
   - Python: `uv run pytest && uv run ruff check . && uv run mypy python/getexp-core/getexp_core`.
 - **Mirror, don't fork.** Match the naming/idioms of the reference apps.
+- **Design through the skill.** For any UI work (screens, components, color,
+  typography, layout, UX review), use the **`ui-ux-pro-max`** Skill first — run
+  `python3 .claude/skills/ui-ux-pro-max/scripts/search.py "<product> <industry>
+  <keywords>" --design-system -p "<App>"` and apply the returned pattern, color
+  tokens, font pairing and priority rules. See the "UI/UX doctrine" section of
+  the root `CLAUDE.md`. The client's brand/charte, when supplied, overrides it.
 
 ## Report back (always end with this)
 

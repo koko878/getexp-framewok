@@ -65,6 +65,41 @@ projects we adopt):
   a connection URL, so apps run unchanged on AWS, Azure, GCP, on-prem or local
   (see `docs/adr/0004-storage-ports-and-adapters.md`).
 
+## UI/UX doctrine — the design paved road (MANDATORY)
+
+Just as the backend has a blessed stack, the **front end has a blessed design
+process**. Any time you produce or change an interface — a "bluffant" HTML
+prototype, a web/mobile screen, a component, a color/typography choice, a UX
+review — you **MUST** use the installed **`ui-ux-pro-max`** Skill
+(`.claude/skills/ui-ux-pro-max/`) before hand-rolling design decisions.
+
+> **Claude: this is not optional.** Treat it like the building blocks: don't
+> invent a palette, a font pairing, or a layout from scratch when the skill can
+> recommend a researched one. Reuse, don't hand-roll.
+
+**The protocol for every prototype / UI task:**
+
+1. **Query the skill first.** Run its design-system search to get a coherent
+   pattern + style + color system + typography + effects for the product type:
+   ```bash
+   python3 .claude/skills/ui-ux-pro-max/scripts/search.py \
+     "<product type> <industry> <keywords>" --design-system -p "<App Name>"
+   ```
+   For a specific concern, query a domain: `--domain style|color|typography|ux|chart`
+   or a stack: `--stack react|nextjs|react-native|html-tailwind|…`.
+2. **Apply the recommendation**: use the returned color tokens, font pairing,
+   layout pattern and the priority rules (accessibility 4.5:1 contrast, 44×44px
+   touch targets, 150–300ms motion, SVG icons not emoji, semantic tokens — see
+   the skill's `SKILL.md` priority table).
+3. **Respect the client brand** when a charte/logo is supplied — the skill
+   informs choices, the client's identity overrides it.
+4. **Then build**, keeping the established prototype conventions (single
+   self-contained `index.html` for demos, view-switching nav, mobile dropdown
+   menu, toast notifications, Chart.js via CDN).
+
+If the skill is ever missing, reinstall it from
+`github.com/nextlevelbuilder/ui-ux-pro-max-skill` before proceeding.
+
 ## Repository layout
 
 ```
