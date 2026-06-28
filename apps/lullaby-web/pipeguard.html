@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0F172A" />
+<title>PipeGuard — Maintenance prédictive pipeline slurry · OCP</title>
+<style>
+  /* ui-ux-pro-max: "Real-Time/Operations" pattern + status palette. Light pro theme (brief override of dark). System fonts (offline). */
+  :root{
+    --bg:#F1F5F9; --card:#FFFFFF; --ink:#0F172A; --slate:#1E293B; --slate-2:#334155;
+    --muted:#64748B; --muted-2:#94A3B8; --border:#E2E8F0; --line:#EEF2F7; --soft:#F8FAFC;
+    --blue:#2563EB; --blue-soft:#DBEAFE;
+    --ok:#16A34A; --ok-soft:#DCFCE7; --warn:#F59E0B; --warn-soft:#FEF3C7; --crit:#EF4444; --crit-soft:#FEE2E2;
+    --sh:0 1px 2px rgba(15,23,42,.05); --sh-2:0 6px 22px rgba(15,23,42,.08); --sh-lg:0 24px 60px rgba(15,23,42,.22);
+    --mono:ui-monospace,"SF Mono","Menlo","Consolas",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input{font-family:inherit;font-size:15px;color:var(--ink)}
+  .mono{font-family:var(--mono)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  .hidden{display:none!important}
+
+  /* ===== shell ===== */
+  .app{display:flex;min-height:100vh}
+  .side{width:230px;flex:0 0 230px;background:var(--slate);color:#cbd5e1;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+  .brand{display:flex;align-items:center;gap:11px;padding:18px 18px 14px}
+  .brand .logo{width:38px;height:38px;flex:0 0 38px}
+  .brand h1{font-size:17px;font-weight:700;color:#fff;letter-spacing:-.3px;line-height:1}
+  .brand .sub{font-size:10px;color:#7c8aa3;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+  .nav{padding:8px 12px;display:flex;flex-direction:column;gap:2px}
+  .nav .lbl{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#5d6b85;padding:14px 12px 6px}
+  .nav button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:10px 12px;border-radius:9px;color:#aebbd0;font-size:13.5px;font-weight:500;transition:.15s}
+  .nav button svg{width:18px;height:18px;flex:0 0 18px;opacity:.85}
+  .nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav button.active{background:var(--blue);color:#fff;font-weight:600}
+  .nav button.active svg{opacity:1}
+  .nav .badge{margin-left:auto;font-size:11px;font-weight:700;background:var(--crit);color:#fff;border-radius:20px;padding:1px 7px;min-width:20px;text-align:center}
+  .side-foot{margin-top:auto;padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);font-size:11.5px;color:#7c8aa3}
+  .side-foot .ag{display:flex;align-items:center;gap:8px;color:#dbe4f0;font-weight:600;margin-bottom:5px}
+  .side-foot .dot{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.2);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 6px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .top{display:flex;align-items:center;gap:14px;padding:14px 26px;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30}
+  .burger{display:none}
+  .top .ttl{flex:1;min-width:0}
+  .top .ttl h2{font-size:19px;font-weight:700;letter-spacing:-.3px}
+  .top .ttl p{font-size:12.5px;color:var(--muted)}
+  .clock{font-family:var(--mono);font-size:13px;color:var(--muted);font-weight:600}
+  .uav{width:34px;height:34px;border-radius:50%;background:var(--slate);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px}
+
+  .content{padding:22px 26px 60px;max-width:1240px;width:100%}
+  .view{display:none;animation:fade .3s ease}.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:10px;font-size:14px;font-weight:600;background:var(--blue);color:#fff;transition:.14s}
+  .btn:hover{background:#1D4ED8}.btn:active{transform:scale(.98)}
+  .btn svg{width:17px;height:17px}
+  .btn.crit{background:var(--crit)}.btn.crit:hover{background:#DC2626}
+  .btn.slate{background:var(--slate)}.btn.slate:hover{background:var(--slate-2)}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--border)}
+  .btn.ghost:hover{background:var(--soft)}
+  .btn.sm{padding:8px 13px;font-size:13px;border-radius:9px}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh)}
+  .card.pad{padding:18px}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .sec-h h3{font-size:15px;font-weight:600}
+  .sec-h .hint{font-size:12px;color:var(--muted)}
+  .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);background:var(--blue-soft);padding:4px 10px;border-radius:6px}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kpi{padding:16px}
+  .kpi .kt{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:600}
+  .kpi .ki{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+  .kpi .ki svg{width:16px;height:16px}
+  .kpi .v{font-size:27px;font-weight:700;letter-spacing:-1px;line-height:1;margin-top:10px;font-family:var(--mono)}
+  .kpi .l{font-size:11.5px;color:var(--muted);margin-top:6px}
+
+  /* pipeline schematic */
+  .pipe{padding:22px 18px 14px}
+  .pipe-head{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:6px}
+  .pipe-head .a{color:var(--slate)}
+  .pipe-svg{width:100%;height:96px;overflow:visible}
+  .stn-dot{cursor:pointer}
+  .legend{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}
+  .legend .lg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .legend .lg i{width:10px;height:10px;border-radius:50%}
+
+  /* station grid */
+  .stn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+  .stn{padding:15px;cursor:pointer;transition:.14s;border-left:4px solid var(--ok)}
+  .stn:hover{box-shadow:var(--sh-2);transform:translateY(-2px)}
+  .stn.warn{border-left-color:var(--warn)}.stn.crit{border-left-color:var(--crit)}
+  .stn .sh{display:flex;align-items:center;justify-content:space-between}
+  .stn .sn{font-weight:600;font-size:14.5px}
+  .stn .sk{font-size:11.5px;color:var(--muted)}
+  .stn .stt{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.03em}
+  .stt.ok{background:var(--ok-soft);color:#15803D}.stt.warn{background:var(--warn-soft);color:#92400E}.stt.crit{background:var(--crit-soft);color:#B91C1C}
+  .stn .read{display:flex;gap:14px;margin-top:12px}
+  .stn .rd .rv{font-family:var(--mono);font-size:18px;font-weight:700;line-height:1}
+  .stn .rd .rl{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .stn .spark{margin-top:10px;height:34px;width:100%}
+
+  /* alerts feed */
+  .alert{display:flex;gap:12px;padding:13px;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;border-left:4px solid var(--warn)}
+  .alert.crit{border-left-color:var(--crit);background:#FFFBFB}
+  .alert .ax{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:0 0 36px}
+  .alert .ax svg{width:18px;height:18px}
+  .alert .am{flex:1;min-width:0}
+  .alert .at{font-weight:600;font-size:13.5px}
+  .alert .ad{font-size:12px;color:var(--muted);margin-top:2px}
+  .alert .atime{font-size:11px;color:var(--muted-2);white-space:nowrap}
+
+  /* station detail */
+  .det-head{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px}
+  .det-ic{width:54px;height:54px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 54px}
+  .det-ic svg{width:26px;height:26px}
+  .det-head h2{font-size:21px;font-weight:700;letter-spacing:-.3px}
+  .det-head .ds{font-size:13px;color:var(--muted);margin-top:2px}
+  .det-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}
+  @media(max-width:880px){.det-grid{grid-template-columns:1fr}}
+  .chart-box{margin-bottom:16px}
+  .chart-box .cl{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:6px}
+  .chart-box svg{width:100%;height:140px}
+  .gauge{display:flex;align-items:center;gap:16px}
+  .ministat{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .ms{border:1px solid var(--border);border-radius:10px;padding:11px}
+  .ms .v{font-family:var(--mono);font-size:16px;font-weight:700}
+  .ms .l{font-size:11px;color:var(--muted);margin-top:1px}
+  .agent-step{display:flex;gap:10px;padding:9px 0;font-size:13px;border-bottom:1px solid var(--line)}
+  .agent-step:last-child{border:none}
+  .agent-step .as{width:22px;height:22px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:flex;align-items:center;justify-content:center;flex:0 0 22px}
+  .agent-step .as svg{width:13px;height:13px}
+
+  /* phone mockup */
+  .phone{width:280px;margin:0 auto;background:#0F172A;border-radius:34px;padding:12px;box-shadow:var(--sh-lg)}
+  .phone .screen{background:#F1F5F9;border-radius:24px;overflow:hidden;min-height:440px;display:flex;flex-direction:column}
+  .phone .psb{background:#0F172A;color:#fff;font-family:var(--mono);font-size:11px;padding:8px 16px;display:flex;justify-content:space-between}
+  .call{background:linear-gradient(160deg,#1E293B,#0F172A);color:#fff;padding:24px 16px;text-align:center}
+  .call .cav{width:64px;height:64px;border-radius:50%;background:var(--crit);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;animation:ring 1s infinite}
+  @keyframes ring{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .call .cav svg{width:30px;height:30px}
+  .call .cl{font-size:12px;color:#94A3B8}.call .cn{font-size:18px;font-weight:700;margin-top:3px}
+  .call .cbtns{display:flex;justify-content:center;gap:30px;margin-top:18px}
+  .call .cb{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .call .cb.dec{background:#EF4444}.call .cb.acc{background:#22C55E}
+  .sms{padding:14px;flex:1}
+  .sms .sender{font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:10px}
+  .sms .bub{background:#fff;border:1px solid var(--border);border-radius:14px 14px 14px 4px;padding:12px 14px;font-size:13px;line-height:1.5;box-shadow:var(--sh)}
+  .sms .bub b{color:var(--crit)}
+  .sms .tm{font-size:10.5px;color:var(--muted-2);margin-top:5px;text-align:left}
+
+  /* SAP work order */
+  .sap{border:1px solid var(--border);border-radius:14px;overflow:hidden}
+  .sap-h{background:var(--slate);color:#fff;padding:13px 16px;display:flex;align-items:center;justify-content:between;gap:10px}
+  .sap-h .sl{font-size:11px;color:#94A3B8}.sap-h .sn{font-family:var(--mono);font-size:15px;font-weight:700}
+  .sap-h .auto{margin-left:auto;font-size:10.5px;font-weight:700;background:rgba(34,197,94,.2);color:#4ADE80;padding:3px 9px;border-radius:20px}
+  .sap-b{padding:16px}
+  .sap-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .sap-row:last-child{border:none}
+  .sap-row .k{color:var(--muted)}.sap-row .v{font-weight:600;text-align:right}
+  .stock{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:2px 9px;border-radius:20px}
+  .stock.ok{background:var(--ok-soft);color:#15803D}.stock.low{background:var(--warn-soft);color:#92400E}
+  .sap-foot{display:flex;gap:9px;padding:13px 16px;border-top:1px solid var(--border);background:var(--soft);flex-wrap:wrap}
+
+  /* timeline ML */
+  .tl30{display:flex;gap:3px;align-items:flex-end;height:90px}
+  .tl30 .d{flex:1;border-radius:3px;min-height:6px;position:relative}
+  .perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+  /* toast */
+  .toast-wrap{position:fixed;bottom:22px;right:22px;z-index:120;display:flex;flex-direction:column;gap:10px;max-width:380px}
+  .toast{display:flex;align-items:flex-start;gap:11px;background:var(--slate);color:#fff;padding:13px 16px;border-radius:12px;box-shadow:var(--sh-lg);font-size:13.5px;animation:tin .3s ease}
+  .toast.crit{background:#7F1D1D}
+  .toast .ti{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:0 0 22px;margin-top:1px}
+  .toast .ti svg{width:13px;height:13px}
+  @keyframes tin{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+  @media(max-width:920px){
+    .side{display:none}
+    .burger{display:flex;width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center;border:1px solid var(--border);background:#fff}
+    .burger svg{width:20px;height:20px}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .content{padding:18px 14px 60px}.top{padding:12px 14px}
+    .mob-menu{position:fixed;top:60px;left:12px;right:12px;background:var(--slate);border-radius:14px;box-shadow:var(--sh-lg);z-index:60;padding:8px;display:none;flex-direction:column;gap:2px}
+    .mob-menu.open{display:flex}
+    .mob-menu button{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:9px;color:#aebbd0;font-weight:500;text-align:left}
+    .mob-menu button svg{width:18px;height:18px}.mob-menu button.active{background:var(--blue);color:#fff}
+  }
+  .mob-menu{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="11" fill="#2563EB"/><path d="M8 20h7l3-7 4 14 3-7h7" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><h1>PipeGuard</h1><div class="sub">OCP · Slurry IA</div></div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="lbl">Supervision</div>
+      <button data-v="cockpit" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Cockpit pipeline</span></button>
+      <button data-v="alertes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span>Alertes & SAP</span><span class="badge" id="navAlerts">1</span></button>
+      <button data-v="perf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg><span>Performance IA</span></button>
+      <div class="lbl">Démo</div>
+      <button data-v="cockpit" onclick="simulateAnomaly()" style="color:#fda4af"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg><span>Simuler anomalie S7</span></button>
+    </nav>
+    <div class="side-foot">
+      <div class="ag"><span class="dot"></span>Agent IA actif</div>
+      Ingestion PI/SCADA · 10 stations<br>SSO Entra ID · Key Vault
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="top">
+      <button class="burger" id="burger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="ttl"><h2 id="pgTitle">Cockpit pipeline</h2><p id="pgSub">Pipeline slurry Khouribga → Jorf Lasfar · 187 km</p></div>
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="uav">RM</div>
+    </div>
+    <div class="mob-menu" id="mmenu"></div>
+    <div class="content">
+
+      <!-- COCKPIT -->
+      <section class="view active" id="v-cockpit">
+        <div class="kpis" id="kpis"></div>
+        <div class="card" style="margin-top:16px">
+          <div class="pipe">
+            <div class="pipe-head"><span class="a">⬤ Khouribga (km 0)</span><span class="a">Jorf Lasfar (km 187) ⬤</span></div>
+            <svg class="pipe-svg" id="pipeSvg" viewBox="0 0 1000 96" preserveAspectRatio="none"></svg>
+            <div class="legend">
+              <div class="lg"><i style="background:#16A34A"></i>Nominal</div>
+              <div class="lg"><i style="background:#F59E0B"></i>Surveillance</div>
+              <div class="lg"><i style="background:#EF4444"></i>Critique</div>
+              <div class="lg" style="margin-left:auto"><i style="background:#2563EB"></i>Débit moyen <b class="mono" id="flowAvg" style="color:var(--ink);margin-left:3px">—</b> m³/h</div>
+            </div>
+          </div>
+        </div>
+        <div class="sec-h" style="margin:22px 0 0"><h3 style="font-size:16px">État temps réel des stations</h3><span class="hint">PI/SCADA · rafraîchissement 1 min (accéléré pour la démo)</span></div>
+        <div class="stn-grid" id="stnGrid" style="margin-top:14px"></div>
+      </section>
+
+      <!-- STATION DETAIL -->
+      <section class="view" id="v-station"></section>
+
+      <!-- ALERTES & SAP -->
+      <section class="view" id="v-alertes">
+        <div class="det-grid">
+          <div>
+            <div class="sec-h"><h3 style="font-size:16px">Alertes détectées</h3><span class="hint">SMS + appel au Maintenance Manager</span></div>
+            <div id="alertFeed"></div>
+            <div class="sec-h" style="margin-top:22px"><h3 style="font-size:16px">Ordre de travail SAP PM</h3><span class="hint">création automatique</span></div>
+            <div id="sapBox"></div>
+          </div>
+          <div>
+            <div class="sec-h"><h3 style="font-size:16px">Notification reçue</h3></div>
+            <div id="phoneBox"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PERFORMANCE IA -->
+      <section class="view" id="v-perf">
+        <div class="perf-grid">
+          <div class="card pad"><div class="kt" style="color:var(--muted);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px"><span class="ki" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#DCFCE7;color:#16A34A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M9 11l3 3L22 4"/></svg></span>Taux de détection précoce</div><div class="v mono" style="font-size:27px;font-weight:700;margin-top:10px">83%</div><div class="l" style="font-size:11.5px;color:var(--muted);margin-top:6px">≥80% visé · préavis moyen 41 h</div></div>
+          <div class="card pad"><div class="kt" style="color:var(--muted);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px"><span class="ki" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#DBEAFE;color:#2563EB"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Délai création OT SAP</div><div class="v mono" style="font-size:27px;font-weight:700;margin-top:10px">2 min</div><div class="l" style="font-size:11.5px;color:var(--muted);margin-top:6px">après détection · cible &lt;5 min</div></div>
+          <div class="card pad"><div class="kt" style="color:var(--muted);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px"><span class="ki" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#FEF3C7;color:#92400E"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 2v20M2 12h20"/></svg></span>Faux positifs</div><div class="v mono" style="font-size:27px;font-weight:700;margin-top:10px">6%</div><div class="l" style="font-size:11.5px;color:var(--muted);margin-top:6px">modèle Isolation Forest + LSTM</div></div>
+        </div>
+        <div class="card pad" style="margin-top:16px">
+          <div class="sec-h"><h3>30 derniers jours — anomalies détectées vs pannes réelles</h3><span class="hint">vert = détecté à temps · rouge = panne · gris = nominal</span></div>
+          <div class="tl30" id="tl30"></div>
+        </div>
+        <div class="det-grid" style="margin-top:16px">
+          <div class="card pad">
+            <div class="sec-h"><h3>Disponibilité & économies</h3><span class="hint">cumul année</span></div>
+            <div class="chart-box"><div class="cl"><span style="color:var(--ok)">Jours d'arrêt non planifiés</span></div><svg id="availChart" viewBox="0 0 600 140" preserveAspectRatio="none"></svg></div>
+            <div class="ministat">
+              <div class="ms"><div class="v" style="color:var(--ok)">-43%</div><div class="l">Jours d'arrêt évités (12,9 j)</div></div>
+              <div class="ms"><div class="v" style="color:var(--blue)">6,4 M DH</div><div class="l">Économies générées</div></div>
+            </div>
+          </div>
+          <div class="card pad">
+            <div class="sec-h"><h3>Base de connaissances</h3><span class="hint">enrichie par les REX SAP</span></div>
+            <div id="kbList"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ================= DONNÉES ================= */
+const RANGE=60; // points
+function genSeries(base, noise, drift){ const a=[]; for(let i=0;i<RANGE;i++){ a.push(+(base + (Math.sin(i/7)*noise*0.5) + (Math.random()-0.5)*noise + (drift?drift*i/RANGE:0)).toFixed(2)); } return a; }
+
+let STATIONS = [
+  {id:"SP-01", nom:"Khouribga – Départ", km:0,   pump:"P-01", pNom:42, qNom:2100, status:"ok", risk:6,  comm:2014},
+  {id:"SP-02", nom:"Oued Zem",           km:25,  pump:"P-02", pNom:40, qNom:2090, status:"ok", risk:9,  comm:2014},
+  {id:"SP-03", nom:"Boujniba",           km:52,  pump:"P-03", pNom:39, qNom:2080, status:"warn", risk:48, comm:2014, drift:-3},
+  {id:"SP-04", nom:"El Borouj",          km:78,  pump:"P-04", pNom:41, qNom:2085, status:"ok", risk:11, comm:2015},
+  {id:"SP-05", nom:"Settat Nord",        km:95,  pump:"P-05", pNom:40, qNom:2075, status:"ok", risk:7,  comm:2014},
+  {id:"SP-06", nom:"Sidi Hajjaj",        km:120, pump:"P-06", pNom:39, qNom:2070, status:"ok", risk:14, comm:2014},
+  {id:"SP-07", nom:"Khémisset Sud",      km:140, pump:"P-07", pNom:41, qNom:2080, status:"ok", risk:12, comm:2014},
+  {id:"SP-08", nom:"Bir Jdid",           km:158, pump:"P-08", pNom:38, qNom:2065, status:"ok", risk:8,  comm:2016},
+  {id:"SP-09", nom:"Had Soualem",        km:172, pump:"P-09", pNom:37, qNom:2060, status:"ok", risk:10, comm:2014},
+  {id:"SP-10", nom:"Jorf Lasfar – Port", km:187, pump:"P-10", pNom:36, qNom:2055, status:"ok", risk:5,  comm:2014},
+];
+STATIONS.forEach(s=>{ s.pSeries=genSeries(s.pNom, 0.7, s.drift||0); s.qSeries=genSeries(s.qNom, 9, 0); });
+
+const COLORS={ok:"#16A34A",warn:"#F59E0B",crit:"#EF4444"};
+let ALERTS=[
+  {id:"a3", st:"SP-03", lvl:"warn", t:"Dérive de pression progressive", ago:"il y a 2 h", risk:48, win:"72 h", ot:null},
+];
+let SAP_ORDER=null;
+let simulated=false;
+
+const KB=[
+  {t:"Remplacement garniture mécanique pompe slurry", v:"v4 · MAJ 12/06/2026", rex:"8 interventions"},
+  {t:"Contrôle vibratoire ligne d'arbre", v:"v3 · MAJ 02/06/2026", rex:"5 interventions"},
+  {t:"Procédure purge & rinçage anti-sédimentation", v:"v2 · MAJ 28/05/2026", rex:"12 interventions"},
+];
+
+/* ================= HELPERS ================= */
+const $ = s => document.querySelector(s);
+function toast(msg,crit){const t=document.createElement("div");t.className="toast"+(crit?" crit":"");t.innerHTML=`<span class="ti" style="background:${crit?'#EF4444':'#22C55E'}">${crit?'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>'}</span><span>${msg}</span>`;$("#toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="all .35s";t.style.transform="translateX(20px)";setTimeout(()=>t.remove(),350);},crit?5000:3000);}
+function sparkPath(data, w, h, pad){ const mn=Math.min(...data),mx=Math.max(...data),rg=(mx-mn)||1; return data.map((v,i)=>`${(i/(data.length-1)*w).toFixed(1)},${(h-pad-(v-mn)/rg*(h-2*pad)).toFixed(1)}`).join(" "); }
+
+/* ================= COCKPIT ================= */
+function renderKpis(){
+  const crit=STATIONS.filter(s=>s.status==="crit").length;
+  const warn=STATIONS.filter(s=>s.status==="warn").length;
+  const dispo=(98.7 - crit*1.2).toFixed(1);
+  const k=[
+    {l:"Disponibilité pipeline",v:dispo+"%",c:"#16A34A",ic:'<path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4 12 14.01l-3-3"/>'},
+    {l:"Jours d'arrêt évités (an)",v:"12,9 j",c:"#2563EB",ic:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},
+    {l:"Économies générées",v:"6,4 M DH",c:"#F59E0B",ic:'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'},
+    {l:"Anomalies actives",v:(crit+warn)+"",c:crit?"#EF4444":"#F59E0B",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'},
+  ];
+  $("#kpis").innerHTML=k.map(c=>`<div class="card kpi"><div class="kt"><span class="ki" style="background:${c.c}1a;color:${c.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${c.ic}</svg></span>${c.l}</div><div class="v">${c.v}</div></div>`).join("");
+  const fa=Math.round(STATIONS.reduce((s,x)=>s+x.qSeries[RANGE-1],0)/STATIONS.length);
+  $("#flowAvg").textContent=fa.toLocaleString("fr-FR");
+}
+function renderPipe(){
+  const W=1000,H=96,y=48,x0=30,x1=970;
+  let svg=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>`;
+  // flow animation dashes
+  svg+=`<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke="#2563EB" stroke-width="2" stroke-dasharray="2 16" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="18" to="0" dur="1s" repeatCount="indefinite"/></line>`;
+  STATIONS.forEach(s=>{ const x=x0+(s.km/187)*(x1-x0); const c=COLORS[s.status];
+    svg+=`<g class="stn-dot" onclick="openStation('${s.id}')"><circle cx="${x}" cy="${y}" r="${s.status==='ok'?7:9}" fill="${c}"/>${s.status!=='ok'?`<circle cx="${x}" cy="${y}" r="13" fill="none" stroke="${c}" stroke-width="2"><animate attributeName="r" from="9" to="17" dur="1.4s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.7" to="0" dur="1.4s" repeatCount="indefinite"/></circle>`:''}<text x="${x}" y="${y-16}" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">${s.id}</text><text x="${x}" y="${y+24}" text-anchor="middle" font-size="9" fill="#94A3B8">km ${s.km}</text></g>`; });
+  $("#pipeSvg").innerHTML=svg;
+}
+function renderStations(){
+  $("#stnGrid").innerHTML=STATIONS.map(s=>{
+    const c=COLORS[s.status];
+    return `<div class="card stn ${s.status}" onclick="openStation('${s.id}')" id="card-${s.id}">
+      <div class="sh"><div><div class="sn">${s.id} · ${s.nom}</div><div class="sk">km ${s.km} · pompe ${s.pump}</div></div><span class="stt ${s.status}">${s.status==='ok'?'Nominal':s.status==='warn'?'Surveillance':'Critique'}</span></div>
+      <div class="read"><div class="rd"><div class="rv" id="p-${s.id}" style="color:${c}">${s.pSeries[RANGE-1].toFixed(1)}</div><div class="rl">Pression · bar</div></div><div class="rd"><div class="rv" id="q-${s.id}">${Math.round(s.qSeries[RANGE-1])}</div><div class="rl">Débit · m³/h</div></div><div class="rd"><div class="rv" style="color:${c}">${s.risk}</div><div class="rl">Risque /100</div></div></div>
+      <svg class="spark" id="spark-${s.id}" viewBox="0 0 240 34" preserveAspectRatio="none"><polyline fill="none" stroke="${c}" stroke-width="2" points="${sparkPath(s.pSeries,240,34,4)}"/></svg>
+    </div>`;
+  }).join("");
+}
+
+/* ===== live tick ===== */
+function tick(){
+  const now=new Date(); $("#clock").textContent=now.toLocaleTimeString("fr-FR");
+  STATIONS.forEach(s=>{
+    const lastP=s.pSeries[RANGE-1]; let np=s.pNom+(Math.sin(now.getSeconds()/9)*0.4)+(Math.random()-0.5)*0.8;
+    if(s.status==="warn")np=lastP-0.02+(Math.random()-0.5)*0.5;
+    if(s.status==="crit")np=lastP-0.18+(Math.random()-0.5)*0.4;
+    s.pSeries.push(+np.toFixed(2)); s.pSeries.shift();
+    s.qSeries.push(+(s.qNom+(Math.random()-0.5)*14).toFixed(1)); s.qSeries.shift();
+    const pe=$("#p-"+s.id), qe=$("#q-"+s.id), sp=$("#spark-"+s.id);
+    if(pe)pe.textContent=s.pSeries[RANGE-1].toFixed(1);
+    if(qe)qe.textContent=Math.round(s.qSeries[RANGE-1]);
+    if(sp)sp.querySelector("polyline").setAttribute("points",sparkPath(s.pSeries,240,34,4));
+  });
+  if($("#v-cockpit").classList.contains("active")){ const fa=Math.round(STATIONS.reduce((s,x)=>s+x.qSeries[RANGE-1],0)/STATIONS.length); const f=$("#flowAvg"); if(f)f.textContent=fa.toLocaleString("fr-FR"); }
+}
+
+/* ================= STATION DETAIL ================= */
+let curStn=null;
+function openStation(id){ curStn=id; go('station'); renderStation(); }
+function lineChart(data,nom,w,h,color,anomFrom){
+  const mn=Math.min(...data)-1,mx=Math.max(...data)+1,rg=(mx-mn)||1;
+  const pts=data.map((v,i)=>`${(i/(data.length-1)*w).toFixed(1)},${(h-10-(v-mn)/rg*(h-20)).toFixed(1)}`).join(" ");
+  const yNom=(h-10-(nom-mn)/rg*(h-20)).toFixed(1);
+  let anom="";
+  if(anomFrom!=null){ const x=(anomFrom/(data.length-1)*w).toFixed(1); anom=`<rect x="${x}" y="0" width="${w-x}" height="${h}" fill="#EF4444" opacity="0.07"/><line x1="${x}" y1="0" x2="${x}" y2="${h}" stroke="#EF4444" stroke-width="1" stroke-dasharray="3 3"/>`; }
+  return `${anom}<line x1="0" y1="${yNom}" x2="${w}" y2="${yNom}" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 4"/><text x="4" y="${yNom-4}" font-size="9" fill="#94A3B8">seuil nominal</text><polyline fill="none" stroke="${color}" stroke-width="2" points="${pts}"/>`;
+}
+function renderStation(){
+  const s=STATIONS.find(x=>x.id===curStn); const c=COLORS[s.status];
+  $("#pgTitle").textContent=s.id+" · "+s.nom; $("#pgSub").textContent="km "+s.km+" · pompe "+s.pump;
+  const anomFrom = s.status==="crit"?38 : s.status==="warn"?40 : null;
+  const win = s.status==="crit"?"48 h":s.status==="warn"?"72 h":"—";
+  const steps = s.status==="ok"
+    ? [["Ingestion PI/SCADA active (1 min)","ok"],["Aucun pattern anormal détecté","ok"],["Scoring de risque : faible","ok"]]
+    : [["Pattern précurseur détecté (séries pression)","ok"],["Modèle LSTM : probabilité défaillance élevée","ok"],["Score criticité calculé : "+s.risk+"/100","ok"],["Alerte + OT SAP "+(s.status==="crit"?"déclenchés":"en surveillance"),s.status==="crit"?"ok":"warn"]];
+  $("#v-station").innerHTML=`
+    <button class="btn ghost sm" onclick="go('cockpit')" style="margin-bottom:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Cockpit</button>
+    <div class="det-head">
+      <div class="det-ic" style="background:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="9"/></svg></div>
+      <div style="flex:1"><h2>${s.id} · ${s.nom}</h2><div class="ds">Pompe ${s.pump} · km ${s.km} · mise en service ${s.comm} · seuil nominal ${s.pNom} bar / ${s.qNom} m³/h</div>
+        <div style="margin-top:8px"><span class="stt ${s.status}" style="font-size:11.5px;padding:4px 11px">${s.status==='ok'?'Nominal':s.status==='warn'?'Surveillance':'Critique'}</span> ${s.status!=='ok'?`<span style="font-size:12.5px;color:var(--muted);margin-left:8px">Risque défaillance sous <b style="color:${c}">${win}</b></span>`:''}</div>
+      </div>
+      ${s.status!=='ok'?`<button class="btn ${s.status==='crit'?'crit':'slate'}" onclick="go('alertes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>Voir l'alerte & l'OT SAP</button>`:''}
+    </div>
+    <div class="det-grid">
+      <div class="card pad">
+        <div class="chart-box"><div class="cl"><span style="color:${c}">Pression (bar) · 60 dernières minutes</span><span class="mono" style="color:${c}">${s.pSeries[RANGE-1].toFixed(1)}</span></div><svg viewBox="0 0 600 140" preserveAspectRatio="none">${lineChart(s.pSeries,s.pNom,600,140,c,anomFrom)}</svg></div>
+        <div class="chart-box" style="margin-bottom:0"><div class="cl"><span style="color:#2563EB">Débit (m³/h) · 60 dernières minutes</span><span class="mono" style="color:#2563EB">${Math.round(s.qSeries[RANGE-1])}</span></div><svg viewBox="0 0 600 140" preserveAspectRatio="none">${lineChart(s.qSeries,s.qNom,600,140,'#2563EB',null)}</svg></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card pad">
+          <div class="sec-h"><h3>Score de criticité</h3></div>
+          <div class="gauge">
+            <svg viewBox="0 0 120 120" style="width:104px;height:104px"><circle cx="60" cy="60" r="50" fill="none" stroke="#EEF2F7" stroke-width="12"/><circle cx="60" cy="60" r="50" fill="none" stroke="${c}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${(s.risk/100*314).toFixed(0)} 314" transform="rotate(-90 60 60)"/><text x="60" y="58" text-anchor="middle" font-size="26" font-weight="800" fill="${c}" font-family="ui-monospace,monospace">${s.risk}</text><text x="60" y="76" text-anchor="middle" font-size="10" fill="#94A3B8">/ 100</text></svg>
+            <div><div style="font-weight:600;font-size:14px;color:${c}">${s.status==='ok'?'Aucun risque':s.status==='warn'?'Risque modéré':'Risque critique'}</div><div style="font-size:12.5px;color:var(--muted);margin-top:3px">${s.status==='ok'?'Fonctionnement nominal, aucune action requise.':'Anomalie '+(s.status==='crit'?'critique':'modérée')+' — défaillance probable sous '+win+'.'}</div></div>
+          </div>
+          <div class="ministat">
+            <div class="ms"><div class="v">${(s.pSeries[RANGE-1]-s.pNom).toFixed(1)} bar</div><div class="l">Écart au nominal</div></div>
+            <div class="ms"><div class="v">${s.comm}</div><div class="l">Mise en service</div></div>
+          </div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h"><h3>Raisonnement de l'agent IA</h3></div>
+          ${steps.map(st=>`<div class="agent-step"><span class="as" style="${st[1]==='warn'?'background:#FEF3C7;color:#92400E':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span><span>${st[0]}</span></div>`).join("")}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ================= ALERTES & SAP ================= */
+function renderAlerts(){
+  $("#alertFeed").innerHTML = ALERTS.length ? ALERTS.map(a=>{
+    const s=STATIONS.find(x=>x.id===a.st); const crit=a.lvl==="crit";
+    return `<div class="alert ${crit?'crit':''}" onclick="openStation('${a.st}')" style="cursor:pointer">
+      <div class="ax" style="background:${crit?'var(--crit-soft)':'var(--warn-soft)'};color:${crit?'var(--crit)':'var(--warn)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+      <div class="am"><div class="at">${crit?'ALERTE CRITIQUE':'Surveillance'} — ${a.st} (km ${s.km})</div><div class="ad">${a.t} · risque défaillance ${a.lvl==='crit'?'pompe '+s.pump+' ':''}sous ${a.win}${a.ot?' · OT '+a.ot:''}</div></div>
+      <div class="atime">${a.ago}</div></div>`;
+  }).join("") : `<div style="color:var(--muted);padding:20px;text-align:center">Aucune alerte active.</div>`;
+  $("#navAlerts").textContent=ALERTS.length; $("#navAlerts").style.display=ALERTS.length?"":"none";
+  // SAP
+  if(SAP_ORDER){
+    const s=STATIONS.find(x=>x.id===SAP_ORDER.st);
+    $("#sapBox").innerHTML=`<div class="sap">
+      <div class="sap-h"><div><div class="sl">Ordre de travail · SAP PM</div><div class="sn">${SAP_ORDER.ot}</div></div><span class="auto">⚡ Créé automatiquement</span></div>
+      <div class="sap-b">
+        <div class="sap-row"><span class="k">Équipement (réf. SAP)</span><span class="v">${s.pump} — Pompe slurry ${s.id}</span></div>
+        <div class="sap-row"><span class="k">Localisation</span><span class="v">${s.nom} · km ${s.km}</span></div>
+        <div class="sap-row"><span class="k">Type d'intervention</span><span class="v">Maintenance préventive — remplacement garniture mécanique</span></div>
+        <div class="sap-row"><span class="k">Criticité / fenêtre</span><span class="v" style="color:var(--crit)">Critique · sous 48 h</span></div>
+        <div class="sap-row"><span class="k">Pièce recommandée</span><span class="v">Garniture mécanique réf. GM-225 <span class="stock ok">● Stock : 2 u.</span></span></div>
+        <div class="sap-row"><span class="k">Priorité</span><span class="v" id="sapPrio">Haute (1)</span></div>
+        <div class="sap-row"><span class="k">Statut</span><span class="v" id="sapStat" style="color:var(--warn)">À valider</span></div>
+      </div>
+      <div class="sap-foot">
+        <button class="btn sm" onclick="validateOT()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>Valider & dispatcher l'équipe</button>
+        <button class="btn ghost sm" onclick="toast('Priorité ajustée — modification tracée dans SAP')">Ajuster la priorité</button>
+        <button class="btn ghost sm" onclick="closeOT()">Clôturer avec REX</button>
+      </div>
+    </div>`;
+  } else {
+    $("#sapBox").innerHTML=`<div class="card pad" style="text-align:center;color:var(--muted)">Aucun ordre de travail automatique en attente.<br><span style="font-size:12.5px">Lancez « Simuler anomalie S7 » pour voir la création automatique.</span></div>`;
+  }
+  renderPhone();
+}
+function renderPhone(){
+  if(!SAP_ORDER){ $("#phoneBox").innerHTML=`<div class="card pad" style="text-align:center;color:var(--muted)">En attente d'une alerte critique.</div>`; return; }
+  const s=STATIONS.find(x=>x.id===SAP_ORDER.st);
+  $("#phoneBox").innerHTML=`<div class="phone"><div class="screen">
+    <div class="psb"><span>09:14</span><span>OCP ▪ 4G ▪ 87%</span></div>
+    <div class="call">
+      <div class="cav"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+      <div class="cl">Appel automatique · PipeGuard</div><div class="cn">Alerte maintenance critique</div>
+      <div class="cbtns"><div class="cb dec"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:22px;height:22px;transform:rotate(135deg)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="cb acc"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:22px;height:22px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div></div>
+    </div>
+    <div class="sms">
+      <div class="sender">SMS · PipeGuard &lt;+212 5 22 ...&gt;</div>
+      <div class="bub"><b>ALERTE CRITIQUE</b> — ${s.id} (km ${s.km}) : pression anormale détectée, risque défaillance pompe ${s.pump} <b>sous 48 h</b>. Ordre SAP <b>${SAP_ORDER.ot}</b> créé. Pièce garniture mécanique GM-225 en stock (2 u.). Criticité : élevée.<div class="tm">09:14 · aujourd'hui</div></div>
+    </div>
+  </div></div>`;
+}
+function validateOT(){ if(!SAP_ORDER)return; $("#sapStat").textContent="Validé · équipe dispatchée"; $("#sapStat").style.color="var(--ok)"; toast("OT "+SAP_ORDER.ot+" validé — équipe terrain dispatchée (SAP PM)"); }
+function closeOT(){ if(!SAP_ORDER)return;
+  const s=STATIONS.find(x=>x.id===SAP_ORDER.st); s.status="ok"; s.risk=7;
+  ALERTS=ALERTS.filter(a=>a.st!==SAP_ORDER.st); SAP_ORDER=null; simulated=false;
+  toast("Intervention clôturée — REX enregistré, modèle ML ré-entraîné (amélioration continue)");
+  renderKpis();renderPipe();renderStations();renderAlerts();
+}
+
+/* ================= SIMULATE (le clou de la démo) ================= */
+function simulateAnomaly(){
+  go('cockpit');
+  if(simulated){ toast("Anomalie déjà simulée — clôturez l'OT pour relancer"); return; }
+  simulated=true;
+  const s=STATIONS.find(x=>x.id==="SP-07");
+  toast("Agent IA : pattern précurseur détecté sur SP-07 (chute de pression progressive)…");
+  s.status="warn"; s.risk=46; renderPipe(); renderStations();
+  setTimeout(()=>{
+    s.status="crit"; s.risk=87; renderPipe(); renderStations(); renderKpis();
+    const ot="OT-20260614-007";
+    ALERTS.unshift({id:"a7",st:"SP-07",lvl:"crit",t:"Chute de pression — risque garniture mécanique",ago:"à l'instant",risk:87,win:"48 h",ot});
+    SAP_ORDER={st:"SP-07",ot};
+    renderAlerts();
+    toast("ALERTE CRITIQUE SP-07 — SMS + appel envoyés au Maintenance Manager",true);
+    setTimeout(()=>{ toast("Ordre SAP "+ot+" créé automatiquement (<2 min) · pièce GM-225 en stock"); go('alertes'); },1400);
+  },1800);
+}
+
+/* ================= PERF ================= */
+function renderPerf(){
+  // 30-day timeline
+  const days=[]; for(let i=0;i<30;i++){ const r=Math.random(); days.push(r>0.9?"crit":r>0.78?"det":"ok"); }
+  days[12]="det";days[13]="crit";days[24]="det";
+  $("#tl30").innerHTML=days.map((d,i)=>{ const c=d==="crit"?"#EF4444":d==="det"?"#16A34A":"#E2E8F0"; const h=d==="ok"?(20+Math.random()*30):(60+Math.random()*30); return `<div class="d" title="J-${30-i}" style="background:${c};height:${h}%"></div>`; }).join("");
+  // availability chart (downtime days falling)
+  const data=[30,29,28,26,25,23,21,19,18,17.5,17,17.1];
+  const w=600,h=140,mn=15,mx=31,rg=mx-mn;
+  const pts=data.map((v,i)=>`${(i/(data.length-1)*w).toFixed(0)},${(h-10-(v-mn)/rg*(h-20)).toFixed(0)}`).join(" ");
+  const yT=(h-10-(18-mn)/rg*(h-20)).toFixed(0);
+  $("#availChart").innerHTML=`<line x1="0" y1="${yT}" x2="${w}" y2="${yT}" stroke="#16A34A" stroke-width="1" stroke-dasharray="4 4"/><text x="4" y="${yT-4}" font-size="10" fill="#16A34A">objectif 18 j</text><polyline fill="none" stroke="#2563EB" stroke-width="2.5" points="${pts}"/>`;
+  $("#kbList").innerHTML=KB.map(k=>`<div style="display:flex;gap:11px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)"><div style="width:32px;height:32px;border-radius:8px;background:var(--soft);display:flex;align-items:center;justify-content:center;flex:0 0 32px"><svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8" style="width:16px;height:16px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div><div style="flex:1"><div style="font-weight:600;font-size:13.5px">${k.t}</div><div style="font-size:11.5px;color:var(--muted)">${k.v} · ${k.rex}</div></div></div>`).join("");
+}
+
+/* ================= NAV ================= */
+const TITLES={cockpit:["Cockpit pipeline","Pipeline slurry Khouribga → Jorf Lasfar · 187 km"],alertes:["Alertes & ordres SAP","Notification manager + création automatique SAP PM"],perf:["Performance IA","Détection, disponibilité et amélioration continue"],station:["Station","Détail capteurs"]};
+function buildMobileMenu(){ $("#mmenu").innerHTML=[...document.querySelectorAll("#nav button[data-v]")].slice(0,3).map(b=>`<button data-v="${b.dataset.v}" class="${b.classList.contains('active')?'active':''}">${b.querySelector('svg').outerHTML}<span>${b.querySelector('span').textContent}</span></button>`).join(""); $("#mmenu").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{go(b.dataset.v);$("#mmenu").classList.remove("open");})); }
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  $("#v-"+v).classList.add("active");
+  document.querySelectorAll("#nav button[data-v]").forEach(b=>b.classList.toggle("active",b.dataset.v===v&&!b.onclick));
+  if(TITLES[v]&&v!=="station"){$("#pgTitle").textContent=TITLES[v][0];$("#pgSub").textContent=TITLES[v][1];}
+  if(v==="alertes")renderAlerts();
+  if(v==="perf")renderPerf();
+  buildMobileMenu(); window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("#nav button[data-v]").forEach(b=>{ if(!b.onclick) b.addEventListener("click",()=>go(b.dataset.v)); });
+$("#burger").addEventListener("click",()=>$("#mmenu").classList.toggle("open"));
+
+/* ================= INIT ================= */
+renderKpis(); renderPipe(); renderStations(); buildMobileMenu();
+tick(); setInterval(tick, 2000);
+</script>
+</body>
+</html>
