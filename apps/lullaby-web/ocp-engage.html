@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1B5E20" />
+<title>OCP Engage — Coupe du Monde 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green-900:#103d17; --green-800:#1B5E20; --green-700:#2E7D32; --green-600:#388E3C;
+    --green-500:#4CAF50; --green-300:#66BB6A; --green-100:#D6EADB; --green-50:#EAF4EC;
+    --ink:#10231a; --muted:#5c6b62; --line:#e3ebe5; --dark:#07140c;
+    --warn:#B45309; --warn-bg:#FEF3C7; --bad:#B91C1C; --bad-bg:#FEE2E2; --amber:#D97706; --amber-bg:#FFFBEB;
+    --card:#ffffff;
+    --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --sh:0 1px 2px rgba(16,35,26,.05),0 6px 20px rgba(16,35,26,.06);
+    --sh-2:0 10px 34px rgba(16,35,26,.10); --sh-lg:0 24px 60px rgba(16,35,26,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:#f4f8f5;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  .serif{font-family:var(--serif)}
+  .caps{text-transform:uppercase;letter-spacing:.09em}
+
+  /* ===== HEADER ===== */
+  header{background:linear-gradient(120deg,var(--green-900),var(--green-700));color:#fff;padding-top:env(safe-area-inset-top)}
+  .hd{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:15px 22px}
+  .wm{display:flex;align-items:center;gap:12px}
+  .wm .logo{width:42px;height:42px;flex:0 0 42px}
+  .wm h1{font-family:var(--serif);font-size:24px;font-weight:700;line-height:1;letter-spacing:.2px}
+  .wm .tl{font-size:11px;color:#c7e0cc;font-weight:500;margin-top:2px}
+  .hd-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .role-pick{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:11px;padding:6px 10px}
+  .role-pick svg{width:16px;height:16px;color:#c7e0cc}
+  .role-pick select{background:transparent;border:none;color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;outline:none}
+  .role-pick select option{color:#10231a}
+  .me{display:flex;align-items:center;gap:9px}
+  .me .av{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .me .mn{font-size:13px;font-weight:600;line-height:1.15}.me .mn span{display:block;font-weight:400;color:#c7e0cc;font-size:11.5px}
+  @media(max-width:640px){.me .mn{display:none}}
+
+  /* tabs */
+  .tabs-wrap{background:linear-gradient(120deg,var(--green-900),var(--green-700));border-top:1px solid rgba(255,255,255,.1)}
+  .tabs{max-width:1120px;margin:0 auto;display:flex;gap:4px;padding:0 18px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{display:flex;align-items:center;gap:8px;padding:13px 15px;color:#bcd7c1;font-size:14px;font-weight:600;white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
+  .tabs button svg{width:17px;height:17px}
+  .tabs button:hover{color:#fff}
+  .tabs button.active{color:#fff;border-bottom-color:var(--green-300)}
+  .tabs button .n{background:var(--green-300);color:var(--green-900);font-size:11px;font-weight:800;border-radius:20px;padding:0 7px;min-width:19px;text-align:center}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:24px 22px 40px}
+  .view{display:none;animation:fade .3s ease}.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .role-banner{display:flex;align-items:center;gap:10px;background:var(--green-50);border:1px solid var(--green-100);border-radius:12px;padding:11px 15px;margin-bottom:18px;font-size:13.5px;color:var(--green-800)}
+  .role-banner svg{width:18px;height:18px;flex:0 0 18px}
+  .role-banner b{font-weight:700}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 17px;border-radius:11px;font-size:14.5px;font-weight:600;background:var(--green-800);color:#fff;transition:.14s;min-height:44px}
+  .btn:hover{background:var(--green-900)}.btn:active{transform:scale(.98)}
+  .btn svg{width:17px;height:17px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--green-50);border-color:var(--green-100)}
+  .btn.amber{background:var(--amber)}.btn.amber:hover{background:#B45309}
+  .btn.sm{padding:8px 13px;font-size:13px;min-height:38px;border-radius:9px}
+  .btn.block{width:100%}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
+  .card.pad{padding:20px}
+  .soft{background:var(--green-50)}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .sec-h h2{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:.2px}
+  .sec-h h3{font-size:16px;font-weight:700}
+  .sec-h .hint{font-size:13px;color:var(--muted)}
+  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--green-700)}
+
+  /* status pastilles */
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .pill.ok{background:var(--green-100);color:var(--green-800)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn)}
+  .pill.bad{background:var(--bad-bg);color:var(--bad)}
+  .pill.info{background:var(--amber-bg);color:var(--amber)}
+
+  .grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+
+  /* ===== FEED ===== */
+  .filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;margin-bottom:4px;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .filters button{padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;transition:.14s}
+  .filters button.on{background:var(--green-800);color:#fff;border-color:var(--green-800)}
+  .post{margin-bottom:16px;overflow:hidden}
+  .post .ph{display:flex;align-items:center;gap:11px;padding:15px 18px}
+  .post .pa{width:40px;height:40px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;flex:0 0 40px}
+  .post .pn{font-weight:600;font-size:14px}
+  .post .pm{font-size:12px;color:var(--muted)}
+  .post .media{height:170px;background:linear-gradient(135deg,var(--green-700),var(--green-500));display:flex;align-items:center;justify-content:center;color:#fff;position:relative}
+  .post .media.info{background:linear-gradient(135deg,var(--green-900),var(--green-600))}
+  .post .media .tag{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.9);color:var(--green-800);font-size:11px;font-weight:700;padding:4px 9px;border-radius:8px}
+  .post .media .big{font-family:var(--serif);font-size:26px;font-weight:700;text-align:center;padding:0 20px;line-height:1.15}
+  .post .media svg{width:44px;height:44px;opacity:.9}
+  .post .pb{padding:14px 18px}
+  .post .pt{font-size:14.5px;line-height:1.55}
+  .post .pactions{display:flex;align-items:center;gap:4px;padding:6px 10px 12px;border-top:1px solid var(--line);margin-top:12px}
+  .post .pact{display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--muted);transition:.14s}
+  .post .pact:hover{background:var(--green-50);color:var(--green-800)}
+  .post .pact.liked{color:var(--green-800)}
+  .post .pact svg{width:17px;height:17px}
+  .post .pact .cnt{font-variant-numeric:tabular-nums}
+
+  /* ===== POLLS / CONTEST ===== */
+  .poll{margin-bottom:16px;padding:18px}
+  .poll .q{font-weight:700;font-size:16px;margin-bottom:4px}
+  .poll .sub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .opt{position:relative;border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:9px;cursor:pointer;overflow:hidden;transition:.14s}
+  .opt:hover{border-color:var(--green-300)}
+  .opt .fill{position:absolute;inset:0;background:var(--green-50);width:0;transition:width .6s ease;z-index:0}
+  .opt.win .fill{background:var(--green-100)}
+  .opt .row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;font-size:14px}
+  .opt .row .lab{font-weight:600}
+  .opt .row .pct{font-weight:700;color:var(--green-800);font-variant-numeric:tabular-nums}
+  .opt.voted-me{border-color:var(--green-800);box-shadow:0 0 0 1px var(--green-800)}
+  .match{display:flex;align-items:center;justify-content:center;gap:14px;padding:14px;background:var(--green-50);border-radius:12px;margin-bottom:14px}
+  .match .team{font-weight:700;font-size:15px}
+  .match .sc{display:flex;gap:8px}
+  .match .sc input{width:52px;text-align:center;font-size:20px;font-weight:700;padding:8px;border:1px solid var(--line);border-radius:10px}
+  .match .vs{font-size:12px;color:var(--muted);font-weight:600}
+  .prono-list{max-height:210px;overflow-y:auto}
+  .prono{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .prono:last-child{border:none}
+  .prono .pv{margin-left:auto;font-weight:700;font-family:var(--serif);font-size:17px}
+
+  /* ===== LEADERBOARD ===== */
+  .lb{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line)}
+  .lb:last-child{border:none}
+  .lb .rk{font-family:var(--serif);font-size:22px;font-weight:700;width:32px;text-align:center;color:var(--muted)}
+  .lb .rk.top{color:var(--green-700)}
+  .lb .lav{width:42px;height:42px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;flex:0 0 42px}
+  .lb .ln{font-weight:600;font-size:14.5px}
+  .lb .le{font-size:12px;color:var(--muted)}
+  .lb .badges{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+  .badge{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--green-50);color:var(--green-800);border:1px solid var(--green-100)}
+  .lb .pts{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--green-800);min-width:64px;text-align:right}
+  .me-card{background:linear-gradient(120deg,var(--green-800),var(--green-600));color:#fff;border-radius:16px;padding:20px;margin-bottom:18px}
+  .me-card .lvl{font-size:12px;color:#c7e0cc;font-weight:600}
+  .me-card .pts{font-family:var(--serif);font-size:40px;font-weight:700;line-height:1}
+  .me-card .prog{height:8px;background:rgba(255,255,255,.2);border-radius:5px;margin-top:14px;overflow:hidden}
+  .me-card .prog i{display:block;height:100%;background:var(--green-300);border-radius:5px}
+  .me-card .nx{font-size:12px;color:#dceede;margin-top:8px}
+  .me-card .my-badges{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+  .me-card .my-badges .b{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(255,255,255,.16)}
+
+  /* ===== PRODUCE FORM ===== */
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+  .field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:#fff;transition:.15s;min-height:46px}
+  .field textarea{min-height:96px;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--green-600);box-shadow:0 0 0 3px rgba(56,142,60,.14)}
+  .typechips{display:flex;gap:8px;flex-wrap:wrap}
+  .typechips button{padding:10px 14px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:600;font-size:13.5px;color:var(--muted);min-height:44px}
+  .typechips button.on{background:var(--green-800);color:#fff;border-color:var(--green-800)}
+  .check{display:flex;align-items:flex-start;gap:11px;padding:12px 14px;border:1px solid var(--line);border-radius:11px;margin-bottom:9px;cursor:pointer;transition:.14s}
+  .check:hover{background:var(--green-50)}
+  .check.on{border-color:var(--green-600);background:var(--green-50)}
+  .check .box{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);flex:0 0 22px;display:flex;align-items:center;justify-content:center;transition:.14s;margin-top:1px}
+  .check.on .box{background:var(--green-700);border-color:var(--green-700)}
+  .check .box svg{width:13px;height:13px;color:#fff;opacity:0}.check.on .box svg{opacity:1}
+  .check .ct{font-size:13.5px;font-weight:600}.check .cd{font-size:12px;color:var(--muted);margin-top:1px}
+  .comp-meter{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;margin-bottom:16px}
+  .comp-meter.low{background:var(--warn-bg)}.comp-meter.high{background:var(--green-50)}
+  .comp-meter .ring{flex:0 0 54px}
+  .comp-meter .ct{font-weight:700;font-size:14px}.comp-meter .cd{font-size:12px;color:var(--muted)}
+
+  /* ===== WORKFLOW ===== */
+  .wf{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:820px){.wf{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.wf{grid-template-columns:1fr}}
+  .wcol{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;min-height:120px}
+  .wcol .wh{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:700;padding:4px 6px 10px;color:var(--green-800)}
+  .wcard{border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:9px;cursor:pointer;transition:.14s}
+  .wcard:hover{box-shadow:var(--sh);border-color:var(--green-300)}
+  .wcard .wt{font-size:13px;font-weight:600;line-height:1.3}
+  .wcard .wm2{font-size:11.5px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:6px}
+  .audit{font-size:12.5px;display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .audit:last-child{border:none}
+  .audit .ad{width:9px;height:9px;border-radius:50%;background:var(--green-500);margin-top:5px;flex:0 0 9px}
+  .audit .at{font-weight:600}.audit .atm{color:var(--muted);font-size:11px}
+
+  /* ===== KPI DASHBOARD ===== */
+  .kpi-band{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.kpi-band{grid-template-columns:1fr}}
+  .kpi{padding:20px}
+  .kpi .big{font-family:var(--serif);font-size:46px;font-weight:700;line-height:1;color:var(--green-800)}
+  .kpi .sub{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+  .kpi .tgt{font-size:12px;margin-top:8px}
+  .seg-bar{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+  .seg-bar .sn{font-size:13px;font-weight:600;width:150px;flex:0 0 150px}
+  .seg-bar .tr{flex:1;height:10px;background:var(--green-50);border-radius:6px;overflow:hidden}
+  .seg-bar .tr i{display:block;height:100%;background:var(--green-600);border-radius:6px}
+  .seg-bar .sv{font-weight:700;font-size:13px;width:44px;text-align:right;font-variant-numeric:tabular-nums}
+  .funnel{display:flex;flex-direction:column;gap:8px}
+  .fstep{display:flex;align-items:center;gap:12px}
+  .fstep .fbar{height:38px;border-radius:9px;display:flex;align-items:center;padding:0 14px;color:#fff;font-weight:600;font-size:13px}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(16,35,26,.55);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
+  .scrim.open{display:flex}
+  .modal{background:#fff;border-radius:18px;width:100%;max-width:560px;box-shadow:var(--sh-lg);animation:pop .26s ease;overflow:hidden}
+  @keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  .m-head{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .m-head h3{font-family:var(--serif);font-size:21px;font-weight:700}
+  .m-head p{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .m-x{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 32px}.m-x:hover{background:var(--green-50)}
+  .m-body{padding:20px 22px}
+  .m-foot{padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;background:#fbfdfb;flex-wrap:wrap}
+
+  /* toast */
+  .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:120;display:flex;flex-direction:column;gap:10px;width:calc(100% - 32px);max-width:400px}
+  .toast{display:flex;align-items:center;gap:11px;background:var(--green-900);color:#fff;padding:13px 17px;border-radius:12px;box-shadow:var(--sh-lg);font-size:14px;font-weight:500;animation:tin .3s ease}
+  .toast .ti{font-size:16px;flex:0 0 auto}
+  @keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  footer{text-align:center;padding:22px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:20px}
+  footer b{color:var(--green-800);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="wm">
+      <svg class="logo" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="13" fill="#EAF4EC"/>
+        <path d="M24 8c-8 5-12 11-12 17a12 12 0 0 0 24 0c0-6-4-12-12-17z" fill="#66BB6A"/>
+        <path d="M24 13v22M24 21c-3-1.2-5-3-6-5.5M24 26c3-1.2 5-3 6-5.5" stroke="#103d17" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div><h1>OCP Engage</h1><div class="tl">Coupe du Monde 2026 · Nutricrops</div></div>
+    </div>
+    <div class="hd-r">
+      <div class="role-pick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/></svg>
+        <select id="roleSel" onchange="setRole(this.value)" aria-label="Choisir la vue">
+          <option value="collab">Vue : Collaborateur</option>
+          <option value="comm">Vue : Équipe comm</option>
+          <option value="juridique">Vue : Juridique</option>
+          <option value="ceo">Vue : CEO</option>
+        </select>
+      </div>
+      <div class="me"><div class="mn" id="meName">Yasmine Alaoui<span id="meRole">Commercial</span></div><div class="av" id="meAv">YA</div></div>
+    </div>
+  </div>
+  <div class="tabs-wrap"><nav class="tabs" id="tabs"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="role-banner" id="roleBanner"></div>
+
+  <!-- FIL -->
+  <section class="view active" id="v-fil">
+    <div class="sec-h"><div><span class="eyebrow">Fil d'actualité</span><h2>L'esprit d'équipe, jusqu'au coup de sifflet</h2></div></div>
+    <div class="filters" id="feedFilters"></div>
+    <div class="grid2">
+      <div id="feedList"></div>
+      <div>
+        <div class="card pad soft" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:12px"><h3 style="font-size:15px">Prochains matchs</h3><span class="pill ok">CDM 2026</span></div>
+          <div id="matchMini"></div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3 style="font-size:15px">Sondage express</h3></div>
+          <div id="miniPoll"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SONDAGES & CONCOURS -->
+  <section class="view" id="v-concours">
+    <div class="grid2">
+      <div>
+        <div class="sec-h"><div><span class="eyebrow">Sondages</span><h2>Votre voix compte</h2></div></div>
+        <div id="pollList"></div>
+      </div>
+      <div>
+        <div class="sec-h"><div><span class="eyebrow">Concours pronostics</span><h3 style="font-size:20px" class="serif">Pronostic du match</h3></div></div>
+        <div class="card pad">
+          <div id="contestMatch"></div>
+          <div class="sec-h" style="margin:16px 0 10px"><h3 style="font-size:14px">Derniers pronostics</h3><span class="hint" id="pronoCount"></span></div>
+          <div class="prono-list" id="pronoList"></div>
+          <button class="btn ghost block sm" style="margin-top:12px" onclick="tirage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4"/></svg>Effectuer le tirage au sort</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLASSEMENT -->
+  <section class="view" id="v-classement">
+    <div class="sec-h"><div><span class="eyebrow">Gamification</span><h2>Classement des collaborateurs</h2></div></div>
+    <div class="grid2">
+      <div class="card"><div id="lbList"></div></div>
+      <div>
+        <div class="me-card">
+          <div class="lvl">Niveau 4 · Ambassadeur</div>
+          <div class="pts" id="myPts">340</div>
+          <div style="font-size:12px;color:#c7e0cc">points d'engagement</div>
+          <div class="prog"><i style="width:68%"></i></div>
+          <div class="nx">→ 160 pts avant le niveau 5 « Capitaine »</div>
+          <div class="my-badges"><span class="b">⚽ Supporter</span><span class="b">🎯 Pronostiqueur</span><span class="b">✍ Créateur</span></div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3 style="font-size:15px">Comment gagner des points</h3></div>
+          <div style="font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;justify-content:space-between"><span>Voter à un sondage</span><b style="color:var(--green-800)">+5 pts</b></div>
+            <div style="display:flex;justify-content:space-between"><span>Commenter un contenu</span><b style="color:var(--green-800)">+10 pts</b></div>
+            <div style="display:flex;justify-content:space-between"><span>Participer à un concours</span><b style="color:var(--green-800)">+20 pts</b></div>
+            <div style="display:flex;justify-content:space-between"><span>Publier un contenu validé</span><b style="color:var(--green-800)">+50 pts</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUIRE -->
+  <section class="view" id="v-produire">
+    <div class="sec-h"><div><span class="eyebrow">Production de contenu</span><h2>Soumettre un contenu</h2></div></div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="field"><label>Type de contenu</label><div class="typechips" id="typeChips"></div></div>
+        <div class="field"><label>Titre</label><input id="c-title" placeholder="Ex. Les Lions de l'Atlas, notre fierté" /></div>
+        <div class="field"><label>Message</label><textarea id="c-body" placeholder="Rédigez votre contenu…"></textarea></div>
+        <div class="field"><label>Segment cible</label><select id="c-seg"><option>Tous les collaborateurs</option><option>Mines Khouribga</option><option>Chimie Jorf Lasfar</option><option>Commercial</option><option>R&D Nutricrops</option><option>Site Safi</option></select></div>
+      </div>
+      <div>
+        <div class="comp-meter low" id="compMeter">
+          <svg class="ring" viewBox="0 0 54 54" id="compRing"></svg>
+          <div><div class="ct" id="compTxt">Conformité : 0%</div><div class="cd">Cochez la checklist avant de soumettre</div></div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3 style="font-size:15px">⚠ Checklist de conformité</h3></div>
+          <div id="checklist"></div>
+          <button class="btn block" id="submitBtn" style="margin-top:14px" disabled onclick="submitContent()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Soumettre au circuit de validation</button>
+          <div style="font-size:11.5px;color:var(--muted);text-align:center;margin-top:9px">→ Juridique → CEO → Publication</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALIDATION -->
+  <section class="view" id="v-validation">
+    <div class="sec-h"><div><span class="eyebrow">Workflow de validation</span><h2>Circuit de conformité</h2></div><span class="hint">Agence → Juridique → CEO → Publication</span></div>
+    <div class="wf" id="wfBoard"></div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="view" id="v-dashboard">
+    <div class="sec-h"><div><span class="eyebrow">Pilotage comm</span><h2>Tableau de bord engagement</h2></div><span class="pill ok">● Temps réel</span></div>
+    <div class="kpi-band" id="kpiBand"></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Activité par segment / entité</h3><span class="hint">participants actifs</span></div>
+        <div id="segBars"></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Entonnoir de validation</h3><span class="hint">ce mois</span></div>
+        <div class="funnel" id="funnel"></div>
+      </div>
+    </div>
+    <div class="card pad" style="margin-top:18px">
+      <div class="sec-h"><h3>Résultats des concours</h3></div>
+      <div id="contestResults"></div>
+    </div>
+  </section>
+</main>
+
+<footer>Prototype de démonstration — <b>OCP Nutricrops · D²nAI</b></footer>
+
+<div class="scrim" id="scrim"><div id="modalHost"></div></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ================= DONNÉES ================= */
+const ME={nom:"Yasmine Alaoui",init:"YA",entite:"Commercial"};
+const ROLES={
+  collab:{lab:"Collaborateur",tabs:["fil","concours","classement","produire"],banner:"Vous naviguez en <b>collaborateur</b> — consommez, votez, participez et produisez du contenu."},
+  comm:{lab:"Équipe comm",tabs:["fil","concours","classement","validation","dashboard"],banner:"Vous pilotez en <b>équipe communication</b> — publiez les contenus validés et suivez les KPIs."},
+  juridique:{lab:"Juridique",tabs:["validation","fil"],banner:"Vous agissez en <b>juridique</b> — vérifiez la conformité (droits, marques, Loi 09-08) et approuvez ou rejetez."},
+  ceo:{lab:"CEO",tabs:["validation","dashboard","fil"],banner:"Vous agissez en tant que <b>CEO</b> — approbation finale des contenus avant publication."},
+};
+const TAB_META={
+  fil:["Fil d'actualité",'<path d="M4 5h16M4 12h16M4 19h10"/>'],
+  concours:["Sondages & Concours",'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>'],
+  classement:["Classement",'<path d="M6 9H4a2 2 0 0 0-2 2v9h6zM10 3H14v17h-4zM18 13h2a2 2 0 0 1 2 2v5h-6v-5a2 2 0 0 1 2-2z"/>'],
+  produire:["Produire",'<path d="M12 5v14M5 12h14"/>'],
+  validation:["Validation",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
+  dashboard:["Dashboard",'<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'],
+};
+
+let FEED=[
+  {id:1,auth:"Équipe Comm",init:"EC",type:"Infographie",seg:"Tous",time:"il y a 1 h",media:"info",big:"1000 collègues, 1 seule équipe",txt:"Découvrez le calendrier officiel des matchs et rejoignez les concours internes tout au long de la compétition.",likes:184,comments:23,liked:false},
+  {id:2,auth:"Agence Créative",init:"AC",type:"Vidéo",seg:"Tous",time:"il y a 3 h",media:"video",txt:"Teaser : les Lions de l'Atlas portent nos couleurs. Partagez votre fierté avec le hashtag interne #OCPSupporters.",likes:242,comments:41,liked:true},
+  {id:3,auth:"Équipe Comm",init:"EC",type:"Post",seg:"Mines Khouribga",time:"il y a 5 h",media:"post",big:"Fan-zone à Khouribga",txt:"Une fan-zone sera installée au site de Khouribga pour vivre les matchs ensemble. Inscriptions ouvertes cette semaine.",likes:97,comments:12,liked:false},
+  {id:4,auth:"Agence Créative",init:"AC",type:"Infographie",seg:"Commercial",time:"hier",media:"info",big:"Le fair-play, notre valeur",txt:"Parallèle entre l'esprit d'équipe sur le terrain et nos engagements Nutricrops. Contenu validé conformité ●.",likes:131,comments:18,liked:false},
+];
+let feedFilter="Tous";
+
+let POLLS=[
+  {id:"p1",q:"Jusqu'où iront les Lions de l'Atlas ?",sub:"Sondage interne — résultats en direct",opts:[{t:"Quarts de finale",v:112},{t:"Demi-finales",v:198},{t:"Finale",v:143},{t:"Vainqueurs !",v:97}],mine:null},
+  {id:"p2",q:"Comment souhaitez-vous vivre les matchs ?",sub:"Organisation interne",opts:[{t:"Fan-zone sur site",v:214},{t:"Diffusion en salle de pause",v:156},{t:"Chez soi, en famille",v:88}],mine:null},
+];
+let CONTEST={home:"Maroc",away:"Croatie",date:"14 juin 2026 · 20h00",pronos:[
+  {n:"Karim Benjelloun",e:"Chimie Jorf",s:"2 – 1"},{n:"Salma Idrissi",e:"R&D",s:"1 – 0"},{n:"Omar Fassi",e:"Mines Khouribga",s:"3 – 1"},
+]};
+
+let LEADER=[
+  {n:"Mehdi Tazi",e:"Mines Khouribga",pts:520,badges:["⚽","🎯","✍","🏅"]},
+  {n:"Salma Idrissi",e:"R&D Nutricrops",pts:465,badges:["🎯","✍"]},
+  {n:"Omar Fassi",e:"Commercial",pts:410,badges:["⚽","🎯"]},
+  {n:"Yasmine Alaoui",e:"Commercial",pts:340,badges:["⚽","🎯","✍"],me:true},
+  {n:"Karim Benjelloun",e:"Chimie Jorf",pts:305,badges:["⚽"]},
+  {n:"Nadia Berrada",e:"Site Safi",pts:270,badges:["✍"]},
+];
+
+const CHECK_ITEMS=[
+  {t:"Droits d'auteur des visuels vérifiés",d:"Images/vidéos libres de droits ou licence OCP"},
+  {t:"Droit à l'image des personnes",d:"Autorisations obtenues pour les personnes identifiables"},
+  {t:"Aucune marque/logo tiers non autorisé",d:"Pas de sponsors/logos FIFA sans accord"},
+  {t:"Conformité Loi 09-08 (données personnelles)",d:"Aucune donnée personnelle non consentie"},
+  {t:"Charte OCP & mentions obligatoires respectées",d:"Ton, marque et mentions conformes"},
+];
+let checkState=CHECK_ITEMS.map(()=>false);
+let contentType="Post";
+
+let WORKFLOW=[
+  {id:"w1",t:"Vidéo — Teaser Lions de l'Atlas",from:"Agence Créative",status:"revision",time:"il y a 2 h"},
+  {id:"w2",t:"Post — Fan-zone Safi",from:"Équipe Comm",status:"soumis",time:"il y a 30 min"},
+  {id:"w3",t:"Infographie — Valeurs & fair-play",from:"Agence Créative",status:"ceo",time:"il y a 1 h"},
+  {id:"w4",t:"Post — Calendrier des matchs",from:"Équipe Comm",status:"publie",time:"hier"},
+];
+const WF_COLS=[["soumis","Soumis","info"],["revision","Révision juridique","warn"],["ceo","Approbation CEO","info"],["publie","Publié ●","ok"]];
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+let role="collab";
+function toast(msg,ic){const t=document.createElement("div");t.className="toast";t.innerHTML=`<span class="ti">${ic||"●"}</span><span>${msg}</span>`;$("#toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="all .35s";t.style.transform="translateY(12px)";setTimeout(()=>t.remove(),350);},3000);}
+function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();}
+
+/* ================= ROLE / NAV ================= */
+function setRole(r){
+  role=r; const R=ROLES[r];
+  $("#meRole").textContent=R.lab;
+  $("#roleBanner").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg><span>${R.banner}</span>`;
+  // tabs
+  $("#tabs").innerHTML=R.tabs.map((t,i)=>{
+    const badge = t==="validation" ? `<span class="n">${WORKFLOW.filter(w=>w.status!=="publie").length}</span>`:"";
+    return `<button data-v="${t}" onclick="go('${t}')">${`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${TAB_META[t][1]}</svg>`}${TAB_META[t][0]}${badge}</button>`;
+  }).join("");
+  go(R.tabs[0]);
+}
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  const el=$("#v-"+v); if(el)el.classList.add("active");
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  if(v==="fil")renderFeed();
+  if(v==="concours"){renderPolls();renderContest();}
+  if(v==="classement")renderLeader();
+  if(v==="produire")renderProduce();
+  if(v==="validation")renderWorkflow();
+  if(v==="dashboard")renderDashboard();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ================= FEED ================= */
+function renderFeed(){
+  const segs=["Tous","Mines Khouribga","Chimie Jorf Lasfar","Commercial","R&D Nutricrops","Site Safi"];
+  $("#feedFilters").innerHTML=segs.map(s=>`<button class="${feedFilter===s?'on':''}" onclick="feedFilter='${s}';renderFeed()">${s}</button>`).join("");
+  const list=FEED.filter(p=>feedFilter==="Tous"||p.seg==="Tous"||p.seg===feedFilter);
+  $("#feedList").innerHTML=list.map(p=>{
+    const media = p.media==="video"
+      ? `<div class="media"><span class="tag">${p.type} · ●</span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>`
+      : `<div class="media ${p.media==='info'?'info':''}"><span class="tag">${p.type} · ●</span><div class="big serif">${p.big||''}</div></div>`;
+    return `<article class="card post">
+      <div class="ph"><div class="pa">${p.init}</div><div style="flex:1"><div class="pn">${p.auth}</div><div class="pm">${p.time} · ${p.seg==="Tous"?"Tous les collaborateurs":p.seg}</div></div><span class="pill ok">Validé ●</span></div>
+      ${media}
+      <div class="pb"><div class="pt">${p.txt}</div></div>
+      <div class="pactions">
+        <button class="pact ${p.liked?'liked':''}" onclick="likePost(${p.id})"><svg viewBox="0 0 24 24" fill="${p.liked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>J'aime <span class="cnt">${p.likes}</span></button>
+        <button class="pact" onclick="commentPost(${p.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Commenter <span class="cnt">${p.comments}</span></button>
+        <button class="pact" onclick="toast('Contenu partagé à votre entité','→')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Partager</button>
+      </div>
+    </article>`;
+  }).join("");
+  // side widgets
+  $("#matchMini").innerHTML=[["Maroc","Croatie","14 juin"],["Maroc","Canada","20 juin"],["Maroc","Belgique","25 juin"]].map(m=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px"><span style="font-weight:600">${m[0]} <span style="color:var(--muted);font-weight:400">–</span> ${m[1]}</span><span class="pill info">${m[2]}</span></div>`).join("");
+  const mp=POLLS[0];
+  $("#miniPoll").innerHTML=`<div style="font-weight:600;font-size:14px;margin-bottom:10px">${mp.q}</div>`+mp.opts.slice(0,3).map((o,i)=>`<button class="btn ghost block sm" style="justify-content:space-between;margin-bottom:7px" onclick="go('concours')"><span>${o.t}</span><span>→</span></button>`).join("");
+}
+function likePost(id){const p=FEED.find(x=>x.id===id);p.liked=!p.liked;p.likes+=p.liked?1:-1;renderFeed();if(p.liked)toast("+5 pts · merci pour votre soutien !","⚽");}
+function commentPost(id){
+  $("#modalHost").innerHTML=`<div class="modal"><div class="m-head"><div><h3>Ajouter un commentaire</h3><p>Votre message sera visible par les collaborateurs</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="m-body"><div class="field" style="margin:0"><textarea id="cm" placeholder="Allez les Lions ! …"></textarea></div></div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal()">Annuler</button><button class="btn" onclick="postComment(${id})">Publier (+10 pts)</button></div></div>`;
+  $("#scrim").classList.add("open");
+}
+function postComment(id){const p=FEED.find(x=>x.id===id);p.comments++;closeModal();renderFeed();toast("Commentaire publié · +10 pts","✍");}
+
+/* ================= POLLS ================= */
+function renderPolls(){
+  $("#pollList").innerHTML=POLLS.map(p=>{
+    const total=p.opts.reduce((s,o)=>s+o.v,0);
+    const max=Math.max(...p.opts.map(o=>o.v));
+    return `<div class="card poll">
+      <div class="q">${p.q}</div><div class="sub">${p.sub} · ${total} votes</div>
+      ${p.opts.map((o,i)=>{const pct=Math.round(o.v/total*100);const voted=p.mine!==null;return `<div class="opt ${p.mine===i?'voted-me':''} ${voted&&o.v===max?'win':''}" onclick="vote('${p.id}',${i})"><div class="fill" style="width:${voted?pct:0}%"></div><div class="row"><span class="lab">${p.mine===i?'● ':''}${o.t}</span>${voted?`<span class="pct">${pct}%</span>`:'<span style="color:var(--muted);font-size:12px">Cliquez pour voter</span>'}</div></div>`;}).join("")}
+      ${p.mine!==null?'<div style="font-size:12px;color:var(--green-800);font-weight:600;margin-top:6px">✓ Vous avez voté · +5 pts</div>':''}
+    </div>`;
+  }).join("");
+}
+function vote(pid,i){const p=POLLS.find(x=>x.id===pid);if(p.mine!==null)return;p.mine=i;p.opts[i].v++;renderPolls();renderFeed();toast("Vote enregistré · +5 pts","⚽");}
+
+/* ================= CONTEST ================= */
+function renderContest(){
+  $("#contestMatch").innerHTML=`
+    <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-bottom:10px">${CONTEST.date}</div>
+    <div class="match"><span class="team">${CONTEST.home}</span><div class="sc"><input id="sh" type="number" min="0" value="2" aria-label="score ${CONTEST.home}"><span class="vs" style="align-self:center">–</span><input id="sa" type="number" min="0" value="1" aria-label="score ${CONTEST.away}"></div><span class="team">${CONTEST.away}</span></div>
+    <button class="btn block" onclick="submitProno()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Valider mon pronostic (+20 pts)</button>`;
+  $("#pronoList").innerHTML=CONTEST.pronos.map(p=>`<div class="prono"><div style="width:30px;height:30px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px">${initials(p.n)}</div><div><div style="font-weight:600">${p.n}</div><div style="font-size:11.5px;color:var(--muted)">${p.e}</div></div><div class="pv">${p.s}</div></div>`).join("");
+  $("#pronoCount").textContent=CONTEST.pronos.length+" participants";
+}
+function submitProno(){
+  const s=`${$("#sh").value} – ${$("#sa").value}`;
+  CONTEST.pronos.unshift({n:ME.nom,e:ME.entite,s});
+  renderContest();toast("Pronostic enregistré · +20 pts","🎯");
+}
+function tirage(){
+  const w=CONTEST.pronos[Math.floor(CONTEST.pronos.length*0.4)]||CONTEST.pronos[0];
+  $("#modalHost").innerHTML=`<div class="modal"><div class="m-head"><div><h3>🏆 Tirage au sort</h3><p>Parmi les pronostics enregistrés</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="m-body" style="text-align:center;padding:26px"><div style="width:70px;height:70px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:24px;margin:0 auto 14px">${initials(w.n)}</div><div style="font-family:var(--serif);font-size:24px;font-weight:700">${w.n}</div><div style="color:var(--muted);font-size:13px">${w.e} · pronostic ${w.s}</div><div class="pill ok" style="margin-top:14px">Gagnant du tirage</div></div>
+    <div class="m-foot"><button class="btn" onclick="closeModal();toast('Gagnant notifié par e-mail','→')">Notifier le gagnant</button></div></div>`;
+  $("#scrim").classList.add("open");
+}
+
+/* ================= LEADERBOARD ================= */
+function renderLeader(){
+  const sorted=[...LEADER].sort((a,b)=>b.pts-a.pts);
+  $("#lbList").innerHTML=sorted.map((l,i)=>`<div class="lb" style="${l.me?'background:var(--green-50)':''}">
+    <div class="rk ${i<3?'top':''}">${i+1}</div>
+    <div class="lav">${initials(l.n)}</div>
+    <div style="flex:1;min-width:0"><div class="ln">${l.n}${l.me?' <span class="pill ok" style="font-size:10px">Vous</span>':''}</div><div class="le">${l.e}</div></div>
+    <div class="badges">${l.badges.map(b=>`<span class="badge">${b}</span>`).join("")}</div>
+    <div class="pts">${l.pts}</div></div>`).join("");
+}
+
+/* ================= PRODUIRE ================= */
+function renderProduce(){
+  $("#typeChips").innerHTML=["Post","Image","Vidéo","Infographie"].map(t=>`<button class="${contentType===t?'on':''}" onclick="contentType='${t}';renderProduce()">${t}</button>`).join("");
+  $("#checklist").innerHTML=CHECK_ITEMS.map((c,i)=>`<div class="check ${checkState[i]?'on':''}" onclick="toggleCheck(${i})"><div class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><div><div class="ct">${c.t}</div><div class="cd">${c.d}</div></div></div>`).join("");
+  updateComp();
+}
+function toggleCheck(i){checkState[i]=!checkState[i];renderProduce();}
+function updateComp(){
+  const done=checkState.filter(Boolean).length,tot=CHECK_ITEMS.length,pct=Math.round(done/tot*100);
+  const r=25,circ=2*Math.PI*r,off=circ*(1-pct/100);
+  $("#compRing").innerHTML=`<circle cx="27" cy="27" r="${r}" fill="none" stroke="#e3ebe5" stroke-width="5"/><circle cx="27" cy="27" r="${r}" fill="none" stroke="${pct===100?'#2E7D32':'#D97706'}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${off}" transform="rotate(-90 27 27)"/><text x="27" y="31" text-anchor="middle" font-size="14" font-weight="800" fill="${pct===100?'#2E7D32':'#B45309'}" font-family="Inter,sans-serif">${pct}%</text>`;
+  $("#compMeter").className="comp-meter "+(pct===100?"high":"low");
+  $("#compTxt").textContent="Conformité : "+pct+"%";
+  $("#submitBtn").disabled=(pct!==100);
+}
+function submitContent(){
+  const title=$("#c-title").value.trim()||"Nouveau contenu";
+  WORKFLOW.unshift({id:"w"+Date.now(),t:contentType+" — "+title,from:"Vous ("+ME.entite+")",status:"soumis",time:"à l'instant"});
+  checkState=CHECK_ITEMS.map(()=>false);$("#c-title").value="";$("#c-body").value="";
+  renderProduce();setRoleBadge();
+  toast("Contenu soumis au circuit → Juridique → CEO","→");
+}
+
+/* ================= WORKFLOW ================= */
+function setRoleBadge(){const b=document.querySelector('#tabs button[data-v="validation"] .n');if(b)b.textContent=WORKFLOW.filter(w=>w.status!=="publie").length;}
+function renderWorkflow(){
+  $("#wfBoard").innerHTML=WF_COLS.map(([k,lab,cls])=>{
+    const items=WORKFLOW.filter(w=>w.status===k);
+    return `<div class="wcol"><div class="wh"><span>${lab}</span><span class="pill ${cls}">${items.length}</span></div>${items.map(w=>`<div class="wcard" onclick="openWF('${w.id}')"><div class="wt">${w.t}</div><div class="wm2">${w.from} · ${w.time}</div></div>`).join("")||'<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px">—</div>'}</div>`;
+  }).join("");
+}
+function openWF(id){
+  const w=WORKFLOW.find(x=>x.id===id);
+  const audit=[["Soumis par "+w.from,w.time],["Checklist conformité complétée","auto"],w.status!=="soumis"?["Pris en charge — juridique","il y a 40 min"]:null,["Historique d'audit horodaté","tracé"]].filter(Boolean);
+  let actions="";
+  if(role==="juridique") actions=`<button class="btn ghost" onclick="wfAction('${id}','rejeté')">⚠ Rejeter</button><button class="btn" onclick="wfAction('${id}','ceo')">● Conforme → CEO</button>`;
+  else if(role==="ceo") actions=`<button class="btn ghost" onclick="wfAction('${id}','rejeté')">Renvoyer</button><button class="btn" onclick="wfAction('${id}','publie_ready')">● Approuver</button>`;
+  else if(role==="comm") actions=`<button class="btn" onclick="wfAction('${id}','publie')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Publier maintenant</button>`;
+  else actions=`<button class="btn ghost" onclick="closeModal()">Fermer</button>`;
+  $("#modalHost").innerHTML=`<div class="modal"><div class="m-head"><div><h3>${w.t}</h3><p>Statut : ${labelOf(w.status)} · ${w.from}</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="m-body">
+      <div class="card pad soft" style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:var(--green-800);margin-bottom:8px">⚠ CHECKLIST DE CONFORMITÉ</div>${CHECK_ITEMS.map(c=>`<div style="display:flex;gap:9px;align-items:center;font-size:13px;padding:4px 0"><span style="color:var(--green-700);font-weight:700">●</span>${c.t}</div>`).join("")}</div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px" class="caps">Historique d'audit</div>
+      ${audit.map(a=>`<div class="audit"><span class="ad"></span><div><div class="at">${a[0]}</div><div class="atm">${a[1]}</div></div></div>`).join("")}
+    </div>
+    <div class="m-foot">${actions}</div></div>`;
+  $("#scrim").classList.add("open");
+}
+function labelOf(s){return {soumis:"Soumis",revision:"En révision juridique",ceo:"Attente approbation CEO",publie:"Publié",rejeté:"Rejeté"}[s]||s;}
+function wfAction(id,to){
+  const w=WORKFLOW.find(x=>x.id===id);
+  if(to==="publie_ready"){w.status="publie";toast("Approuvé par le CEO · prêt à publier","●");}
+  else if(to==="publie"){w.status="publie";FEED.unshift({id:Date.now(),auth:"Équipe Comm",init:"EC",type:w.t.split(" — ")[0],seg:"Tous",time:"à l'instant",media:"post",big:w.t.split(" — ")[1]||"",txt:"Nouveau contenu publié après validation du circuit de conformité.",likes:0,comments:0,liked:false});toast("Contenu publié dans le fil ●","●");}
+  else if(to==="ceo"){w.status="ceo";toast("Validé conformité → transmis au CEO","→");}
+  else if(to==="rejeté"){w.status="rejeté";toast("Contenu rejeté · retour à l'émetteur","⚠");}
+  closeModal();renderWorkflow();setRoleBadge();
+}
+
+/* ================= DASHBOARD ================= */
+function renderDashboard(){
+  const kpis=[
+    {big:"42%",sub:"Taux de participation actif",tgt:"● Objectif >40% atteint",cls:"ok"},
+    {big:"18%",sub:"Engagement par contenu",tgt:"● Objectif >15% atteint",cls:"ok"},
+    {big:"84%",sub:"Conformité au 1ᵉʳ passage",tgt:"● Objectif >80% atteint",cls:"ok"},
+  ];
+  $("#kpiBand").innerHTML=kpis.map(k=>`<div class="card kpi"><div class="big">${k.big}</div><div class="sub">${k.sub}</div><div class="tgt"><span class="pill ${k.cls}">${k.tgt}</span></div></div>`).join("");
+  const segs=[["Mines Khouribga",68],["Chimie Jorf Lasfar",54],["Commercial",47],["R&D Nutricrops",39],["Site Safi",31]];
+  const max=68;
+  $("#segBars").innerHTML=segs.map(s=>`<div class="seg-bar"><span class="sn">${s[0]}</span><span class="tr"><i style="width:${s[1]/max*100}%"></i></span><span class="sv">${s[1]}%</span></div>`).join("");
+  const fun=[["Contenus soumis",128,"#1B5E20"],["Validés juridique",108,"#2E7D32"],["Approuvés CEO",96,"#388E3C"],["Publiés",92,"#66BB6A"]];
+  const fmax=128;
+  $("#funnel").innerHTML=fun.map(f=>`<div class="fstep"><div class="fbar" style="width:${Math.max(f[1]/fmax*100,30)}%;background:${f[2]}">${f[0]}</div><b style="font-family:var(--serif);font-size:17px;color:var(--green-800)">${f[1]}</b></div>`).join("");
+  const total=POLLS[0].opts.reduce((s,o)=>s+o.v,0);
+  $("#contestResults").innerHTML=`<div style="font-weight:600;margin-bottom:10px">${POLLS[0].q}</div>`+POLLS[0].opts.map(o=>{const pct=Math.round(o.v/total*100);return `<div class="seg-bar"><span class="sn">${o.t}</span><span class="tr"><i style="width:${pct}%"></i></span><span class="sv">${pct}%</span></div>`;}).join("")+`<div style="margin-top:12px;font-size:13px;color:var(--muted)">Concours pronostics « ${CONTEST.home} – ${CONTEST.away} » : <b style="color:var(--green-800)">${CONTEST.pronos.length} participations</b></div>`;
+}
+
+/* ================= MODAL ================= */
+function closeModal(){$("#scrim").classList.remove("open");$("#modalHost").innerHTML="";}
+$("#scrim").addEventListener("click",e=>{if(e.target===$("#scrim"))closeModal();});
+
+/* ================= INIT ================= */
+$("#meAv").textContent=ME.init;
+setRole("collab");
+</script>
+</body>
+</html>
