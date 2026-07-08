@@ -253,6 +253,7 @@
       <button data-v="home" class="active" onclick="go('home')">Rechercher</button>
       <button data-v="bookings" onclick="go('bookings')">Mes réservations</button>
       <button data-v="backoffice" onclick="go('backoffice')">Espace support</button>
+      <button data-v="investors" onclick="go('investors')">Investisseurs</button>
     </div>
     <div class="nav-r">
       <div class="mad-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Paiement 100% MAD</span></div>
@@ -341,6 +342,9 @@
       </div>
     </div>
   </section>
+
+  <!-- ===== INVESTISSEURS ===== -->
+  <section class="view" id="v-investors"></section>
 
 </div>
 
@@ -659,6 +663,139 @@ function cbRoute(t){
   cbSay("Je peux vous aider sur le <b>paiement en MAD</b>, la <b>modification</b> d'une réservation, vos <b>documents de voyage</b>, ou vous <b>mettre en relation</b> avec un conseiller. Que souhaitez-vous ?",()=>cbQR(["Payer sans dotation devise ?","Modifier ma réservation","Parler à un conseiller"]));
 }
 
+/* ================= INVESTISSEURS ================= */
+let growthChart,fundsChart;
+function renderInvestors(){
+  const head=(eb,t)=>`<div class="sec-h" style="margin:30px 0 14px"><div><span class="eyebrow">${eb}</span><h2>${t}</h2></div></div>`;
+  $("#v-investors").innerHTML=`
+    <div class="hero" style="padding:34px 30px 28px">
+      <div class="eh">Dossier investisseurs · Série Seed</div>
+      <h2 style="font-size:33px">Capter la marge du voyage des Marocains,<br>en dirhams et en full-automated.</h2>
+      <p>Rihla digitalise un marché fragmenté et hors-ligne, avec un avantage structurel de coûts (4 personnes, IA à 83%) et un déblocage unique : payer ses voyages en MAD sans entamer sa dotation devise.</p>
+      <div style="display:flex;gap:26px;flex-wrap:wrap;margin-top:24px;position:relative">
+        <div><div class="serif" style="font-size:32px;font-weight:700;line-height:1">2,0 M$</div><div style="font-size:12px;color:#bae6fd">GMV cible · An 2</div></div>
+        <div><div class="serif" style="font-size:32px;font-weight:700;line-height:1">3,8×</div><div style="font-size:12px;color:#bae6fd">Ratio LTV / CAC</div></div>
+        <div><div class="serif" style="font-size:32px;font-weight:700;line-height:1">~16 mois</div><div style="font-size:12px;color:#bae6fd">Seuil de rentabilité</div></div>
+        <div><div class="serif" style="font-size:32px;font-weight:700;line-height:1">3 M MAD</div><div style="font-size:12px;color:#bae6fd">Levée recherchée</div></div>
+      </div>
+    </div>
+
+    ${head("Le problème → la solution","Un marché mûr pour la disruption")}
+    <div class="two">
+      <div class="card pad">
+        <div style="display:flex;align-items:center;gap:9px;font-weight:700;color:var(--orange);margin-bottom:10px"><span style="width:26px;height:26px;border-radius:8px;background:var(--orange-soft);display:flex;align-items:center;justify-content:center">!</span>Aujourd'hui</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:var(--muted)">
+          <div>• Recherche fragmentée (vols, hôtels, excursions sur des plateformes séparées).</div>
+          <div>• Paiement en devises qui <b style="color:var(--ink)">ampute la dotation touristique</b> des Marocains.</div>
+          <div>• Agences traditionnelles chères, support non localisé, process manuels.</div>
+        </div>
+      </div>
+      <div class="card pad" style="border-color:var(--sky-2)">
+        <div style="display:flex;align-items:center;gap:9px;font-weight:700;color:var(--sky-d);margin-bottom:10px"><span style="width:26px;height:26px;border-radius:8px;background:var(--soft);display:flex;align-items:center;justify-content:center">✓</span>Rihla</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:var(--muted)">
+          <div>• Une seule plateforme : vols + hôtels + excursions + transferts, prix en MAD.</div>
+          <div>• Paiement local en dirhams <b style="color:var(--ink)">sans impacter la dotation devise</b>.</div>
+          <div>• Full-automated + IA (83% des demandes), équipe locale 24/7 pour le reste.</div>
+        </div>
+      </div>
+    </div>
+
+    ${head("Taille du marché","TAM · SAM · SOM (estimations)")}
+    <div class="card pad">
+      <div id="marketBars"></div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:10px">Estimations internes — voyage des résidents marocains (domestique + sortant), part réservable en ligne, et part atteignable par Rihla à 3 ans.</div>
+    </div>
+
+    ${head("Modèle économique","Unit economics par transaction")}
+    <div class="two">
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:12px"><h3>Décomposition d'une réservation</h3><span class="hint">panier moyen ~350 $</span></div>
+        <div id="unitEcon"></div>
+      </div>
+      <div class="card pad soft" style="background:var(--soft);display:flex;flex-direction:column;justify-content:center;gap:16px">
+        <div><div class="serif" style="font-size:30px;font-weight:700;color:var(--sky-d);line-height:1">14%</div><div style="font-size:12.5px;color:var(--muted)">Take rate moyen (marge brute sur GMV)</div></div>
+        <div><div class="serif" style="font-size:30px;font-weight:700;color:var(--sky-d);line-height:1">3,8×</div><div style="font-size:12.5px;color:var(--muted)">LTV / CAC (repeat ~35%)</div></div>
+        <div><div class="serif" style="font-size:30px;font-weight:700;color:var(--green);line-height:1">~370 MAD</div><div style="font-size:12.5px;color:var(--muted)">Marge de contribution / transaction</div></div>
+      </div>
+    </div>
+
+    ${head("Projections","Trajectoire sur 3 ans")}
+    <div class="card pad">
+      <div class="two" style="align-items:center">
+        <div style="height:280px"><canvas id="growthChart"></canvas></div>
+        <div id="projTable"></div>
+      </div>
+    </div>
+
+    ${head("Avantage concurrentiel","Pourquoi Rihla gagne — et le garde")}
+    <div class="trust" id="moatGrid" style="margin-top:0"></div>
+
+    ${head("Feuille de route","Jalons clés")}
+    <div class="card pad"><div id="milestones"></div></div>
+
+    ${head("L'équipe & la demande","Levée & allocation des fonds")}
+    <div class="two">
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:12px"><h3>Structure légère</h3></div>
+        <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px">
+          <div style="display:flex;justify-content:space-between"><span>Équipe support locale</span><b>4 personnes</b></div>
+          <div style="display:flex;justify-content:space-between"><span>Automatisation IA</span><b style="color:var(--green)">83% des requêtes</b></div>
+          <div style="display:flex;justify-content:space-between"><span>Coût d'infrastructure</span><b>~940 MAD/mois</b></div>
+          <div style="display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:11px"><span>Coûts fixes maîtrisés</span><b style="color:var(--sky-d)">marge scalable</b></div>
+        </div>
+        <div style="margin-top:16px;padding:14px;border-radius:12px;background:var(--soft)">
+          <div style="font-weight:700;font-size:14px;color:var(--sky-d)">La demande : 3 M MAD (~300 K$) en Seed</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:4px">18 mois de runway pour atteindre 2 M$ de GMV et la rentabilité opérationnelle.</div>
+        </div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:12px"><h3>Allocation des fonds</h3></div>
+        <div style="height:240px"><canvas id="fundsChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-top:24px;text-align:center;background:linear-gradient(120deg,var(--sky-d),var(--sky));color:#fff;border:none">
+      <div class="serif" style="font-size:24px;font-weight:600">Prêt à embarquer avec Rihla ?</div>
+      <p style="color:#dbeefb;max-width:480px;margin:8px auto 16px">Prototype fonctionnel livré, modèle validé, marché adressable clair. Discutons du tour de table.</p>
+      <button class="btn orange" onclick="toast('Deck & data-room envoyés par e-mail')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>Recevoir le deck complet & la data-room</button>
+    </div>`;
+
+  // market bars
+  const mk=[["TAM — Voyage des Marocains",2400,"#0C4A6E","Domestique + sortant, tous canaux"],["SAM — Réservable en ligne",520,"#0EA5E9","Vols/hôtels/packages digitalisables"],["SOM — Cible Rihla à 3 ans",6,"#EA580C","Part réaliste captée"]];
+  const mkMax=2400;
+  $("#marketBars").innerHTML=mk.map(m=>`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-weight:600;font-size:13.5px">${m[0]}</span><b class="serif" style="font-size:18px;color:${m[2]}">${m[1]>=1000?(m[1]/1000).toLocaleString("fr-FR")+' Md$':m[1]+' M$'}</b></div><div style="height:12px;border-radius:7px;background:var(--soft);overflow:hidden"><i style="display:block;height:100%;width:${Math.max(m[1]/mkMax*100,2)}%;background:${m[2]};border-radius:7px"></i></div><div style="font-size:11.5px;color:var(--muted);margin-top:4px">${m[3]}</div></div>`).join("");
+
+  // unit economics waterfall
+  const ue=[["GMV (panier moyen)",3400,"#0C4A6E",false],["Marge brute (take rate 14%)",476,"#0EA5E9",false],["− Frais de paiement (1,8%)",-61,"#94a3b8",true],["− Ops & support (IA+humain)",-45,"#94a3b8",true],["Marge de contribution",370,"#16A34A",false],["− CAC (acquisition)",-190,"#94a3b8",true],["Profit net / 1ʳᵉ transaction",180,"#EA580C",false]];
+  $("#unitEcon").innerHTML=ue.map(u=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px"><span style="${u[3]?'color:var(--muted)':'font-weight:600'}">${u[0]}</span><b class="serif" style="font-size:16px;color:${u[2]}">${u[1]<0?'−':''}${Math.abs(u[1]).toLocaleString("fr-FR")} MAD</b></div>`).join("")+`<div style="font-size:11.5px;color:var(--muted);margin-top:8px">Repeat rate ~35% → les commandes suivantes n'ont pas de CAC, tirant la LTV à ~720 MAD.</div>`;
+
+  // projections table
+  const pr=[["An 1","0,8 M$","2 300","112 K$","Amorçage"],["An 2","2,0 M$","5 700","280 K$","Objectif atteint"],["An 3","4,6 M$","13 000","645 K$","Rentable"]];
+  $("#projTable").innerHTML=`<table style="width:100%"><thead><tr><th>Année</th><th>GMV</th><th>Transactions</th><th>Revenu net</th><th>Statut</th></tr></thead><tbody>${pr.map((p,i)=>`<tr><td style="font-weight:600">${p[0]}</td><td class="serif" style="font-weight:600">${p[1]}</td><td>${p[2]}</td><td style="color:var(--sky-d);font-weight:600">${p[3]}</td><td><span class="pill ${i===2?'arr':i===1?'mod':''}" style="${i===0?'background:var(--soft);color:var(--sky-d)':''}">${p[4]}</span></td></tr>`).join("")}</tbody></table>`;
+
+  // moat
+  const moat=[
+    ["Paiement MAD sans dotation",'Déblocage réglementaire unique — argument d\'acquisition massif au Maroc.','<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'],
+    ["Avantage de coûts structurel",'Full-automated + IA 83% : marge scalable, 4 personnes seulement.','<path d="M13 2L3 14h9l-1 8 10-12h-9z"/>'],
+    ["Support local 24/7",'Confiance & rétention — barrière que les OTA globaux n\'ont pas.','<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/>'],
+    ["Donnée client propriétaire",'Historique & préférences → personnalisation, upsell, LTV croissante.','<path d="M3 3v18h18M7 14l4-4 3 3 5-6"/>'],
+  ];
+  $("#moatGrid").innerHTML=moat.map(m=>`<div class="t"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${m[2]}</svg></div><div><div class="tt">${m[0]}</div><div class="td">${m[1]}</div></div></div>`).join("");
+
+  // milestones
+  const ms=[["T0","Prototype fonctionnel livré (cette démo)","done"],["T+3 mois","Intégration WebBeds + passerelle paiement MAD, lancement MVP","now"],["T+9 mois","1 000 transactions, IA >80%, premières cohortes de repeat","next"],["T+18 mois","2 M$ de GMV, rentabilité opérationnelle","next"]];
+  $("#milestones").innerHTML=ms.map((m,i)=>`<div style="display:flex;gap:13px;padding:10px 0;${i<ms.length-1?'border-bottom:1px solid var(--line)':''}"><div style="width:80px;flex:0 0 80px;font-weight:700;font-size:12.5px;color:var(--sky-d)">${m[0]}</div><div style="width:22px;flex:0 0 22px;display:flex;justify-content:center"><span style="width:12px;height:12px;border-radius:50%;background:${m[2]==='done'?'var(--green)':m[2]==='now'?'var(--orange)':'var(--border)'};margin-top:3px"></span></div><div style="flex:1;font-size:13.5px;${m[2]==='next'?'color:var(--muted)':''}">${m[1]} ${m[2]==='done'?'<span class="pill arr" style="margin-left:6px">✓ Fait</span>':m[2]==='now'?'<span class="pill mod" style="margin-left:6px">En cours</span>':''}</div></div>`).join("");
+
+  // charts
+  if(growthChart)growthChart.destroy();
+  growthChart=new Chart($("#growthChart"),{data:{labels:["An 1","An 2","An 3"],datasets:[
+    {type:"bar",label:"GMV (M$)",data:[0.8,2.0,4.6],backgroundColor:"#0EA5E9",borderRadius:7,yAxisID:"y",order:2},
+    {type:"line",label:"Revenu net (K$)",data:[112,280,645],borderColor:"#EA580C",backgroundColor:"rgba(234,88,12,.1)",borderWidth:3,tension:.4,pointBackgroundColor:"#EA580C",pointRadius:5,yAxisID:"y1",order:1}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",font:{size:11}}}},scales:{y:{position:"left",grid:{color:"#EAF4FB"},title:{display:true,text:"GMV (M$)",font:{size:10}}},y1:{position:"right",grid:{display:false},title:{display:true,text:"Revenu net (K$)",font:{size:10}}},x:{grid:{display:false}}}}});
+  if(fundsChart)fundsChart.destroy();
+  fundsChart=new Chart($("#fundsChart"),{type:"doughnut",data:{labels:["Acquisition / marketing","Produit & tech","Équipe & ops","Fonds de roulement","Légal & licences"],datasets:[{data:[45,20,22,8,5],backgroundColor:["#0EA5E9","#0C4A6E","#38BDF8","#EA580C","#94a3b8"],borderWidth:3,borderColor:"#fff"}]},options:{responsive:true,maintainAspectRatio:false,cutout:"60%",plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",font:{size:11},padding:10}}}}});
+}
+
 /* ================= NAV ================= */
 function go(v){
   document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
@@ -668,6 +805,7 @@ function go(v){
   if(v==="results")renderResults();
   if(v==="bookings")renderBookings();
   if(v==="backoffice")renderBackoffice();
+  if(v==="investors")renderInvestors();
   window.scrollTo({top:0,behavior:reduceMotion?"auto":"smooth"});
 }
 
