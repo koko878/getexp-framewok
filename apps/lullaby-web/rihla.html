@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0EA5E9" />
+<title>Rihla — Voyagez en Dirhams</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  /* ui-ux-pro-max: Marketplace pattern + "Sky blue + adventure orange" + Fraunces/Inter, motion-light */
+  :root{
+    --sky:#0EA5E9; --sky-2:#38BDF8; --sky-d:#0C4A6E; --sky-900:#082F49;
+    --orange:#EA580C; --orange-soft:#FFEDD5;
+    --bg:#F0F9FF; --card:#fff; --ink:#0F2233; --muted:#5b7488; --muted-2:#94a3b8;
+    --border:#D8ECF8; --line:#EAF4FB; --soft:#E8F2F8;
+    --green:#16A34A; --green-soft:#DCFCE7; --amber:#D97706; --red:#DC2626;
+    --serif:"Fraunces",Georgia,serif; --sans:"Inter",system-ui,sans-serif;
+    --sh:0 1px 2px rgba(12,74,110,.05),0 8px 26px rgba(12,74,110,.07);
+    --sh-2:0 12px 34px rgba(12,74,110,.12); --sh-lg:0 28px 64px rgba(8,47,73,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .serif{font-family:var(--serif)}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select{font-family:inherit;font-size:15px;color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  /* nav */
+  .nav{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+  .nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:13px 22px}
+  .brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+  .brand .logo{width:38px;height:38px;flex:0 0 38px}
+  .brand h1{font-family:var(--serif);font-size:23px;font-weight:700;letter-spacing:.2px;line-height:1}
+  .brand .tl{font-size:10px;color:var(--muted);font-weight:600}
+  .nlinks{display:flex;gap:4px;margin-left:8px}
+  .nlinks button{padding:9px 14px;border-radius:9px;font-size:14px;font-weight:600;color:var(--muted);transition:.15s}
+  .nlinks button:hover{background:var(--soft);color:var(--sky-d)}
+  .nlinks button.active{background:var(--sky);color:#fff}
+  .nav-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .mad-badge{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--sky-d);background:var(--soft);padding:6px 12px;border-radius:20px}
+  .uav{width:36px;height:36px;border-radius:50%;background:var(--sky);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  @media(max-width:820px){.nlinks{display:none}.mad-badge span{display:none}}
+
+  .view{display:none;animation:fade .3s ease}.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 22px 60px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:11px;font-size:14.5px;font-weight:600;background:var(--sky);color:#fff;transition:.14s;min-height:46px}
+  .btn:hover{background:#0284C7}.btn:active{transform:scale(.98)}
+  .btn svg{width:17px;height:17px}
+  .btn.orange{background:var(--orange)}.btn.orange:hover{background:#C2410C}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--border)}
+  .btn.ghost:hover{background:var(--soft)}
+  .btn.sm{padding:8px 13px;font-size:13px;min-height:38px;border-radius:9px}
+  .btn.block{width:100%}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--sh)}
+  .card.pad{padding:20px}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .sec-h h2{font-family:var(--serif);font-size:27px;font-weight:600;letter-spacing:.2px}
+  .sec-h h3{font-size:16px;font-weight:700}
+  .sec-h .hint{font-size:13px;color:var(--muted)}
+  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--sky)}
+
+  /* ===== HERO ===== */
+  .hero{background:linear-gradient(135deg,var(--sky-900),var(--sky-d) 55%,var(--sky));color:#fff;border-radius:24px;padding:40px 32px 30px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;background:rgba(56,189,248,.25);filter:blur(10px)}
+  .hero .eh{font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#bae6fd;position:relative}
+  .hero h2{font-family:var(--serif);font-size:40px;font-weight:600;line-height:1.08;margin:10px 0 8px;position:relative;letter-spacing:-.5px}
+  .hero p{font-size:15.5px;color:#dbeefb;max-width:520px;position:relative}
+  @media(max-width:600px){.hero{padding:28px 20px}.hero h2{font-size:29px}}
+
+  .searchbox{background:#fff;border-radius:18px;box-shadow:var(--sh-2);padding:12px;margin-top:22px;position:relative}
+  .stabs{display:flex;gap:4px;padding:4px 4px 10px}
+  .stabs button{display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--muted)}
+  .stabs button svg{width:16px;height:16px}
+  .stabs button.on{background:var(--soft);color:var(--sky-d)}
+  .sfields{display:grid;grid-template-columns:2fr 1.4fr 1.2fr auto;gap:8px}
+  @media(max-width:820px){.sfields{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.sfields{grid-template-columns:1fr}}
+  .sf{border:1px solid var(--border);border-radius:12px;padding:10px 13px;display:flex;align-items:center;gap:10px;background:#fff}
+  .sf svg{width:18px;height:18px;color:var(--sky);flex:0 0 18px}
+  .sf .in{flex:1;min-width:0}
+  .sf .lb{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .sf input,.sf select{width:100%;border:none;outline:none;padding:2px 0;font-weight:600;font-size:14.5px;background:transparent}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;position:relative}
+  .chips .c{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:20px;cursor:pointer;transition:.14s}
+  .chips .c:hover{background:rgba(255,255,255,.24)}
+
+  /* trust strip */
+  .trust{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+  @media(max-width:820px){.trust{grid-template-columns:1fr 1fr}}
+  .trust .t{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;display:flex;gap:11px;align-items:flex-start}
+  .trust .ti{width:38px;height:38px;border-radius:10px;background:var(--soft);color:var(--sky);display:flex;align-items:center;justify-content:center;flex:0 0 38px}
+  .trust .ti svg{width:19px;height:19px}
+  .trust .tt{font-weight:700;font-size:13.5px}.trust .td{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* destination cards */
+  .dest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+  .dest{border-radius:16px;overflow:hidden;cursor:pointer;position:relative;height:180px;box-shadow:var(--sh);transition:.18s}
+  .dest:hover{transform:translateY(-4px);box-shadow:var(--sh-2)}
+  .dest .ph{position:absolute;inset:0}
+  .dest .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,47,73,0) 40%,rgba(8,47,73,.82));display:flex;flex-direction:column;justify-content:flex-end;padding:15px;color:#fff}
+  .dest .dn{font-family:var(--serif);font-size:19px;font-weight:600}
+  .dest .dd{font-size:12px;color:#dbeefb;display:flex;justify-content:space-between;align-items:center;margin-top:2px}
+  .dest .dd b{font-weight:700}
+  .dest .flag{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.9);color:var(--sky-d);font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px}
+
+  /* offer cards */
+  .results-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap}
+  .filters button,.filters select{padding:8px 13px;border:1px solid var(--border);border-radius:20px;background:#fff;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+  .filters button.on{background:var(--sky);color:#fff;border-color:var(--sky)}
+  .offer{display:grid;grid-template-columns:230px 1fr auto;gap:0;margin-bottom:16px;overflow:hidden}
+  @media(max-width:760px){.offer{grid-template-columns:1fr}}
+  .offer .ph{height:100%;min-height:170px;position:relative}
+  @media(max-width:760px){.offer .ph{height:150px}}
+  .offer .ph .flag{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);color:var(--sky-d);font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px}
+  .offer .mid{padding:16px 18px}
+  .offer .ot{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.15}
+  .offer .oh{font-size:13px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .stars{color:var(--amber);font-size:13px;letter-spacing:1px}
+  .otags{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+  .otag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:7px;background:var(--soft);color:var(--sky-d);display:inline-flex;align-items:center;gap:5px}
+  .otag svg{width:12px;height:12px}
+  .offer .price{padding:16px 18px;border-left:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;min-width:190px}
+  @media(max-width:760px){.offer .price{border-left:none;border-top:1px solid var(--line);align-items:stretch;text-align:left}}
+  .offer .rating{background:var(--sky-d);color:#fff;font-size:12px;font-weight:700;padding:3px 8px;border-radius:7px;display:inline-flex;gap:5px;align-items:center;margin-bottom:8px}
+  .offer .old{font-size:13px;color:var(--muted-2);text-decoration:line-through}
+  .offer .now{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--sky-d);line-height:1}
+  .offer .now small{font-size:13px;color:var(--muted);font-family:var(--sans);font-weight:600}
+  .offer .save{font-size:11.5px;font-weight:700;color:var(--green);background:var(--green-soft);padding:2px 8px;border-radius:20px;margin-top:6px;display:inline-block}
+
+  /* detail */
+  .det-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px;align-items:start}
+  @media(max-width:880px){.det-grid{grid-template-columns:1fr}}
+  .det-hero{height:260px;border-radius:16px;overflow:hidden;position:relative;margin-bottom:16px}
+  .det-hero .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,47,73,0) 45%,rgba(8,47,73,.8));display:flex;flex-direction:column;justify-content:flex-end;padding:20px;color:#fff}
+  .det-hero h2{font-family:var(--serif);font-size:28px;font-weight:600}
+  .cust-item{display:flex;align-items:center;gap:13px;padding:13px;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:.14s}
+  .cust-item:hover{border-color:var(--sky-2)}
+  .cust-item.on{border-color:var(--sky);background:var(--soft)}
+  .cust-item .cb{width:22px;height:22px;border-radius:7px;border:2px solid var(--border);flex:0 0 22px;display:flex;align-items:center;justify-content:center}
+  .cust-item.on .cb{background:var(--sky);border-color:var(--sky)}
+  .cust-item .cb svg{width:13px;height:13px;color:#fff;opacity:0}.cust-item.on .cb svg{opacity:1}
+  .cust-item .ci{width:40px;height:40px;border-radius:10px;background:var(--soft);color:var(--sky);display:flex;align-items:center;justify-content:center;flex:0 0 40px}
+  .cust-item .ci svg{width:19px;height:19px}
+  .cust-item .cm{flex:1}.cust-item .ct{font-weight:600;font-size:14px}.cust-item .cd{font-size:12px;color:var(--muted)}
+  .cust-item .cp{font-weight:700;color:var(--sky-d)}
+  .sticky-price{position:sticky;top:88px}
+  .price-row{display:flex;justify-content:space-between;padding:8px 0;font-size:14px}
+  .price-row.tot{border-top:2px solid var(--line);margin-top:8px;padding-top:14px;font-family:var(--serif);font-size:22px;font-weight:700;color:var(--sky-d)}
+
+  /* dotation devise */
+  .dotation{background:linear-gradient(120deg,var(--green-soft),#fff);border:1px solid #bbf7d0;border-radius:14px;padding:15px;margin-bottom:16px}
+  .dotation .dh{display:flex;align-items:center;gap:9px;font-weight:700;font-size:13.5px;color:#15803D}
+  .dotation .dh svg{width:18px;height:18px}
+  .dotation .bar{height:9px;border-radius:6px;background:#fff;border:1px solid #bbf7d0;overflow:hidden;margin:11px 0 6px}
+  .dotation .bar i{display:block;height:100%;background:var(--green);border-radius:6px}
+  .dotation .dt{font-size:12px;color:#15803D}
+
+  /* payment methods */
+  .pm{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:.14s}
+  .pm:hover{border-color:var(--sky-2)}.pm.on{border-color:var(--sky);background:var(--soft)}
+  .pm .radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:0 0 20px;display:flex;align-items:center;justify-content:center}
+  .pm.on .radio{border-color:var(--sky)}.pm.on .radio::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--sky)}
+  .pm .pl{font-weight:600;font-size:14px}.pm .pd{font-size:12px;color:var(--muted)}
+
+  /* confirmation */
+  .confirm-hero{text-align:center;padding:32px 20px}
+  .confirm-hero .ck{width:74px;height:74px;border-radius:50%;background:var(--green-soft);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+  .confirm-hero .ck svg{width:38px;height:38px;color:var(--green)}
+  .voucher{border:1px dashed var(--border);border-radius:14px;padding:18px;background:var(--soft)}
+  .checklist-item{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .checklist-item:last-child{border:none}
+  .checklist-item .ci{width:24px;height:24px;border-radius:7px;background:var(--soft);color:var(--sky);display:flex;align-items:center;justify-content:center;flex:0 0 24px}
+  .checklist-item .ci svg{width:14px;height:14px}
+
+  /* bookings */
+  .bk{display:flex;gap:15px;padding:16px;margin-bottom:14px;align-items:center}
+  .bk .bph{width:80px;height:80px;border-radius:12px;flex:0 0 80px;position:relative;overflow:hidden}
+  .bk .bm{flex:1;min-width:0}
+  .bk .bt{font-family:var(--serif);font-size:17px;font-weight:600}
+  .bk .bd{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .bk .bs{margin-left:auto;text-align:right}
+
+  /* KPIs backoffice */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:820px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{padding:18px}
+  .kpi .ki{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:11px}
+  .kpi .ki svg{width:17px;height:17px}
+  .kpi .v{font-family:var(--serif);font-size:27px;font-weight:700;letter-spacing:-.5px;line-height:1}
+  .kpi .l{font-size:12px;color:var(--muted);margin-top:5px}
+  .kpi .tr{font-size:11.5px;font-weight:600;color:var(--green);margin-top:7px}
+  .two{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}@media(max-width:880px){.two{grid-template-columns:1fr}}
+  .case{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .case:last-child{border:none}
+  .case .cav{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:0 0 34px}
+  .case .cn{font-weight:600;font-size:13.5px}.case .cq{font-size:12px;color:var(--muted)}
+  .pill{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .pill.urg{background:#FEE2E2;color:#B91C1C}.pill.mod{background:#FEF3C7;color:#92400E}.pill.arr{background:var(--green-soft);color:#15803D}
+
+  /* chatbot */
+  .cb-launch{position:fixed;bottom:22px;right:22px;z-index:70;width:60px;height:60px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-lg);transition:.15s}
+  .cb-launch:hover{transform:scale(1.06)}.cb-launch svg{width:26px;height:26px}
+  .cb-launch .dot{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:#16A34A;border:2px solid #fff}
+  .chatw{position:fixed;bottom:22px;right:22px;z-index:71;width:370px;max-width:calc(100vw - 32px);height:540px;max-height:calc(100vh - 44px);background:#fff;border-radius:20px;box-shadow:var(--sh-lg);display:none;flex-direction:column;overflow:hidden}
+  .chatw.open{display:flex}
+  .chatw-h{background:linear-gradient(120deg,var(--sky-d),var(--sky));color:#fff;padding:14px 16px;display:flex;align-items:center;gap:11px}
+  .chatw-h .ba{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;flex:0 0 40px}
+  .chatw-h .ba svg{width:21px;height:21px}
+  .chatw-h .bn{font-weight:700;font-size:15px}.chatw-h .bs{font-size:11.5px;color:#bae6fd;display:flex;align-items:center;gap:5px}
+  .chatw-h .cx{margin-left:auto;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14)}
+  .chatw-b{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:11px;background:var(--bg)}
+  .msg{max-width:86%;display:flex;gap:8px}
+  .msg .mav{width:26px;height:26px;border-radius:50%;background:var(--sky);color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 26px;align-self:flex-end}
+  .msg .mav svg{width:14px;height:14px}
+  .bubble{padding:10px 13px;border-radius:15px;font-size:13.5px;line-height:1.5;box-shadow:var(--sh)}
+  .msg.bot .bubble{background:#fff;border-bottom-left-radius:4px}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse}.msg.user .bubble{background:var(--sky);color:#fff;border-bottom-right-radius:4px}
+  .typing{display:flex;gap:4px;padding:12px}.typing span{width:7px;height:7px;border-radius:50%;background:var(--sky-2);animation:bnc 1.3s infinite}
+  .typing span:nth-child(2){animation-delay:.18s}.typing span:nth-child(3){animation-delay:.36s}
+  @keyframes bnc{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+  .qr{display:flex;gap:6px;flex-wrap:wrap;padding:0 15px 6px}
+  .qr button{font-size:12px;font-weight:600;color:var(--sky-d);background:#fff;border:1px solid var(--border);padding:7px 11px;border-radius:18px}
+  .qr button:hover{background:var(--sky);color:#fff}
+  .chatw-i{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);background:#fff}
+  .chatw-i input{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:20px;background:var(--bg)}
+  .chatw-i .snd{width:42px;height:42px;border-radius:50%;background:var(--sky);color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 42px}
+  .chatw-i .snd svg{width:18px;height:18px}
+
+  /* toast */
+  .toast-wrap{position:fixed;bottom:22px;left:22px;z-index:120;display:flex;flex-direction:column;gap:10px;max-width:360px}
+  .toast{display:flex;align-items:center;gap:11px;background:var(--sky-d);color:#fff;padding:13px 16px;border-radius:12px;box-shadow:var(--sh-lg);font-size:14px;animation:tin .3s ease}
+  .toast .ti{width:22px;height:22px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;flex:0 0 22px}.toast .ti svg{width:13px;height:13px}
+  @keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  footer{text-align:center;padding:24px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-in">
+    <div class="brand" onclick="go('home')">
+      <svg class="logo" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="11" fill="#0EA5E9"/><path d="M8 24c4-1 7-3 10-7s5-9 5-9 1 6-1 11c3-1 6-3 8-6 0 0 0 8-6 12-4 2.7-9 3-16 2z" fill="#fff"/><circle cx="27" cy="13" r="2" fill="#EA580C"/></svg>
+      <div><h1>Rihla</h1><div class="tl">Voyagez en Dirhams</div></div>
+    </div>
+    <div class="nlinks" id="nlinks">
+      <button data-v="home" class="active" onclick="go('home')">Rechercher</button>
+      <button data-v="bookings" onclick="go('bookings')">Mes réservations</button>
+      <button data-v="backoffice" onclick="go('backoffice')">Espace support</button>
+    </div>
+    <div class="nav-r">
+      <div class="mad-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Paiement 100% MAD</span></div>
+      <div class="uav">SA</div>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ===== HOME ===== -->
+  <section class="view active" id="v-home">
+    <div class="hero">
+      <div class="eh">Agence de voyage marocaine · 100% en ligne</div>
+      <h2>Le monde, payé en Dirhams.<br>Sans toucher votre dotation.</h2>
+      <p>Vols, hôtels, packages, excursions et transferts — au meilleur prix, en MAD, avec une équipe locale disponible 24/7.</p>
+      <div class="searchbox">
+        <div class="stabs" id="stabs"></div>
+        <div class="sfields">
+          <div class="sf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><div class="in"><div class="lb">Destination</div><input id="s-dest" list="destlist" placeholder="Où partez-vous ?" value="Dubaï"/><datalist id="destlist"></datalist></div></div>
+          <div class="sf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><div class="in"><div class="lb">Dates</div><input id="s-dates" value="12 – 19 juil. 2026"/></div></div>
+          <div class="sf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21a6 6 0 0 1 12 0M16 3.1a4 4 0 0 1 0 7.8"/></svg><div class="in"><div class="lb">Voyageurs</div><select id="s-pax"><option>2 adultes</option><option>2 adultes, 1 enfant</option><option>2 adultes, 2 enfants</option><option>1 adulte</option><option>Famille (4)</option></select></div></div>
+          <button class="btn orange" style="border-radius:12px" onclick="doSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>Rechercher</button>
+        </div>
+      </div>
+      <div class="chips" id="popChips"></div>
+    </div>
+
+    <div class="trust" id="trust"></div>
+
+    <div class="sec-h" style="margin:34px 0 0"><div><span class="eyebrow">Tendances</span><h2>Destinations populaires</h2></div><span class="hint">Prix par personne, dès</span></div>
+    <div class="dest-grid" id="destGrid" style="margin-top:16px"></div>
+
+    <div class="sec-h" style="margin:34px 0 0"><div><span class="eyebrow">Sélection Rihla</span><h2>Packages tout compris</h2></div></div>
+    <div id="featured" style="margin-top:16px"></div>
+  </section>
+
+  <!-- ===== RESULTS ===== -->
+  <section class="view" id="v-results">
+    <button class="btn ghost sm" onclick="go('home')" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Nouvelle recherche</button>
+    <div class="sec-h"><div><h2 id="resTitle">Résultats</h2><span class="hint" id="resSub"></span></div></div>
+    <div class="results-top">
+      <div class="filters" id="resFilters"></div>
+      <select id="sortSel" onchange="renderResults()" style="margin-left:auto;padding:8px 13px;border:1px solid var(--border);border-radius:20px;background:#fff;font-weight:600;font-size:13px;color:var(--muted)"><option value="reco">Trier : Recommandés</option><option value="price">Prix croissant</option><option value="rating">Mieux notés</option></select>
+    </div>
+    <div id="resList"></div>
+  </section>
+
+  <!-- ===== DETAIL ===== -->
+  <section class="view" id="v-detail"></section>
+
+  <!-- ===== CHECKOUT ===== -->
+  <section class="view" id="v-checkout"></section>
+
+  <!-- ===== CONFIRM ===== -->
+  <section class="view" id="v-confirm"></section>
+
+  <!-- ===== BOOKINGS ===== -->
+  <section class="view" id="v-bookings">
+    <div class="sec-h"><div><span class="eyebrow">Mon compte</span><h2>Mes réservations</h2></div></div>
+    <div id="bookingsList"></div>
+  </section>
+
+  <!-- ===== BACKOFFICE ===== -->
+  <section class="view" id="v-backoffice">
+    <div class="sec-h"><div><span class="eyebrow">Back-office · Équipe support (4 pers.)</span><h2>Pilotage opérationnel</h2></div><span class="pill arr">● Temps réel</span></div>
+    <div class="kpis" id="boKpis"></div>
+    <div class="two" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Chiffre d'affaires vs objectif</h3><span class="hint">2 M USD / an</span></div>
+        <div style="height:240px"><canvas id="caChart"></canvas></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Cas escaladés à l'équipe</h3><span class="hint">IA → humain</span></div>
+        <div id="caseList"></div>
+      </div>
+    </div>
+    <div class="two" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Résolution des requêtes</h3><span class="hint">IA vs humain</span></div>
+        <div style="height:210px"><canvas id="resChart"></canvas></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Arrivées aujourd'hui</h3><span class="hint">assistance sur place</span></div>
+        <div id="arrivals"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Rihla — prototype de démonstration · Paiement en MAD · Conforme loi 09-08 · Support local 24/7</footer>
+
+<!-- chatbot -->
+<button class="cb-launch" id="cbLaunch" onclick="toggleChat()"><span class="dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+<div class="chatw" id="chatw">
+  <div class="chatw-h">
+    <div class="ba"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 8V4M8 8h8M3 12h2M19 12h2M6 12v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6a4 4 0 0 0-4-4h-2a4 4 0 0 0-4 4z"/><circle cx="9" cy="14" r="1" fill="#fff"/><circle cx="15" cy="14" r="1" fill="#fff"/></svg></div>
+    <div><div class="bn">Yalla, l'assistant Rihla</div><div class="bs"><span style="width:6px;height:6px;border-radius:50%;background:#22C55E;display:inline-block"></span>En ligne · réponse instantanée</div></div>
+    <button class="cx" onclick="toggleChat()"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:16px;height:16px"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="chatw-b" id="chatBody"></div>
+  <div class="qr" id="chatQr"></div>
+  <div class="chatw-i"><input id="chatInput" placeholder="Posez votre question…" onkeydown="if(event.key==='Enter')cbSend()"/><button class="snd" onclick="cbSend()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ================= DONNÉES ================= */
+const grad=(a,b)=>`background:linear-gradient(135deg,${a},${b})`;
+const DESTINATIONS=[
+  {v:"Dubaï",pays:"Émirats",type:"International",g:["#f59e0b","#b45309"],from:5900},
+  {v:"Istanbul",pays:"Turquie",type:"International",g:["#0ea5e9","#0c4a6e"],from:4200},
+  {v:"Paris",pays:"France",type:"International",g:["#6366f1","#312e81"],from:6800},
+  {v:"Marrakech",pays:"Maroc",type:"National",g:["#ea580c","#9a3412"],from:1400},
+  {v:"Agadir",pays:"Maroc",type:"National",g:["#0891b2","#155e75"],from:1200},
+  {v:"Le Caire",pays:"Égypte",type:"International",g:["#d97706","#78350f"],from:5200},
+  {v:"Djerba",pays:"Tunisie",type:"International",g:["#0d9488","#134e4a"],from:3600},
+  {v:"Barcelone",pays:"Espagne",type:"International",g:["#dc2626","#7f1d1d"],from:5400},
+];
+const EXCURSIONS={
+  "Dubaï":[["Safari dans le désert + dîner BBQ","excursion",520],["Billet Burj Khalifa (124e étage)","excursion",340],["Transfert privé aéroport ↔ hôtel","transfert",180]],
+  "Istanbul":[["Croisière sur le Bosphore","excursion",280],["Visite guidée Sainte-Sophie & Topkapi","excursion",360],["Transfert privé aéroport","transfert",150]],
+  "default":[["Excursion guidée d'une journée","excursion",300],["Transfert privé aéroport ↔ hôtel","transfert",160],["Surclassement chambre vue mer","option",450]],
+};
+const OFFERS=[
+  {id:"o1",dest:"Dubaï",title:"Dubaï Émerveillement — 7 nuits",hotel:"Rove Downtown",stars:4,nights:7,board:"Petit-déjeuner",rating:9.1,price:8490,old:10200,g:["#f59e0b","#b45309"],tags:["Vol inclus","Transfert","Annulation gratuite"]},
+  {id:"o2",dest:"Dubaï",title:"Dubaï Luxe — 5 nuits",hotel:"Address Marina 5★",stars:5,nights:5,board:"Demi-pension",rating:9.5,price:12900,old:15400,g:["#f59e0b","#7c2d12"],tags:["Vol inclus","Vue mer","Spa"]},
+  {id:"o3",dest:"Istanbul",title:"Istanbul Impériale — 4 nuits",hotel:"Hôtel Sultanahmet",stars:4,nights:4,board:"Petit-déjeuner",rating:8.8,price:5990,old:7100,g:["#0ea5e9","#0c4a6e"],tags:["Vol inclus","Centre historique"]},
+  {id:"o4",dest:"Marrakech",title:"Marrakech Riad & Spa — 3 nuits",hotel:"Riad Kniza",stars:5,nights:3,board:"Petit-déjeuner",rating:9.3,price:2790,old:3400,g:["#ea580c","#9a3412"],tags:["Sans vol","Riad authentique","Spa"]},
+  {id:"o5",dest:"Agadir",title:"Agadir Bord de mer — 5 nuits",hotel:"Hôtel Riu Palace",stars:4,nights:5,board:"All inclusive",rating:8.6,price:3490,old:4200,g:["#0891b2","#155e75"],tags:["All inclusive","Plage","Famille"]},
+  {id:"o6",dest:"Paris",title:"Paris Escapade — 4 nuits",hotel:"Hôtel Opéra",stars:4,nights:4,board:"Petit-déjeuner",rating:8.9,price:9800,old:11500,g:["#6366f1","#312e81"],tags:["Vol inclus","Centre-ville"]},
+];
+let searchTab="package";
+let currentOffer=null;
+let custState={};
+let payMethod="cmi";
+
+let BOOKINGS=[
+  {id:"RIH-24817",title:"Istanbul Impériale — 4 nuits",dest:"Istanbul",dates:"18 – 22 août 2026",pax:"2 adultes",price:5990,g:["#0ea5e9","#0c4a6e"],status:"Confirmé",upcoming:true},
+  {id:"RIH-24102",title:"Agadir Bord de mer — 5 nuits",dest:"Agadir",dates:"3 – 8 mai 2026",pax:"Famille (4)",price:3490,g:["#0891b2","#155e75"],status:"Terminé",upcoming:false},
+];
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const mad=n=>n.toLocaleString("fr-FR")+" MAD";
+const reduceMotion=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+function toast(msg){const t=document.createElement("div");t.className="toast";t.innerHTML=`<span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span><span>${msg}</span>`;$("#toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="all .35s";t.style.transform="translateY(12px)";setTimeout(()=>t.remove(),350);},3000);}
+function stars(n){return "★".repeat(n)+"☆".repeat(5-n);}
+function ph(g){return `<div class="ph" style="${grad(g[0],g[1])}"></div>`;}
+
+/* ================= HOME ================= */
+function renderHome(){
+  const tabs=[["package","Vols + Hôtels",'<path d="M2 16h20M6 12l4-8 4 8M18 8l-2 8"/>'],["hotel","Hôtels",'<path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/>'],["flight","Vols",'<path d="M17 16l4-4-4-4M3 12h18"/>'],["excursion","Excursions",'<path d="M3 21l6-6 4 4 8-8M14 3h7v7"/>']];
+  $("#stabs").innerHTML=tabs.map(t=>`<button class="${searchTab===t[0]?'on':''}" onclick="searchTab='${t[0]}';renderHome()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${t[2]}</svg>${t[1]}</button>`).join("");
+  $("#destlist").innerHTML=DESTINATIONS.map(d=>`<option value="${d.v}">`).join("");
+  $("#popChips").innerHTML=["Dubaï","Istanbul","Marrakech","Agadir","Paris"].map(d=>`<button class="c" onclick="$('#s-dest').value='${d}';doSearch()">${d}</button>`).join("");
+  const tr=[
+    ["Sans dotation devise",'Payez en MAD, votre dotation touristique reste intacte.','<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'],
+    ["Meilleur prix garanti",'Marge directe = tarifs inférieurs aux agences classiques.','<path d="M20 6 9 17l-5-5"/>'],
+    ["Support local 24/7",'Une équipe marocaine pour les urgences et l\'assistance sur place.','<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/>'],
+    ["Réservation instantanée",'Confirmation, facture et documents envoyés automatiquement.','<path d="M13 2L3 14h9l-1 8 10-12h-9z"/>'],
+  ];
+  $("#trust").innerHTML=tr.map(t=>`<div class="t"><div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${t[2]}</svg></div><div><div class="tt">${t[0]}</div><div class="td">${t[1]}</div></div></div>`).join("");
+  $("#destGrid").innerHTML=DESTINATIONS.map(d=>`<div class="dest" onclick="$('#s-dest').value='${d.v}';doSearch()"><div class="ph" style="${grad(d.g[0],d.g[1])}"></div><span class="flag">${d.type}</span><div class="ov"><div class="dn">${d.v}</div><div class="dd"><span>${d.pays}</span><b>dès ${mad(d.from)}</b></div></div></div>`).join("");
+  $("#featured").innerHTML=OFFERS.slice(0,3).map(offerCard).join("");
+}
+
+function offerCard(o){
+  return `<div class="card offer" onclick="openOffer('${o.id}')" style="cursor:pointer">
+    <div class="ph" style="${grad(o.g[0],o.g[1])}"><span class="flag">${o.dest}</span></div>
+    <div class="mid">
+      <div class="ot">${o.title}</div>
+      <div class="oh"><span class="stars">${stars(o.stars)}</span> ${o.hotel} · ${o.nights} nuits · ${o.board}</div>
+      <div class="otags">${o.tags.map(t=>`<span class="otag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>${t}</span>`).join("")}</div>
+    </div>
+    <div class="price">
+      <span class="rating"><svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>${o.rating}</span>
+      <span class="old">${mad(o.old)}</span>
+      <span class="now">${o.price.toLocaleString("fr-FR")} <small>MAD</small></span>
+      <span class="save">Économie ${mad(o.old-o.price)}</span>
+      <button class="btn sm" style="margin-top:10px" onclick="event.stopPropagation();openOffer('${o.id}')">Voir l'offre →</button>
+    </div>
+  </div>`;
+}
+
+/* ================= SEARCH / RESULTS ================= */
+function doSearch(){
+  const dest=$("#s-dest").value.trim();
+  go('results');
+  $("#resTitle").textContent=dest?`Séjours à ${dest}`:"Tous les séjours";
+  $("#resSub").textContent=`${$("#s-dates").value} · ${$("#s-pax").value} · prix en MAD`;
+  resFilterDest=dest; renderResults();
+}
+let resFilterDest="",resFilter="all";
+function renderResults(){
+  const filters=[["all","Tous"],["5","5 étoiles"],["4","4 étoiles"],["allin","All inclusive"],["vol","Vol inclus"]];
+  $("#resFilters").innerHTML=filters.map(f=>`<button class="${resFilter===f[0]?'on':''}" onclick="resFilter='${f[0]}';renderResults()">${f[1]}</button>`).join("");
+  let list=OFFERS.filter(o=>!resFilterDest||o.dest.toLowerCase()===resFilterDest.toLowerCase());
+  if(!list.length)list=OFFERS.slice();
+  if(resFilter==="5")list=list.filter(o=>o.stars===5);
+  if(resFilter==="4")list=list.filter(o=>o.stars===4);
+  if(resFilter==="allin")list=list.filter(o=>o.board.includes("inclusive"));
+  if(resFilter==="vol")list=list.filter(o=>o.tags.some(t=>t.includes("Vol")));
+  const sort=$("#sortSel").value;
+  if(sort==="price")list.sort((a,b)=>a.price-b.price);
+  if(sort==="rating")list.sort((a,b)=>b.rating-a.rating);
+  $("#resList").innerHTML=list.length?list.map(offerCard).join(""):`<div class="card pad" style="text-align:center;color:var(--muted)">Aucune offre pour ce filtre.</div>`;
+}
+
+/* ================= DETAIL ================= */
+function openOffer(id){
+  currentOffer=OFFERS.find(o=>o.id===id);
+  custState={};
+  go('detail'); renderDetail();
+}
+function excursionsFor(dest){return EXCURSIONS[dest]||EXCURSIONS.default;}
+function detailTotal(){
+  let t=currentOffer.price;
+  const ex=excursionsFor(currentOffer.dest);
+  ex.forEach((e,i)=>{if(custState[i])t+=e[2];});
+  return t;
+}
+function renderDetail(){
+  const o=currentOffer; const ex=excursionsFor(o.dest);
+  $("#v-detail").innerHTML=`
+    <button class="btn ghost sm" onclick="go('results')" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour aux résultats</button>
+    <div class="det-grid">
+      <div>
+        <div class="det-hero" style="${grad(o.g[0],o.g[1])}"><div class="ov"><span style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#bae6fd">${o.dest}</span><h2>${o.title}</h2><div style="font-size:13.5px;color:#dbeefb"><span class="stars">${stars(o.stars)}</span> ${o.hotel} · ${o.board}</div></div></div>
+        <div class="card pad" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:10px"><h3>Ce package comprend</h3><span class="rating" style="background:var(--sky-d)"><svg viewBox="0 0 24 24" fill="#fff" style="width:12px;height:12px"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg>${o.rating}/10</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            ${o.tags.concat([o.nights+" nuits d'hébergement",o.board]).map(t=>`<div style="display:flex;gap:9px;align-items:center;font-size:13.5px"><span style="color:var(--green)">✓</span>${t}</div>`).join("")}
+          </div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h"><h3>Personnalisez votre voyage</h3><span class="hint">excursions & transferts locaux</span></div>
+          ${ex.map((e,i)=>`<div class="cust-item ${custState[i]?'on':''}" onclick="toggleCust(${i})">
+            <div class="cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${e[1]==='transfert'?'<path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 9h8"/><circle cx="8" cy="17" r="1.5"/><circle cx="16" cy="17" r="1.5"/>':e[1]==='option'?'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>':'<path d="M3 21l6-6 4 4 8-8M14 3h7v7"/>'}</svg></div>
+            <div class="cm"><div class="ct">${e[0]}</div><div class="cd">${e[1]==='transfert'?'Transfert privé':e[1]==='option'?'Option confort':'Excursion locale'}</div></div>
+            <div class="cp">+${mad(e[2])}</div>
+          </div>`).join("")}
+        </div>
+      </div>
+      <div class="sticky-price">
+        <div class="card pad">
+          <div style="font-size:12.5px;color:var(--muted)">À partir de</div>
+          <div style="font-family:var(--serif);font-size:34px;font-weight:700;color:var(--sky-d);line-height:1">${o.price.toLocaleString("fr-FR")} <span style="font-size:15px;font-family:var(--sans)">MAD</span></div>
+          <div style="font-size:12.5px;color:var(--muted)">${$("#s-pax")?$("#s-pax").value:'2 adultes'} · ${o.nights} nuits</div>
+          <div style="border-top:1px solid var(--line);margin:14px 0"></div>
+          <div class="price-row"><span>Package de base</span><b>${mad(o.price)}</b></div>
+          <div id="custLines"></div>
+          <div class="price-row tot"><span>Total en MAD</span><span id="detTotal">${mad(o.price)}</span></div>
+          <button class="btn block orange" style="margin-top:14px" onclick="go('checkout');renderCheckout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Réserver et payer en MAD</button>
+          <div style="font-size:11.5px;color:var(--green);text-align:center;margin-top:9px;font-weight:600">✓ Sans impact sur votre dotation devise</div>
+        </div>
+      </div>
+    </div>`;
+  updateCustLines();
+}
+function toggleCust(i){custState[i]=!custState[i];renderDetail();}
+function updateCustLines(){
+  const ex=excursionsFor(currentOffer.dest);
+  let html="";
+  ex.forEach((e,i)=>{if(custState[i])html+=`<div class="price-row"><span style="color:var(--muted)">+ ${e[0].slice(0,26)}${e[0].length>26?'…':''}</span><b>${mad(e[2])}</b></div>`;});
+  const cl=$("#custLines");if(cl)cl.innerHTML=html;
+  const dt=$("#detTotal");if(dt)dt.textContent=mad(detailTotal());
+}
+
+/* ================= CHECKOUT ================= */
+function renderCheckout(){
+  const o=currentOffer,total=detailTotal();
+  const dotationMax=45000,used=0;
+  const methods=[["cmi","Carte bancaire marocaine (CMI)","Visa / Mastercard émise au Maroc"],["wallet","Wallet mobile (M-Wallet, inwi money)","Paiement mobile local"],["virement","Virement bancaire","Confirmation sous 24h"]];
+  $("#v-checkout").innerHTML=`
+    <button class="btn ghost sm" onclick="go('detail')" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour</button>
+    <div class="sec-h"><h2>Paiement sécurisé en Dirhams</h2></div>
+    <div class="det-grid">
+      <div>
+        <div class="dotation">
+          <div class="dh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Votre dotation touristique est préservée</div>
+          <div class="bar"><i style="width:2%"></i></div>
+          <div class="dt">Ce paiement en MAD <b>n'entame pas</b> votre dotation devise annuelle (${mad(dotationMax)} disponibles). Vous réglez localement, en dirhams.</div>
+        </div>
+        <div class="card pad" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Voyageur principal</h3></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div><div style="font-size:12px;color:var(--muted);margin-bottom:5px">Nom complet</div><input style="width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px" value="Sami Alaoui"></div>
+            <div><div style="font-size:12px;color:var(--muted);margin-bottom:5px">Téléphone</div><input style="width:100%;padding:11px 13px;border:1px solid var(--border);border-radius:10px" value="+212 6 61 ..."></div>
+          </div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Mode de paiement local</h3></div>
+          ${methods.map(m=>`<div class="pm ${payMethod===m[0]?'on':''}" onclick="payMethod='${m[0]}';renderCheckout()"><div class="radio"></div><div style="flex:1"><div class="pl">${m[1]}</div><div class="pd">${m[2]}</div></div><svg viewBox="0 0 24 24" fill="none" stroke="var(--sky)" stroke-width="2" style="width:22px;height:22px"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>`).join("")}
+        </div>
+      </div>
+      <div class="sticky-price">
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:10px"><h3>Récapitulatif</h3></div>
+          <div style="display:flex;gap:11px;margin-bottom:12px"><div style="width:56px;height:56px;border-radius:11px;${grad(o.g[0],o.g[1])};flex:0 0 56px"></div><div><div style="font-weight:600;font-size:14px">${o.title}</div><div style="font-size:12px;color:var(--muted)">${o.dest} · ${o.nights} nuits</div></div></div>
+          <div class="price-row"><span>Sous-total</span><b>${mad(total)}</b></div>
+          <div class="price-row"><span>Taxes & frais</span><b>Inclus</b></div>
+          <div class="price-row"><span style="color:var(--green)">Économie vs agence</span><b style="color:var(--green)">−${mad(o.old-o.price)}</b></div>
+          <div class="price-row tot"><span>À payer</span><span>${mad(total)}</span></div>
+          <button class="btn block orange" style="margin-top:14px" onclick="payNow()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Payer ${mad(total)}</button>
+          <div style="display:flex;align-items:center;gap:6px;justify-content:center;font-size:11.5px;color:var(--muted);margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Paiement chiffré · conforme loi 09-08</div>
+        </div>
+      </div>
+    </div>`;
+}
+function payNow(){
+  const o=currentOffer,total=detailTotal();
+  const id="RIH-"+Math.floor(20000+Math.random()*9000);
+  BOOKINGS.unshift({id,title:o.title,dest:o.dest,dates:$("#s-dates")?$("#s-dates").value:"À définir",pax:"2 adultes",price:total,g:o.g,status:"Confirmé",upcoming:true});
+  go('confirm');renderConfirm(id,total);
+}
+
+/* ================= CONFIRM ================= */
+function renderConfirm(id,total){
+  const o=currentOffer;
+  const checklist=[["Passeport valide (6 mois min.)","À vérifier avant le départ"],["e-Visa / autorisation","Généré automatiquement si requis"],["Assurance voyage incluse","Attestation dans vos documents"],["Conseils & météo destination","Envoyés 72h avant le départ"]];
+  $("#v-confirm").innerHTML=`
+    <div class="card confirm-hero" style="max-width:640px;margin:0 auto">
+      <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h2 class="serif" style="font-size:26px">Réservation confirmée !</h2>
+      <p style="color:var(--muted);max-width:420px;margin:8px auto 0">Votre voyage vers <b>${o.dest}</b> est réservé. Confirmation, facture et documents envoyés par e-mail et WhatsApp.</p>
+      <div class="voucher" style="margin:20px 0;text-align:left">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:11.5px;color:var(--muted)">Référence</div><div class="serif" style="font-size:20px;font-weight:700">${id}</div></div><span class="pill arr">Confirmé</span></div>
+        <div style="border-top:1px dashed var(--border);margin:12px 0"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+          <div><div style="color:var(--muted);font-size:11.5px">Séjour</div><b>${o.title}</b></div>
+          <div><div style="color:var(--muted);font-size:11.5px">Montant payé (MAD)</div><b>${mad(total)}</b></div>
+          <div><div style="color:var(--muted);font-size:11.5px">Dates</div><b>${$("#s-dates")?$("#s-dates").value:'—'}</b></div>
+          <div><div style="color:var(--muted);font-size:11.5px">Dotation devise</div><b style="color:var(--green)">Préservée ✓</b></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:9px;justify-content:center;flex-wrap:wrap">
+        <button class="btn ghost sm" onclick="toast('Facture PDF téléchargée')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Facture</button>
+        <button class="btn ghost sm" onclick="toast('Documents envoyés sur WhatsApp')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-4-1L3 20l1-5a8.5 8.5 0 1 1 17-3.5z"/></svg>WhatsApp</button>
+        <button class="btn sm" onclick="go('bookings')">Mes réservations →</button>
+      </div>
+    </div>
+    <div class="card pad" style="max-width:640px;margin:18px auto 0">
+      <div class="sec-h"><h3>Check-list avant le départ</h3><span class="pill mod">Automatisé</span></div>
+      ${checklist.map(c=>`<div class="checklist-item"><div class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><div><b style="font-weight:600">${c[0]}</b><div style="font-size:12px;color:var(--muted)">${c[1]}</div></div></div>`).join("")}
+    </div>`;
+}
+
+/* ================= BOOKINGS ================= */
+function renderBookings(){
+  $("#bookingsList").innerHTML=BOOKINGS.map(b=>`<div class="card bk">
+    <div class="bph" style="${grad(b.g[0],b.g[1])}"></div>
+    <div class="bm"><div class="bt">${b.title}</div><div class="bd">Réf ${b.id} · ${b.dates} · ${b.pax}</div>
+      <div style="margin-top:8px;display:flex;gap:7px"><button class="btn ghost sm" onclick="toast('Détails de la réservation ${b.id}')">Détails</button>${b.upcoming?`<button class="btn ghost sm" onclick="openChat('modif')">Modifier</button>`:''}</div>
+    </div>
+    <div class="bs"><span class="pill ${b.upcoming?'arr':'mod'}">${b.status}</span><div style="font-family:var(--serif);font-size:20px;font-weight:700;color:var(--sky-d);margin-top:8px">${mad(b.price)}</div></div>
+  </div>`).join("");
+}
+
+/* ================= BACKOFFICE ================= */
+let caChart,resChart;
+function renderBackoffice(){
+  const k=[
+    {l:"CA annuel (réalisé)",v:"14,2 M MAD",c:"#0EA5E9",tr:"▲ 71% de l'objectif 2M USD",ic:'<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'},
+    {l:"Transactions (an)",v:"4 120",c:"#EA580C",tr:"▲ cible ~5700",ic:'<path d="M3 3v18h18M7 14l4-4 3 3 5-6"/>'},
+    {l:"Résolution IA",v:"83%",c:"#16A34A",tr:"● objectif >80% atteint",ic:'<circle cx="12" cy="12" r="3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/>'},
+    {l:"Panier moyen",v:"3 380 MAD",c:"#0C4A6E",tr:"≈ 340 USD",ic:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>'},
+  ];
+  $("#boKpis").innerHTML=k.map(c=>`<div class="card kpi"><div class="ki" style="background:${c.c}1a;color:${c.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${c.ic}</svg></div><div class="v">${c.v}</div><div class="l">${c.l}</div><div class="tr">${c.tr}</div></div>`).join("");
+  const cases=[
+    {n:"Youssef B.",q:"Annulation vol Istanbul — cas médical",tag:"urg",t:"Urgence",c:"#B91C1C"},
+    {n:"Famille Idrissi",q:"Modification dates séjour Agadir",tag:"mod",t:"Modification",c:"#92400E"},
+    {n:"Sami A.",q:"Arrivée Dubaï — transfert à coordonner",tag:"arr",t:"Arrivée",c:"#15803D"},
+    {n:"Nadia K.",q:"Surclassement chambre — demande spéciale",tag:"mod",t:"Modification",c:"#92400E"},
+  ];
+  $("#caseList").innerHTML=cases.map(c=>`<div class="case"><div class="cav" style="background:${c.c}1a;color:${c.c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 8v4"/></svg></div><div style="flex:1"><div class="cn">${c.n}</div><div class="cq">${c.q}</div></div><span class="pill ${c.tag}">${c.t}</span></div>`).join("");
+  $("#arrivals").innerHTML=[["Sami Alaoui","Dubaï · Rove Downtown","Vol EK752 · 14h20"],["Famille Bennani","Istanbul · Sultanahmet","Vol TK618 · 09h05"],["Leila Fassi","Agadir · Riu Palace","Vol AT404 · 18h40"]].map(a=>`<div style="display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)"><div style="width:34px;height:34px;border-radius:9px;background:var(--soft);color:var(--sky);display:flex;align-items:center;justify-content:center;flex:0 0 34px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" style="width:17px;height:17px"><path d="M17 16l4-4-4-4M3 12h18"/></svg></div><div style="flex:1"><div style="font-weight:600;font-size:13.5px">${a[0]}</div><div style="font-size:12px;color:var(--muted)">${a[1]}</div></div><div style="font-size:12px;color:var(--muted);text-align:right">${a[2]}</div></div>`).join("");
+  if(caChart)caChart.destroy();
+  caChart=new Chart($("#caChart"),{type:"bar",data:{labels:["T1","T2","T3","T4"],datasets:[{label:"Réalisé (M MAD)",data:[2.8,3.6,4.1,3.7],backgroundColor:"#0EA5E9",borderRadius:6},{label:"Objectif",data:[5,5,5,5],backgroundColor:"#E8F2F8",borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",font:{size:11}}}},scales:{y:{grid:{color:"#EAF4FB"}},x:{grid:{display:false}}}}});
+  if(resChart)resChart.destroy();
+  resChart=new Chart($("#resChart"),{type:"doughnut",data:{labels:["Résolu par IA","Escaladé équipe"],datasets:[{data:[83,17],backgroundColor:["#0EA5E9","#EA580C"],borderWidth:3,borderColor:"#fff"}]},options:{responsive:true,maintainAspectRatio:false,cutout:"66%",plugins:{legend:{position:"bottom",labels:{usePointStyle:true,pointStyle:"circle",font:{size:12},padding:14}}}}});
+}
+
+/* ================= CHATBOT ================= */
+let chatOpen=false,chatInit=false;
+function toggleChat(){chatOpen=!chatOpen;$("#chatw").classList.toggle("open",chatOpen);$("#cbLaunch").style.display=chatOpen?"none":"flex";if(chatOpen&&!chatInit){chatInit=true;cbGreet();}}
+function openChat(ctx){if(!chatOpen)toggleChat();if(ctx==="modif")setTimeout(()=>cbSend("Je veux modifier ma réservation"),300);}
+function cbAddUser(t){const d=document.createElement("div");d.className="msg user";d.innerHTML=`<div class="bubble">${t}</div>`;$("#chatBody").appendChild(d);$("#chatBody").scrollTop=9e9;}
+function cbBot(html){const d=document.createElement("div");d.className="msg bot";d.innerHTML=`<div class="mav"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 8V4M8 8h8M6 12v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6a4 4 0 0 0-4-4h-2a4 4 0 0 0-4 4z"/></svg></div><div class="bubble">${html}</div>`;$("#chatBody").appendChild(d);$("#chatBody").scrollTop=9e9;}
+function cbTyping(){const d=document.createElement("div");d.className="msg bot";d.id="typing";d.innerHTML=`<div class="mav"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 8V4"/></svg></div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;$("#chatBody").appendChild(d);$("#chatBody").scrollTop=9e9;}
+function cbSay(html,cb){cbTyping();setTimeout(()=>{const t=$("#typing");if(t)t.remove();cbBot(html);cb&&cb();},reduceMotion?0:700);}
+function cbQR(items){$("#chatQr").innerHTML=items.map(i=>`<button onclick="cbSend('${i}')">${i}</button>`).join("");}
+function cbGreet(){$("#chatBody").innerHTML="";cbSay("Ahlan ! 👋 Je suis Yalla, votre assistant Rihla. Comment puis-je vous aider ?",()=>cbQR(["Payer sans dotation devise ?","Modifier ma réservation","Documents de voyage","Parler à un conseiller"]));}
+function cbSend(forced){const inp=$("#chatInput");const t=forced!==undefined?forced:inp.value.trim();if(!t)return;inp.value="";cbAddUser(t);$("#chatQr").innerHTML="";cbRoute(t.toLowerCase());}
+function cbRoute(t){
+  if(/(conseiller|humain|urgence|agent|annul)/.test(t)){cbSay("Je transmets votre demande à notre <b>équipe support locale</b> 🇲🇦. Un conseiller vous rappelle sous <b>~10 min</b> (09h–22h). Votre dossier lui est transmis.",()=>cbQR(["Merci","Autre question"]));return;}
+  if(/(dotation|devise|payer|paiement|mad|dirham)/.test(t)){cbSay("Chez Rihla, vous payez <b>en dirhams localement</b> (CMI, wallet, virement). Ce paiement <b>n'entame pas votre dotation touristique</b> annuelle — vous la gardez intacte pour vos dépenses sur place. 💳",()=>cbQR(["Modifier ma réservation","Documents de voyage"]));return;}
+  if(/(modif|date|change|réserv)/.test(t)){cbSay("Bien sûr. Pour une <b>modification simple</b> (dates, chambre), je peux la traiter directement. Pour une modification majeure, je vous mets en relation avec l'équipe. Quelle réservation ? <b>RIH-24817 (Istanbul)</b> ?",()=>cbQR(["Oui, RIH-24817","Parler à un conseiller"]));return;}
+  if(/(document|visa|passeport|checklist|avant)/.test(t)){cbSay("Vos documents (billets, voucher hôtel, facture, assurance) sont dans <b>Mes réservations</b> et envoyés par e-mail + WhatsApp. Une <b>check-list personnalisée</b> (passeport, visa, météo) vous parvient 72h avant le départ. 🧳",()=>cbQR(["Merci","Parler à un conseiller"]));return;}
+  if(/(merci|super|ok|parfait)/.test(t)){cbSay("Avec plaisir ! Bon voyage avec Rihla 🌍",()=>cbQR(["Payer sans dotation devise ?","Documents de voyage"]));return;}
+  cbSay("Je peux vous aider sur le <b>paiement en MAD</b>, la <b>modification</b> d'une réservation, vos <b>documents de voyage</b>, ou vous <b>mettre en relation</b> avec un conseiller. Que souhaitez-vous ?",()=>cbQR(["Payer sans dotation devise ?","Modifier ma réservation","Parler à un conseiller"]));
+}
+
+/* ================= NAV ================= */
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  $("#v-"+v).classList.add("active");
+  document.querySelectorAll("#nlinks button").forEach(b=>b.classList.toggle("active",b.dataset.v===v||(["results","detail","checkout","confirm"].includes(v)&&b.dataset.v==="home")));
+  if(v==="home")renderHome();
+  if(v==="results")renderResults();
+  if(v==="bookings")renderBookings();
+  if(v==="backoffice")renderBackoffice();
+  window.scrollTo({top:0,behavior:reduceMotion?"auto":"smooth"});
+}
+
+/* ================= INIT ================= */
+renderHome();
+</script>
+</body>
+</html>
