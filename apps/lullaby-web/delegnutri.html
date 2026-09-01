@@ -245,7 +245,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/></svg>
         <select id="roleSel" onchange="setRole(this.value)" aria-label="Choisir la vue">
           <option value="collab">Vue : Opérationnel</option>
-          <option value="delegataire">Vue : Délégataire (CFO)</option>
+          <option value="delegataire">Vue : Délégataire (COO/EVP)</option>
           <option value="bpm">Vue : BPM Director</option>
           <option value="admin">Vue : Admin</option>
         </select>
@@ -261,7 +261,11 @@
 
   <!-- ARBORESCENCE -->
   <section class="view active" id="v-arbre">
-    <div class="sec-h"><div><span class="eyebrow">Matrice OCPNUTRI-ID-3</span><h2>Délégations — cycle commercial & achat MP</h2></div><span class="pill ok">30 actions · 7 thématiques</span></div>
+    <div class="sec-h"><div><span class="eyebrow">Matrice OCPNUTRI-ID-3</span><h2>Délégations — cycle commercial & achat MP</h2></div><span class="pill ok">28 actions · 8 thématiques</span></div>
+    <div class="role-banner" style="margin-bottom:16px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      <span>Note de délégation signée par <b>Faris Derrij</b>, CEO OCP Nutricrops, effective depuis le <b>30 mars 2026</b> — Casablanca, le 17 avril 2026. Objet : délégations rentrant dans le cycle d'exécution des ventes et d'achat de matières premières.</span>
+    </div>
     <div class="filters">
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="treeQ" placeholder="Rechercher une action…" oninput="renderTree()"/></div>
       <select id="fDeleg" onchange="renderTree()"><option value="">Tous les délégataires</option></select>
@@ -329,8 +333,8 @@
           <div class="sec-h" style="margin-bottom:12px"><h3>Import de la matrice de délégations</h3></div>
           <div class="upload-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             <div style="font-weight:600;font-size:14px">Glisser un fichier Word/Excel structuré</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px">Dernier import : OCPNUTRI-ID-3.docx · 30 actions · 12 juin 2026</div>
-            <button class="btn ghost sm" style="margin-top:12px" onclick="toast('Import simulé — 30 actions validées, 0 erreur','●')">Importer une nouvelle version</button>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">Dernier import : OCPNUTRI-ID-3.docx · 28 actions · 12 juin 2026</div>
+            <button class="btn ghost sm" style="margin-top:12px" onclick="toast('Import simulé — 28 actions validées, 0 erreur','●')">Importer une nouvelle version</button>
           </div>
         </div>
         <div class="card pad">
@@ -374,65 +378,73 @@
 <div class="toast-wrap" id="toasts"></div>
 
 <script>
-/* ================= DONNÉES — matrice OCPNUTRI-ID-3 ================= */
+/* ================= DONNÉES — matrice OCPNUTRI-ID-3 (source réelle) ================= */
+// Note de délégation signée par Faris Derrij, CEO OCP Nutricrops — Casablanca, 17-04-2026
+// Objet : délégations rentrant dans le cycle d'exécution des ventes et d'achat de matières premières
+// Effective depuis le 30 mars 2026 — annule et remplace les dispositions antérieures.
+const CEO={nom:"Faris Derrij",role:"Chief Executive Officer"};
 const DELEGATAIRES=[
-  {id:"coo",nom:"Karim Idrissi",role:"Chief Operating Officer",init:"KI"},
-  {id:"evp",nom:"Sophia Bennis",role:"Executive VP Commercial",init:"SB"},
+  {id:"coo_evp",nom:"Karim Idrissi",role:"COO — ou EVP de l'entité concernée *",init:"KI"},
   {id:"cfo",nom:"Yasmine Kadiri",role:"Chief Financial Officer",init:"YK"},
   {id:"chro",nom:"Rachid Ouazzani",role:"Chief HR Officer",init:"RO"},
   {id:"cpo",nom:"Amine Sefrioui",role:"Chief Performance Officer",init:"AS"},
+  {id:"dpo",nom:"Imane Rifai",role:"Responsable Data Management",init:"IR"},
 ];
-const delegById=id=>DELEGATAIRES.find(d=>d.id===id);
+function delegById(id){
+  if(id==="none")return {id:"none",nom:"Non déléguée",role:"Reste au CEO — "+CEO.nom,init:"CEO"};
+  return DELEGATAIRES.find(d=>d.id===id);
+}
+function ctrlText(a){const c=a.ctrl;if(!c||!c.length)return "—";return Array.isArray(c)?c.join(" · "):c;}
 
 const THEMES=[
-  {k:"nda",nom:"NDA & accords de confidentialité",ic:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'},
-  {k:"ops",nom:"Opérations commerciales",ic:'<path d="M3 3v18h18M7 14l4-4 3 3 5-6"/>'},
+  {k:"nda",nom:"Non-Disclosure Agreements (NDA)",ic:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'},
+  {k:"ops",nom:"Opérations commerciales & enregistrement produits",ic:'<path d="M3 3v18h18M7 14l4-4 3 3 5-6"/>'},
   {k:"qual",nom:"Documents qualité",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'},
-  {k:"kyc",nom:"KYC / Legal",ic:'<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/>'},
-  {k:"export",nom:"Documents export",ic:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>'},
+  {k:"kyc",nom:"KYC – Legal – Compliance",ic:'<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/>'},
+  {k:"export",nom:"Documents d'export",ic:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>'},
+  {k:"confirm",nom:"Confirmation client",ic:'<path d="M20 6 9 17l-5-5"/>'},
   {k:"charg",nom:"Opérations de chargement",ic:'<path d="M2 20h20M4 20V9l5 3V9l5 3V6l5 3v11"/>'},
-  {k:"reclam",nom:"Réclamations clients",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'},
+  {k:"reclam",nom:"Régularisations & réclamations (claims) logistique",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'},
 ];
 const themeById=k=>THEMES.find(t=>t.k===k);
 
-// 30 actions across 7 themes
+// 28 actions réparties sur 8 thématiques — transcrites de l'annexe OCPNUTRI-ID-3
 let ACTIONS=[
-  {id:"a1",theme:"nda",nom:"Signature d'un NDA fournisseur standard",deleg:"evp",ctrl:"Direction Juridique"},
-  {id:"a2",theme:"nda",nom:"Signature d'un NDA client international",deleg:"coo",ctrl:"Direction Juridique"},
-  {id:"a3",theme:"nda",nom:"Levée de confidentialité pour due diligence",deleg:"cfo",ctrl:"Direction Juridique"},
-  {id:"a4",theme:"nda",nom:"Accord de confidentialité mutuel (MNDA)",deleg:"evp",ctrl:"Direction Juridique"},
+  {id:"a1",theme:"nda",nom:"Signature d'un NDA dans le cadre d'une vente",deleg:"none",ctrl:["Responsable de l'entité en charge du Juridique"]},
 
-  {id:"a5",theme:"ops",nom:"Validation d'un contrat de vente < 5 M MAD",deleg:"evp",ctrl:"Direction Financière"},
-  {id:"a6",theme:"ops",nom:"Validation d'un contrat de vente ≥ 5 M MAD",deleg:"coo",ctrl:"Comité de Direction"},
-  {id:"a7",theme:"ops",nom:"Approbation d'un achat de matière première",deleg:"cfo",ctrl:"Direction Achats"},
-  {id:"a8",theme:"ops",nom:"Négociation des conditions de paiement client",deleg:"evp",ctrl:"Direction Financière"},
-  {id:"a9",theme:"ops",nom:"Avenant à un contrat commercial existant",deleg:"evp",ctrl:"Direction Juridique"},
-  {id:"a10",theme:"ops",nom:"Résiliation anticipée d'un contrat fournisseur",deleg:"coo",ctrl:"Direction Achats"},
+  {id:"a2",theme:"ops",nom:"Signature du Free Sale Certificate",deleg:"coo_evp",sub:"Responsable de l'entité en charge du Customer Service",ctrl:["Entité Quality Management","Entité Legal"]},
+  {id:"a3",theme:"ops",nom:"Signature du Beneficiary's Confirmation Certificate",deleg:"coo_evp",ctrl:[]},
+  {id:"a4",theme:"ops",nom:"Signature de la Letter of authorization for the registration process of product",deleg:"coo_evp",ctrl:[]},
+  {id:"a5",theme:"ops",nom:"Signature de la lettre d'invitation",deleg:"coo_evp",ctrl:[]},
+  {id:"a6",theme:"ops",nom:"Signature du programme de visite lié à l'invitation du client",deleg:"coo_evp",ctrl:[]},
 
-  {id:"a11",theme:"qual",nom:"Approbation d'une fiche technique produit",deleg:"cpo",ctrl:"Direction Qualité"},
-  {id:"a12",theme:"qual",nom:"Validation d'un certificat de conformité",deleg:"cpo",ctrl:"Direction Qualité"},
-  {id:"a13",theme:"qual",nom:"Déclaration de non-conformité fournisseur",deleg:"cpo",ctrl:"Direction Qualité"},
-  {id:"a14",theme:"qual",nom:"Autorisation de dérogation qualité produit",deleg:"coo",ctrl:"Direction Qualité"},
+  {id:"a7",theme:"qual",nom:"Signature des documents qualité (COA, Certificate of Composition, MSDS, spécifications techniques, certificat métaux lourds, méthode d'analyse, composition détaillée, process flow chart, application for registration, certificat fabricant, et tout autre document qualité vente/tender)",deleg:"coo_evp",ctrl:["Entité Quality Management"]},
 
-  {id:"a15",theme:"kyc",nom:"Validation KYC d'un nouveau client",deleg:"cfo",ctrl:"Direction Conformité"},
-  {id:"a16",theme:"kyc",nom:"Validation KYC d'un nouveau fournisseur",deleg:"cfo",ctrl:"Direction Conformité"},
-  {id:"a17",theme:"kyc",nom:"Approbation d'une contrepartie à risque élevé",deleg:"cfo",ctrl:"Comité de Conformité"},
-  {id:"a18",theme:"kyc",nom:"Signature de documents légaux courants",deleg:"coo",ctrl:"Direction Juridique"},
+  {id:"a8",theme:"kyc",nom:"KYC-Compliance related NDA",deleg:"coo_evp",ctrl:["Entité Legal"]},
+  {id:"a9",theme:"kyc",nom:"Certificats / déclarations de conformité — sanctions, anti-corruption, LAB/FT, clause de conformité tiers",deleg:"coo_evp",ctrl:["Entité Legal"]},
+  {id:"a10",theme:"kyc",nom:"Settlement letter",deleg:"coo_evp",ctrl:["Entité Legal"]},
+  {id:"a11",theme:"kyc",nom:"CNDP Declaration",deleg:"dpo",ctrl:[]},
+  {id:"a12",theme:"kyc",nom:"Authorization for the processing of personal data",deleg:"dpo",ctrl:[]},
+  {id:"a13",theme:"kyc",nom:"Certificats / déclarations relatifs au travail des enfants et aux droits humains",deleg:"chro",ctrl:[]},
+  {id:"a14",theme:"kyc",nom:"Counterparty onboarding form",deleg:"cfo",ctrl:[]},
+  {id:"a15",theme:"kyc",nom:"Signature des formulaires requis par les clients (informations juridiques, commerciales et financières)",deleg:"coo_evp",ctrl:["Entités responsables de la donnée dans le formulaire (Legal / Finance / Contrôle permanent)"]},
+  {id:"a16",theme:"kyc",nom:"Validation et signature des dossiers Office Des Changes (autorisation et/ou dérogation)",deleg:"cpo",ctrl:[]},
 
-  {id:"a19",theme:"export",nom:"Signature de certificats d'origine",deleg:"evp",ctrl:"Direction Export"},
-  {id:"a20",theme:"export",nom:"Validation des licences d'exportation",deleg:"coo",ctrl:"Direction Export"},
-  {id:"a21",theme:"export",nom:"Approbation des documents douaniers",deleg:"evp",ctrl:"Direction Export"},
-  {id:"a22",theme:"export",nom:"Autorisation de dérogation logistique export",deleg:"coo",ctrl:"Direction Export"},
+  {id:"a17",theme:"export",nom:"Signature des documents d'exportation liés aux modalités de paiement (LC / SBLC / CAD…) — process Trade Finance",deleg:"coo_evp",sub:"Responsable de l'entité en charge du Customer Service",ctrl:[]},
+  {id:"a18",theme:"export",nom:"Signature du One pager contract (exigé par les banques — LC, SBLC)",deleg:"coo_evp",ctrl:["Entité en charge du Legal"]},
 
-  {id:"a23",theme:"charg",nom:"Autorisation de chargement navire",deleg:"coo",ctrl:"Direction Opérations Portuaires"},
-  {id:"a24",theme:"charg",nom:"Validation d'un plan de chargement",deleg:"cpo",ctrl:"Direction Opérations Portuaires"},
-  {id:"a25",theme:"charg",nom:"Approbation d'un retard de chargement",deleg:"coo",ctrl:"Direction Opérations Portuaires"},
-  {id:"a26",theme:"charg",nom:"Autorisation de surestarie (demurrage)",deleg:"cfo",ctrl:"Direction Financière"},
+  {id:"a19",theme:"confirm",nom:"Partager la confirmation de la vente avec le client",deleg:"coo_evp",sub:"Entité en charge des ventes",ctrl:[]},
 
-  {id:"a27",theme:"reclam",nom:"Traitement d'une réclamation client < 500 K MAD",deleg:"evp",ctrl:"Direction Qualité"},
-  {id:"a28",theme:"reclam",nom:"Traitement d'une réclamation client ≥ 500 K MAD",deleg:"coo",ctrl:"Comité de Direction"},
-  {id:"a29",theme:"reclam",nom:"Approbation d'un avoir commercial",deleg:"cfo",ctrl:"Direction Financière"},
-  {id:"a30",theme:"reclam",nom:"Gestion RH d'un litige lié à une réclamation",deleg:"chro",ctrl:"Direction RH"},
+  {id:"a20",theme:"charg",nom:"Signature d'une demande de Certificate of Origin (COO) auprès de la chambre de commerce",deleg:"coo_evp",sub:"Responsable de l'entité en charge du Customer Service",ctrl:[]},
+  {id:"a21",theme:"charg",nom:"Signature de la facture du Certificate of Origin délivrée par la chambre de commerce",deleg:"coo_evp",sub:"Responsable de l'entité en charge du Customer Service",ctrl:["Entité en charge du contrôle permanent"]},
+  {id:"a22",theme:"charg",nom:"Signature du Certificate of Origin — transactionnel / chambre de commerce",deleg:"coo_evp",sub:"Responsable de l'entité en charge du Customer Service",ctrl:[]},
+
+  {id:"a23",theme:"reclam",nom:"Signature des ordres de paiement (demurrage, despatch, overage ou shortage)",deleg:"coo_evp",ctrl:["Accord sur quantité : Responsable en charge du contrôle permanent","Conforme à l'engagement : COO*/EVP entité concernée"]},
+  {id:"a24",theme:"reclam",nom:"Note de justification des ristournes — réclamation qualité matérialisée par une Credit Note, dans la limite de 100 000 $",deleg:"coo_evp",ctrl:["Entité en charge de la Qualité","Entité en charge du contrôle permanent"]},
+  {id:"a25",theme:"reclam",nom:"Shortage / Overage — validation sur rapport d'inspection (non contractuel)",deleg:"coo_evp",note:"Habilitation directe COO (hors filiales)",ctrl:[]},
+  {id:"a26",theme:"reclam",nom:"Shortage / Overage — validation sur rapport d'inspection (contractuel)",deleg:"coo_evp",ctrl:[]},
+  {id:"a27",theme:"reclam",nom:"Note justifiant l'octroi d'un Bonus/Discount annuel — contractuel",deleg:"coo_evp",ctrl:["Entité en charge du contrôle permanent"]},
+  {id:"a28",theme:"reclam",nom:"Note justifiant l'octroi d'un Bonus/Discount annuel — non contractuel",deleg:"none",ctrl:[]},
 ];
 
 const DIRECTORY=[
@@ -443,30 +455,31 @@ const DIRECTORY=[
   {id:"u5",nom:"Mehdi Alaoui",email:"m.alaoui@ocpnutricrops.com",entite:"Export",role:"Chargé Export"},
   {id:"u6",nom:"Nawal Bensouda",email:"n.bensouda@ocpnutricrops.com",entite:"Conformité",role:"Analyste KYC"},
   {id:"u7",nom:"Younes Amrani",email:"y.amrani@ocpnutricrops.com",entite:"Opérations Portuaires",role:"Coordinateur Chargement"},
+  {id:"u8",nom:"Aicha Lahlou",email:"a.lahlou@ocpnutricrops.com",entite:"Ressources Humaines",role:"Chargée Conformité RH"},
 ];
 
-// active/pending sub-delegations
+// active/pending sub-delegations (créées dynamiquement via le workflow — distinctes des sous-délégataires structurels de la matrice)
 let SUBDELEGS=[
-  {id:"sd1",ref:"SD-OCPNUTRI-2026-0041",source:"cfo",actions:["a15","a16"],user:"u6",start:"2026-05-02",end:"2026-11-02",status:"active",valBy:"BPM Director",valDate:"2026-05-03",comment:"Backup KYC pendant montée en charge"},
-  {id:"sd2",ref:"SD-OCPNUTRI-2026-0038",source:"evp",actions:["a5","a8"],user:"u3",start:"2026-04-10",end:"2026-10-10",status:"active",valBy:"BPM Director",valDate:"2026-04-11",comment:"Délégation permanente Grands Comptes"},
-  {id:"sd3",ref:"SD-OCPNUTRI-2026-0045",source:"cpo",actions:["a11","a12"],user:"u4",start:"2026-06-01",end:"2026-09-01",status:"active",valBy:"BPM Director",valDate:"2026-06-02",comment:"Congé annuel CPO"},
-  {id:"sd4",ref:null,source:"evp",actions:["a19","a21"],user:"u5",start:"2026-06-16",end:"2026-12-16",status:"soumis",comment:"Renfort équipe export Q3"},
-  {id:"sd5",ref:null,source:"coo",actions:["a23"],user:"u7",start:"2026-06-14",end:"2026-08-14",status:"soumis",comment:"Absence COO — période estivale"},
+  {id:"sd1",ref:"SD-OCPNUTRI-2026-0041",source:"dpo",actions:["a11","a12"],user:"u6",start:"2026-05-02",end:"2026-11-02",status:"active",valBy:"BPM Director",valDate:"2026-05-03",comment:"Backup déclarations CNDP pendant montée en charge"},
+  {id:"sd2",ref:"SD-OCPNUTRI-2026-0038",source:"coo_evp",actions:["a5","a6"],user:"u3",start:"2026-04-10",end:"2026-10-10",status:"active",valBy:"BPM Director",valDate:"2026-04-11",comment:"Gestion des invitations clients Grands Comptes"},
+  {id:"sd3",ref:"SD-OCPNUTRI-2026-0045",source:"cfo",actions:["a14"],user:"u1",start:"2026-06-01",end:"2026-09-01",status:"active",valBy:"BPM Director",valDate:"2026-06-02",comment:"Congé annuel CFO"},
+  {id:"sd4",ref:null,source:"coo_evp",actions:["a18"],user:"u5",start:"2026-06-16",end:"2026-12-16",status:"soumis",comment:"Renfort équipe export Q3"},
+  {id:"sd5",ref:null,source:"chro",actions:["a13"],user:"u8",start:"2026-06-14",end:"2026-08-14",status:"soumis",comment:"Absence CHRO — période estivale"},
 ];
 
 let AUDIT=[
-  {d:"2026-06-12 09:14",who:"Admin — Fatima Zniber",act:"Import matrice OCPNUTRI-ID-3 (v4)","det":"30 actions chargées, 0 erreur"},
+  {d:"2026-06-12 09:14",who:"Admin — Fatima Zniber",act:"Import matrice OCPNUTRI-ID-3 (v4)","det":"28 actions chargées, 0 erreur"},
   {d:"2026-06-02 11:05",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0045","det":"PDF généré et archivé"},
   {d:"2026-04-11 14:22",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0038","det":"PDF généré et archivé"},
   {d:"2026-05-03 08:47",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0041","det":"PDF généré et archivé"},
 ];
 
 let ROLE="collab";
-let CURRENT_USER={collab:"Nadia Squalli", delegataire:"cfo", bpm:"Hassan Belkadi", admin:"Fatima Zniber"};
+let CURRENT_USER={collab:"Nadia Squalli", delegataire:"coo_evp", bpm:"Hassan Belkadi", admin:"Fatima Zniber"};
 
 const ROLES={
   collab:{lab:"Opérationnel",tabs:["arbre"],banner:"Vous naviguez en <b>lecture seule</b> — consultez qui peut décider quoi, par thématique ou par délégataire."},
-  delegataire:{lab:"Délégataire",tabs:["mesdeleg","creer","actives","arbre"],banner:"Vous naviguez en tant que <b>délégataire (CFO)</b> — consultez vos délégations et créez des sous-délégations."},
+  delegataire:{lab:"Délégataire",tabs:["mesdeleg","creer","actives","arbre"],banner:"Vous naviguez en tant que <b>délégataire (COO/EVP)</b> — consultez vos délégations et créez des sous-délégations."},
   bpm:{lab:"BPM Director",tabs:["workflow","actives","arbre"],banner:"Vous agissez en <b>BPM Director</b> — validez ou rejetez les sous-délégations soumises."},
   admin:{lab:"Admin",tabs:["admin","pilotage","arbre"],banner:"Vous agissez en <b>Administrateur</b> — gérez la matrice, les utilisateurs et suivez la gouvernance."},
 };
@@ -538,12 +551,12 @@ function renderTree(){
       </div>
       <div class="theme-body"><div class="card" style="border-top:none;border-radius:0 0 12px 12px;margin-top:-1px">
         ${acts.map(a=>{
-          const d=delegById(a.deleg); const subs=activeSubsFor(a.id);
+          const d=delegById(a.deleg); const subs=activeSubsFor(a.id); const nonDeleg=a.deleg==="none";
           return `<div class="act-row">
-            <div class="an">${a.nom}</div>
-            <div class="ad"><span class="lb">Délégataire</span><span class="vv">${d.nom} <span style="font-weight:400;color:var(--muted)">(${d.role.split(' ').map(w=>w[0]).join('')})</span></span></div>
-            <div class="ad"><span class="lb">Entité de contrôle</span><span class="vv" style="font-weight:500">${a.ctrl}</span></div>
-            <div>${subs.length?subs.map(s=>`<span class="subd-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><path d="M20 6 9 17l-5-5"/></svg>${userById(s.user).nom.split(' ')[0]} ${userById(s.user).nom.split(' ')[1][0]}.</span>`).join(" "):`<span style="color:var(--muted);font-size:12px">—</span>`}</div>
+            <div class="an">${a.nom}${a.sub?`<div style="font-size:11px;color:var(--muted);font-weight:400;margin-top:3px">Sous-délégataire prévu (matrice) : ${a.sub}</div>`:''}${a.note?`<div style="font-size:11px;color:var(--muted);font-weight:400;margin-top:2px">${a.note}</div>`:''}</div>
+            <div class="ad"><span class="lb">Délégataire</span><span class="vv" style="${nonDeleg?'color:var(--muted);font-weight:600':''}">${nonDeleg?'Non déléguée — reste au CEO':d.nom+' <span style=\"font-weight:400;color:var(--muted)\">('+d.role.split(' ').map(w=>w[0]).join('')+')</span>'}</span></div>
+            <div class="ad"><span class="lb">Entité de contrôle</span><span class="vv" style="font-weight:500">${ctrlText(a)}</span></div>
+            <div>${subs.length?subs.map(s=>`<span class="subd-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><path d="M20 6 9 17l-5-5"/></svg>${userById(s.user).nom.split(' ')[0]} ${userById(s.user).nom.split(' ')[1][0]}.</span>`).join(" "):nonDeleg?`<span class="pill bad" style="font-size:10.5px">Non délégable</span>`:`<span style="color:var(--muted);font-size:12px">—</span>`}</div>
           </div>`;
         }).join("")}
       </div></div>
@@ -553,7 +566,7 @@ function renderTree(){
 function toggleTheme(k){openThemes[k]=!openThemes[k];renderTree();}
 
 /* ================= MES DELEGATIONS ================= */
-function myDelegId(){return ROLE==="delegataire"?"cfo":null;}
+function myDelegId(){return ROLE==="delegataire"?"coo_evp":null;}
 function renderMyDeleg(){
   const did=myDelegId(); const d=delegById(did);
   const mine=ACTIONS.filter(a=>a.deleg===did);
@@ -570,7 +583,7 @@ function renderMyDeleg(){
     const th=themeById(tk);
     return `<div class="card deleg-card">
       <div class="dh"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${th.ic}</svg></div><div><div class="dt">${th.nom}</div><div class="dd">${acts.length} action(s) attribuée(s) par le CEO à ${d.nom}</div></div></div>
-      ${acts.map(a=>{const subs=activeSubsFor(a.id);return `<div class="action-item"><span class="an">${a.nom}<div style="font-size:11.5px;color:var(--muted)">Contrôle : ${a.ctrl}</div></span>${subs.length?`<span class="subd-tag">Sous-délégué à ${userById(subs[0].user).nom}</span>`:`<button class="btn ghost sm" onclick="go('creer');preselect('${a.id}')">+ Sous-déléguer</button>`}</div>`;}).join("")}
+      ${acts.map(a=>{const subs=activeSubsFor(a.id);return `<div class="action-item"><span class="an">${a.nom}<div style="font-size:11.5px;color:var(--muted)">Contrôle : ${ctrlText(a)}</div></span>${subs.length?`<span class="subd-tag">Sous-délégué à ${userById(subs[0].user).nom}</span>`:`<button class="btn ghost sm" onclick="go('creer');preselect('${a.id}')">+ Sous-déléguer</button>`}</div>`;}).join("")}
     </div>`;
   }).join("");
 }
@@ -703,8 +716,10 @@ function downloadPdf(id){
 function renderAdmin(){
   $("#auditTbl").innerHTML=`<tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Détail</th></tr>`+AUDIT.map(a=>`<tr><td style="white-space:nowrap;color:var(--muted)">${a.d}</td><td style="font-weight:600">${a.who}</td><td>${a.act}</td><td style="color:var(--muted)">${a.det}</td></tr>`).join("");
   $("#userList").innerHTML=DIRECTORY.slice(0,6).map(u=>`<div class="userow"><div class="uav">${initials(u.nom)}</div><div style="flex:1"><div style="font-weight:600">${u.nom}</div><div style="font-size:11.5px;color:var(--muted)">${u.role} · ${u.entite}</div></div><span class="pill ok">Sync ✓</span></div>`).join("");
-  const missing=ACTIONS.filter(a=>!a.ctrl).length;
-  $("#integrityBox").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Actions sans entité de contrôle</span><b style="color:${missing?'var(--warn)':'var(--green-800)'}">${missing}</b></div>
+  const missing=ACTIONS.filter(a=>a.deleg!=="none"&&(!a.ctrl||a.ctrl.length===0)).length;
+  const nonDelegCount=ACTIONS.filter(a=>a.deleg==="none").length;
+  $("#integrityBox").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Actions sans entité de contrôle formelle</span><b style="color:var(--muted)">${missing}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Actions non délégables (réservées au CEO)</span><b>${nonDelegCount}</b></div>
     <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Délégataires actifs</span><b>${DELEGATAIRES.length}/5</b></div>
     <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Dernière synchro Entra ID</span><b>il y a 12 min</b></div>
     <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0;border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><span>Statut global</span><span class="pill ok">● Conforme</span></div>`;
@@ -716,14 +731,20 @@ function renderPilotage(){
   const k=[
     ["100%","Sous-délégations créées en autonomie","cible 100% — atteinte"],
     ["<1 j","Délai moyen de traitement","vs plusieurs jours par email"],
-    ["30/30","Actions cartographiées","matrice OCPNUTRI-ID-3 à jour"],
+    ["28/28","Actions cartographiées","matrice OCPNUTRI-ID-3 à jour"],
     [active+"/"+total,"Sous-délégations actives / totales",soumis+" en attente BPM"],
   ];
   $("#govKpis").innerHTML=k.map(x=>`<div class="card kpi"><div class="v">${x[0]}</div><div class="l">${x[1]}</div><div class="tgt"><span class="pill ok">${x[2]}</span></div></div>`).join("");
   const byTheme=THEMES.map(t=>({t,n:ACTIONS.filter(a=>a.theme===t.k).length}));
   const max=Math.max(...byTheme.map(x=>x.n));
   $("#themeBars").innerHTML=byTheme.map(x=>`<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px"><span style="width:190px;flex:0 0 190px;font-size:13px;font-weight:600">${x.t.nom}</span><span style="flex:1;height:10px;background:var(--green-50);border-radius:6px;overflow:hidden"><i style="display:block;height:100%;width:${x.n/max*100}%;background:var(--green-600);border-radius:6px"></i></span><span style="width:24px;font-weight:700;font-size:13px;text-align:right">${x.n}</span></div>`).join("");
-  const alerts=[["3 sous-délégations arrivent à échéance sous 30 jours","warn"],["Aucune action orpheline détectée dans la matrice","ok"],["1 délégataire (COO) concentre 8 actions à enjeu élevé","info"]];
+  const cooEvpCount=ACTIONS.filter(a=>a.deleg==="coo_evp").length;
+  const alerts=[
+    ["Le COO / EVP entité concernée concentre "+cooEvpCount+" des 28 actions ("+Math.round(cooEvpCount/28*100)+"%) — point de vigilance gouvernance","warn"],
+    ["2 actions restent non délégables et réservées au CEO (NDA vente, Bonus/Discount non contractuel)","info"],
+    ["3 sous-délégations arrivent à échéance sous 30 jours","warn"],
+    ["Aucune action orpheline détectée dans la matrice","ok"],
+  ];
   $("#govAlerts").innerHTML=alerts.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px"><span class="pill ${a[1]}" style="min-width:22px;text-align:center">${a[1]==='ok'?'●':a[1]==='warn'?'⚠':'→'}</span><span>${a[0]}</span></div>`).join("");
 }
 
