@@ -101,6 +101,26 @@
   .auth-pill svg{width:12px;height:12px}
   .auth-pill.muted{border-color:var(--line);color:var(--muted)}
 
+  /* ===== CASCADE D'AUTORITÉ (CEO → délégataire → sous-délégataire) ===== */
+  .cascade{margin-bottom:6px}
+  .cascade-item{width:82%;border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:#fff}
+  .cascade-item.dashed{border-style:dashed;text-align:center;color:var(--muted);font-size:13px;padding:20px 18px}
+  .cascade-item .ce-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .cascade-item h4{font-size:18px;font-weight:700;color:var(--green-800);margin-top:6px;letter-spacing:-.2px}
+  .cascade-item .ce-sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+  .cascade-item .ce-bar-wrap{margin-top:13px}
+  .cascade-item .ce-bar-lbl{font-size:10.5px;color:var(--muted);margin-bottom:5px}
+  .cascade-item .ce-bar{height:6px;border-radius:4px;background:var(--line);overflow:hidden}
+  .cascade-item .ce-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green-600),var(--green-800));border-radius:4px}
+  .cascade-item .ce-status{margin-top:11px}
+  .cascade-link{position:relative;height:52px}
+  .cascade-link svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .cascade-link .cl-label{position:absolute;top:18px;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+  .cl-pill{font-size:10.5px;font-weight:700;color:var(--green-800);background:var(--green-100);padding:3px 11px;border-radius:20px;white-space:nowrap}
+  .cl-cap{font-size:10.5px;color:var(--muted);white-space:nowrap}
+  .cl-cond{position:absolute;right:0;top:8px;font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);padding:3px 11px;border-radius:20px;white-space:nowrap}
+  @media(max-width:520px){.cascade-item{width:96%}.cl-cond{position:static;display:inline-block;margin-top:6px}.cascade-link{height:64px}}
+
   .grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
   @media(max-width:900px){.grid2{grid-template-columns:1fr}}
 
@@ -606,24 +626,67 @@ function renderTree(){
 }
 function toggleTheme(k){openThemes[k]=openThemes[k]===false?true:false;renderTree();}
 
+/* ================= CASCADE D'AUTORITÉ (CEO → délégataire → sous-délégataire) ================= */
+function cascadeCard(eyebrow,name,sub,scopePct,pillCls,pillLabel,barLabel){
+  return `<div class="cascade-item">
+    <div class="ce-eyebrow">${eyebrow}</div>
+    <h4>${name}</h4>
+    <div class="ce-sub">${sub}</div>
+    <div class="ce-bar-wrap"><div class="ce-bar-lbl">${barLabel}</div><div class="ce-bar"><i style="width:${scopePct}%"></i></div></div>
+    <div class="ce-status"><span class="pill ${pillCls}">${pillLabel}</span></div>
+  </div>`;
+}
+function cascadeLink(label,caption,condition,leftPct){
+  const uid="cl"+Math.random().toString(36).slice(2,8);
+  const endX=leftPct+8;
+  return `<div class="cascade-link">
+    <svg viewBox="0 0 100 44" preserveAspectRatio="none">
+      <defs><marker id="a-${uid}" markerWidth="6" markerHeight="6" refX="4.5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--green-700)"/></marker></defs>
+      <path d="M6 2 C 6 22, ${endX-4} 22, ${endX} 40" fill="none" stroke="var(--green-700)" stroke-width="1.5" marker-end="url(#a-${uid})"/>
+    </svg>
+    <div class="cl-label" style="left:${leftPct}%"><span class="cl-pill">${label}</span><div class="cl-cap">${caption}</div></div>
+    ${condition?`<span class="cl-cond">${condition}</span>`:''}
+  </div>`;
+}
+function renderCascade(a){
+  const th=themeById(a.theme); const nonDeleg=a.deleg==="none"; const total=ACTIONS.length;
+  let html=`<div class="cascade">`;
+  html+=cascadeCard("ISSUER",CEO.nom,"Thématique : "+th.nom,100,"ok","Accepté","Autorité source · note du 30 mars 2026");
+  if(nonDeleg){
+    html+=`<div class="cascade-link"><svg viewBox="0 0 100 44" preserveAspectRatio="none"><path d="M6 2 C 6 22, 6 22, 6 40" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 3"/></svg><div class="cl-label" style="left:14%"><span class="cl-pill" style="background:var(--line);color:var(--muted)">ne délègue pas</span><div class="cl-cap">réservée au CEO</div></div></div>`;
+    html+=`<div class="cascade-item dashed">Action non délégable — traitée directement par le CEO.</div>`;
+    html+=`</div>`;
+    return html;
+  }
+  const d=delegById(a.deleg);
+  const delegCount=ACTIONS.filter(x=>x.deleg===a.deleg).length;
+  const delegScope=Math.round(delegCount/total*100);
+  html+=cascadeLink("délègue","dans la limite de la note CEO",null,18);
+  html+=cascadeCard("RECIPIENT",d.nom,"Thématique : "+th.nom,delegScope,"ok","Accepté",delegCount+"/"+total+" actions détenues");
+  const active=SUBDELEGS.find(s=>s.actions.includes(a.id)&&s.status==="active");
+  const pending=SUBDELEGS.find(s=>s.actions.includes(a.id)&&s.status==="soumis");
+  const sub=active||pending;
+  if(sub){
+    const u=userById(sub.user);
+    const subScope=Math.round(sub.actions.length/delegCount*100);
+    const cond=active?"Validité : "+fmtDate(sub.start)+" → "+fmtDate(sub.end):"Condition : validation BPM Director";
+    html+=cascadeLink("redélègue","ne dépasse jamais le périmètre du délégataire",cond,30);
+    html+=cascadeCard("SUB-RECIPIENT",u.nom,"Thématique : "+th.nom,subScope,active?"ok":"warn",active?"Accepté":"Émis · en attente d'acceptation",sub.actions.length+" action(s) sous-déléguée(s)");
+  } else {
+    const canCreate=ROLE==="delegataire"&&a.deleg===myDelegId();
+    html+=cascadeLink("redélègue","aucune sous-délégation active","",30);
+    html+=`<div class="cascade-item dashed">Aucun sous-délégataire pour l'instant${canCreate?`<br><button class="btn ghost sm" style="margin-top:10px" onclick="closeModal();go('creer');preselect('${a.id}')">+ Créer une sous-délégation</button>`:''}</div>`;
+  }
+  html+=`</div>`;
+  return html;
+}
+
 /* ================= DÉTAIL D'UNE ACTION (carte flottante façon Aptly) ================= */
 function openActionDetail(id){
   const a=ACTIONS.find(x=>x.id===id); const d=delegById(a.deleg); const th=themeById(a.theme);
   const nonDeleg=a.deleg==="none"; const st=actionStatus(a);
   const related=SUBDELEGS.filter(s=>s.actions.includes(a.id)).sort((x,y)=>new Date(x.start)-new Date(y.start));
   const active=related.find(s=>s.status==="active"); const pending=related.find(s=>s.status==="soumis");
-
-  // stat box — who effectively holds authority right now
-  let statBox;
-  if(active){
-    statBox=`<div class="v" style="font-size:22px;font-weight:700">${userById(active.user).nom}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Sous-délégataire actif · ${fmtDate(active.start)} → ${fmtDate(active.end)}</div>`;
-  } else if(pending){
-    statBox=`<div class="v" style="font-size:22px;font-weight:700">${userById(pending.user).nom}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Sous-délégation soumise · en attente de validation BPM</div>`;
-  } else if(nonDeleg){
-    statBox=`<div class="v" style="font-size:22px;font-weight:700">${CEO.nom}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">${CEO.role} · action non délégable</div>`;
-  } else {
-    statBox=`<div class="v" style="font-size:22px;font-weight:700">${d.nom}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">${d.role} · délégataire titulaire</div>`;
-  }
 
   const condLine = a.sub ? "Sous-délégataire prévu par la matrice : "+a.sub
     : a.note ? a.note
@@ -662,20 +725,10 @@ function openActionDetail(id){
       <button class="m-x" onclick="closeModal()">✕</button>
     </div>
     <div class="m-body">
-      <div class="card pad soft" style="margin-bottom:16px">${statBox}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div class="card pad">
-          <div class="eyebrow" style="margin-bottom:9px">Délégataire</div>
-          ${nonDeleg?`<span class="auth-pill muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_NONE}</svg>Non délégable</span>`:`<span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">${ICO_DELEG}</svg>Délégataire</span>`}
-          <div style="font-weight:700;font-size:15px;margin-top:11px">${nonDeleg?CEO.nom:d.nom}</div>
-          <div style="font-size:12.5px;color:var(--muted);margin-top:2px">${nonDeleg?CEO.role:d.role}</div>
-        </div>
-        <div class="card pad" style="border-color:var(--green-300);position:relative">
-          <div class="eyebrow" style="margin-bottom:9px">Contrôle</div>
-          <span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_CTRL}</svg>Contrôle</span>
-          <div style="font-weight:700;font-size:15px;margin-top:11px">${a.ctrl&&a.ctrl.length?a.ctrl[0]:'Aucune'}</div>
-          <div style="font-size:12.5px;color:var(--muted);margin-top:2px">${a.ctrl&&a.ctrl.length>1?a.ctrl.slice(1).join(' · '):'Autorité de contrôle, suivie séparément'}</div>
-        </div>
+      ${renderCascade(a)}
+      <div class="card pad" style="margin:4px 0 16px;display:flex;align-items:center;gap:11px;flex-wrap:wrap">
+        <span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_CTRL}</svg>Contrôle</span>
+        <span style="font-size:13px;color:var(--ink)">${ctrlText(a)}</span>
       </div>
       <div class="role-banner" style="margin-bottom:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/></svg><span>${condLine}</span></div>
       <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Audit trail</div>
