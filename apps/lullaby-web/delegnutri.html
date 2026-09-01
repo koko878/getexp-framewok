@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1B5E20" />
+<title>DelegNutri — Délégations de pouvoirs · OCP Nutricrops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green-900:#103d17; --green-800:#1B5E20; --green-700:#2E7D32; --green-600:#388E3C; --green-500:#4CAF50; --green-300:#66BB6A; --green-100:#D6EADB; --green-50:#EAF4EC;
+    --ink:#10231a; --muted:#5c6b62; --line:#e3ebe5; --dark:#07140c;
+    --warn:#B45309; --warn-bg:#FEF3C7; --bad:#B91C1C; --bad-bg:#FEE2E2; --amber:#D97706; --amber-bg:#FFFBEB;
+    --card:#ffffff;
+    --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --sh:0 1px 2px rgba(16,35,26,.05),0 6px 20px rgba(16,35,26,.06);
+    --sh-2:0 10px 34px rgba(16,35,26,.10); --sh-lg:0 24px 60px rgba(16,35,26,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:#f4f8f5;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  .serif{font-family:var(--serif)}
+  .caps{text-transform:uppercase;letter-spacing:.09em}
+  .hidden{display:none!important}
+
+  /* ===== HEADER ===== */
+  header{background:linear-gradient(120deg,var(--green-900),var(--green-700));color:#fff;padding-top:env(safe-area-inset-top)}
+  .hd{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:15px 22px}
+  .wm{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .wm .logo{width:42px;height:42px;flex:0 0 42px}
+  .wm h1{font-family:var(--serif);font-size:23px;font-weight:700;line-height:1;letter-spacing:.2px}
+  .wm .tl{font-size:10.5px;color:#c7e0cc;font-weight:500;margin-top:2px}
+  .hd-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .role-pick{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:11px;padding:6px 10px}
+  .role-pick svg{width:16px;height:16px;color:#c7e0cc}
+  .role-pick select{background:transparent;border:none;color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;outline:none}
+  .role-pick select option{color:#10231a}
+  .me{display:flex;align-items:center;gap:9px}
+  .me .av{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .me .mn{font-size:13px;font-weight:600;line-height:1.15}.me .mn span{display:block;font-weight:400;color:#c7e0cc;font-size:11.5px}
+  @media(max-width:640px){.me .mn{display:none}}
+
+  .tabs-wrap{background:linear-gradient(120deg,var(--green-900),var(--green-700));border-top:1px solid rgba(255,255,255,.1)}
+  .tabs{max-width:1180px;margin:0 auto;display:flex;gap:4px;padding:0 18px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{display:flex;align-items:center;gap:8px;padding:13px 15px;color:#bcd7c1;font-size:14px;font-weight:600;white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
+  .tabs button svg{width:17px;height:17px}
+  .tabs button:hover{color:#fff}
+  .tabs button.active{color:#fff;border-bottom-color:var(--green-300)}
+  .tabs button .n{background:var(--green-300);color:var(--green-900);font-size:11px;font-weight:800;border-radius:20px;padding:0 7px;min-width:19px;text-align:center}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 22px 40px}
+  .view{display:none;animation:fade .3s ease}.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .role-banner{display:flex;align-items:center;gap:10px;background:var(--green-50);border:1px solid var(--green-100);border-radius:12px;padding:11px 15px;margin-bottom:18px;font-size:13.5px;color:var(--green-800)}
+  .role-banner svg{width:18px;height:18px;flex:0 0 18px}
+  .role-banner b{font-weight:700}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 17px;border-radius:11px;font-size:14.5px;font-weight:600;background:var(--green-800);color:#fff;transition:.14s;min-height:44px}
+  .btn:hover{background:var(--green-900)}.btn:active{transform:scale(.98)}
+  .btn svg{width:17px;height:17px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--green-50);border-color:var(--green-100)}
+  .btn.amber{background:var(--amber)}.btn.amber:hover{background:#B45309}
+  .btn.bad{background:#fff;color:var(--bad);border:1px solid #f3c6c6}.btn.bad:hover{background:var(--bad-bg)}
+  .btn.sm{padding:8px 13px;font-size:13px;min-height:38px;border-radius:9px}
+  .btn.block{width:100%}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
+  .card.pad{padding:20px}
+  .soft{background:var(--green-50)}
+  .sec-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .sec-h h2{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:.2px}
+  .sec-h h3{font-size:16px;font-weight:700}
+  .sec-h .hint{font-size:13px;color:var(--muted)}
+  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--green-700)}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+  .pill.ok{background:var(--green-100);color:var(--green-800)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn)}
+  .pill.bad{background:var(--bad-bg);color:var(--bad)}
+  .pill.info{background:var(--amber-bg);color:var(--amber)}
+
+  .grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+
+  /* KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:820px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{padding:18px}
+  .kpi .v{font-family:var(--serif);font-size:32px;font-weight:700;letter-spacing:-.5px;line-height:1;color:var(--green-800)}
+  .kpi .l{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+  .kpi .tgt{font-size:12px;margin-top:8px}
+
+  /* ===== ARBORESCENCE ===== */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .filters select,.filters .search{padding:9px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:500;font-size:13.5px}
+  .filters .search{position:relative;flex:1;min-width:200px}
+  .filters .search input{border:none;outline:none;width:100%;padding-left:24px}
+  .filters .search svg{position:absolute;left:0;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+  .theme-group{margin-bottom:14px}
+  .theme-h{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-radius:12px;background:#fff;border:1px solid var(--line);transition:.14s}
+  .theme-h:hover{border-color:var(--green-300)}
+  .theme-h .ti{width:38px;height:38px;border-radius:10px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 38px}
+  .theme-h .ti svg{width:19px;height:19px}
+  .theme-h .tt{font-weight:700;font-size:14.5px;flex:1}
+  .theme-h .tc{font-size:12px;color:var(--muted)}
+  .theme-h .chev{width:18px;height:18px;color:var(--muted);transition:transform .2s}
+  .theme-group.open .chev{transform:rotate(90deg)}
+  .theme-body{max-height:0;overflow:hidden;transition:max-height .28s ease}
+  .theme-group.open .theme-body{max-height:2400px}
+  .act-row{display:flex;gap:14px;align-items:center;padding:13px 16px 13px 66px;border-bottom:1px solid var(--line);font-size:13.5px}
+  .act-row:last-child{border-bottom:none}
+  .act-row .an{flex:1;min-width:180px;font-weight:600}
+  .act-row .ad{display:flex;flex-direction:column;gap:2px;min-width:150px}
+  .act-row .ad .lb{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .act-row .ad .vv{font-weight:600}
+  .subd-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--green-700);background:var(--green-50);padding:2px 9px;border-radius:20px}
+  @media(max-width:760px){.act-row{flex-wrap:wrap;padding-left:20px}}
+
+  /* ===== MES DELEGATIONS ===== */
+  .deleg-card{padding:18px;margin-bottom:14px}
+  .deleg-card .dh{display:flex;align-items:flex-start;gap:13px;margin-bottom:12px}
+  .deleg-card .di{width:42px;height:42px;border-radius:11px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 42px}
+  .deleg-card .di svg{width:21px;height:21px}
+  .deleg-card .dt{font-weight:700;font-size:15.5px}
+  .deleg-card .dd{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .action-item{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .action-item .an{flex:1}
+  .action-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--green-700)}
+
+  /* ===== FORM ===== */
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+  .field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:#fff;transition:.15s;min-height:46px}
+  .field textarea{min-height:80px;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--green-600);box-shadow:0 0 0 3px rgba(56,142,60,.14)}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.frow{grid-template-columns:1fr}}
+  .act-pick{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:11px;padding:10px}
+  .act-opt{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer}
+  .act-opt:hover{background:var(--green-50)}
+  .act-opt input{width:18px;height:18px;accent-color:var(--green-700)}
+  .act-opt .ao-t{flex:1;font-size:13.5px}
+  .act-opt .ao-th{font-size:11px;color:var(--muted)}
+  .dir-pick{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto}
+  .dir-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;cursor:pointer;transition:.14s}
+  .dir-item:hover{border-color:var(--green-300)}
+  .dir-item.on{border-color:var(--green-700);background:var(--green-50)}
+  .dir-item .dav{width:34px;height:34px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex:0 0 34px}
+  .dir-item .dn{font-weight:600;font-size:13.5px}.dir-item .de{font-size:11.5px;color:var(--muted)}
+
+  /* ===== WORKFLOW ===== */
+  .wf{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:820px){.wf{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.wf{grid-template-columns:1fr}}
+  .wcol{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;min-height:110px}
+  .wcol .wh{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:700;padding:4px 6px 10px;color:var(--green-800)}
+  .wcard{border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:9px;cursor:pointer;transition:.14s}
+  .wcard:hover{box-shadow:var(--sh);border-color:var(--green-300)}
+  .wcard .wt{font-size:13px;font-weight:600;line-height:1.3}
+  .wcard .wm2{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .audit{font-size:12.5px;display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .audit:last-child{border:none}
+  .audit .ad{width:9px;height:9px;border-radius:50%;background:var(--green-500);margin-top:5px;flex:0 0 9px}
+  .audit .at{font-weight:600}.audit .atm{color:var(--muted);font-size:11px}
+
+  /* ===== ACTIVE / PDF ===== */
+  .sd-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .sd-row:last-child{border-bottom:none}
+  .sd-row .si{width:38px;height:38px;border-radius:10px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 38px}
+  .sd-row .si svg{width:19px;height:19px}
+  .sd-row .sm{flex:1;min-width:0}
+  .sd-row .st{font-weight:600;font-size:14px}
+  .sd-row .sd{font-size:12px;color:var(--muted);margin-top:1px}
+  .sd-row .sref{font-family:var(--serif);font-size:13px;color:var(--green-800);font-weight:700}
+
+  /* PDF preview */
+  .pdf-doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:30px 34px;font-size:12.5px;line-height:1.7;color:#1a2b20}
+  .pdf-doc .ph{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--green-800);padding-bottom:14px;margin-bottom:18px}
+  .pdf-doc .ph h4{font-family:var(--serif);font-size:20px;color:var(--green-800)}
+  .pdf-doc .ref{font-family:var(--serif);font-size:13px;color:var(--muted);text-align:right}
+  .pdf-doc .prow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .pdf-doc .prow b{font-weight:600}
+  .pdf-doc .seal{margin-top:22px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .pdf-doc .seal .sig{text-align:right}
+  .pdf-doc .seal .sig .sn{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--green-800)}
+
+  /* ===== ADMIN ===== */
+  .upload-box{border:2px dashed var(--line);border-radius:14px;padding:26px;text-align:center;transition:.14s}
+  .upload-box:hover{border-color:var(--green-300);background:var(--green-50)}
+  .upload-box svg{width:34px;height:34px;color:var(--green-600);margin-bottom:10px}
+  .userow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .userow:last-child{border-bottom:none}
+  .userow .uav{width:32px;height:32px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;flex:0 0 32px}
+
+  table.audit-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  table.audit-tbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line)}
+  table.audit-tbl td{padding:11px 10px;border-bottom:1px solid var(--line)}
+  table.audit-tbl tr:last-child td{border:none}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(16,35,26,.55);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
+  .scrim.open{display:flex}
+  .modal{background:#fff;border-radius:18px;width:100%;max-width:620px;box-shadow:var(--sh-lg);animation:pop .26s ease;overflow:hidden}
+  .modal.wide{max-width:760px}
+  @keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  .m-head{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .m-head h3{font-family:var(--serif);font-size:21px;font-weight:700}
+  .m-head p{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .m-x{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 32px}.m-x:hover{background:var(--green-50)}
+  .m-body{padding:20px 22px;max-height:70vh;overflow-y:auto}
+  .m-foot{padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;background:#fbfdfb;flex-wrap:wrap}
+
+  /* toast */
+  .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:120;display:flex;flex-direction:column;gap:10px;width:calc(100% - 32px);max-width:400px}
+  .toast{display:flex;align-items:center;gap:11px;background:var(--green-900);color:#fff;padding:13px 17px;border-radius:12px;box-shadow:var(--sh-lg);font-size:14px;font-weight:500;animation:tin .3s ease}
+  .toast .ti{font-size:16px;flex:0 0 auto}
+  @keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  footer{text-align:center;padding:22px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:20px}
+  footer b{color:var(--green-800);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="wm" onclick="go('arbre')">
+      <svg class="logo" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="13" fill="#EAF4EC"/>
+        <path d="M24 8c-8 5-12 11-12 17a12 12 0 0 0 24 0c0-6-4-12-12-17z" fill="#66BB6A"/>
+        <path d="M24 13v22M24 21c-3-1.2-5-3-6-5.5M24 26c3-1.2 5-3 6-5.5" stroke="#103d17" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div><h1>DelegNutri</h1><div class="tl">Délégations de pouvoirs · OCPNUTRI-ID-3</div></div>
+    </div>
+    <div class="hd-r">
+      <div class="role-pick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/></svg>
+        <select id="roleSel" onchange="setRole(this.value)" aria-label="Choisir la vue">
+          <option value="collab">Vue : Opérationnel</option>
+          <option value="delegataire">Vue : Délégataire (CFO)</option>
+          <option value="bpm">Vue : BPM Director</option>
+          <option value="admin">Vue : Admin</option>
+        </select>
+      </div>
+      <div class="me"><div class="mn" id="meName">Nadia Squalli<span id="meRole">Opérationnel</span></div><div class="av" id="meAv">NS</div></div>
+    </div>
+  </div>
+  <div class="tabs-wrap"><nav class="tabs" id="tabs"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="role-banner" id="roleBanner"></div>
+
+  <!-- ARBORESCENCE -->
+  <section class="view active" id="v-arbre">
+    <div class="sec-h"><div><span class="eyebrow">Matrice OCPNUTRI-ID-3</span><h2>Délégations — cycle commercial & achat MP</h2></div><span class="pill ok">30 actions · 7 thématiques</span></div>
+    <div class="filters">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="treeQ" placeholder="Rechercher une action…" oninput="renderTree()"/></div>
+      <select id="fDeleg" onchange="renderTree()"><option value="">Tous les délégataires</option></select>
+      <select id="fSub" onchange="renderTree()"><option value="">Sous-délégation : tous</option><option value="yes">Avec sous-délégation active</option><option value="no">Sans sous-délégation</option></select>
+    </div>
+    <div id="treeList"></div>
+  </section>
+
+  <!-- MES DELEGATIONS -->
+  <section class="view" id="v-mesdeleg">
+    <div class="sec-h"><div><span class="eyebrow">Attribuées par le CEO</span><h2>Mes délégations</h2></div></div>
+    <div class="kpis" style="margin-bottom:18px" id="myKpis"></div>
+    <div id="myDelegList"></div>
+  </section>
+
+  <!-- CREER SOUS-DELEGATION -->
+  <section class="view" id="v-creer">
+    <div class="sec-h"><div><span class="eyebrow">Nouvelle sous-délégation</span><h2>Déléguer des actions</h2></div></div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="field"><label>Délégation source</label><select id="f-source" onchange="renderActPick()"></select></div>
+        <div class="field"><label>Actions à sous-déléguer</label><div class="act-pick" id="actPick"></div></div>
+        <div class="field"><label>Collaborateur (annuaire Entra ID)</label>
+          <div class="search" style="margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="dirQ" placeholder="Rechercher un collaborateur…" oninput="renderDirPick()"/></div>
+          <div class="dir-pick" id="dirPick"></div>
+        </div>
+        <div class="frow">
+          <div class="field"><label>Début de validité</label><input type="date" id="f-start" value="2026-06-15"/></div>
+          <div class="field"><label>Fin de validité</label><input type="date" id="f-end" value="2026-12-15"/></div>
+        </div>
+        <div class="field"><label>Justification / commentaire (facultatif)</label><textarea id="f-com" placeholder="Ex. congé annuel, surcharge d'activité, backup opérationnel…"></textarea></div>
+        <button class="btn block" onclick="submitSubDeleg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Soumettre au BPM Director</button>
+      </div>
+      <div>
+        <div class="card pad soft" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:9px;font-weight:700;color:var(--green-800);margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/></svg>Circuit de validation</div>
+          <div style="font-size:13px;color:var(--muted)">Soumission → notification BPM Director → validation en un clic → activation immédiate + PDF signé généré automatiquement.</div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Récapitulatif</h3></div>
+          <div id="recapBox" style="font-size:13.5px;color:var(--muted)">Sélectionnez une délégation et des actions pour voir l'aperçu.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKFLOW BPM -->
+  <section class="view" id="v-workflow">
+    <div class="sec-h"><div><span class="eyebrow">Workflow de validation</span><h2>Sous-délégations soumises</h2></div><span class="hint">Soumis → Validé → Activé & PDF généré</span></div>
+    <div class="wf" id="wfBoard"></div>
+  </section>
+
+  <!-- SOUS-DELEGATIONS ACTIVES -->
+  <section class="view" id="v-actives">
+    <div class="sec-h"><div><span class="eyebrow">Registre</span><h2>Sous-délégations actives</h2></div><span class="pill ok" id="activeCount"></span></div>
+    <div class="card"><div id="activeList"></div></div>
+  </section>
+
+  <!-- ADMIN -->
+  <section class="view" id="v-admin">
+    <div class="sec-h"><div><span class="eyebrow">Administration</span><h2>Gestion de la matrice & des utilisateurs</h2></div></div>
+    <div class="grid2">
+      <div>
+        <div class="card pad" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Import de la matrice de délégations</h3></div>
+          <div class="upload-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div style="font-weight:600;font-size:14px">Glisser un fichier Word/Excel structuré</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">Dernier import : OCPNUTRI-ID-3.docx · 30 actions · 12 juin 2026</div>
+            <button class="btn ghost sm" style="margin-top:12px" onclick="toast('Import simulé — 30 actions validées, 0 erreur','●')">Importer une nouvelle version</button>
+          </div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Historique & audit trail</h3></div>
+          <div style="overflow-x:auto"><table class="audit-tbl" id="auditTbl"></table></div>
+        </div>
+      </div>
+      <div>
+        <div class="card pad" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:6px"><h3>Utilisateurs & rôles</h3><span class="hint">sync Entra ID</span></div>
+          <div id="userList"></div>
+        </div>
+        <div class="card pad soft">
+          <div class="sec-h" style="margin-bottom:8px"><h3>Intégrité de la matrice</h3></div>
+          <div id="integrityBox"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILOTAGE -->
+  <section class="view" id="v-pilotage">
+    <div class="sec-h"><div><span class="eyebrow">Direction Générale</span><h2>Pilotage de la gouvernance</h2></div><span class="pill ok">● Temps réel</span></div>
+    <div class="kpis" id="govKpis"></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Répartition par thématique</h3><span class="hint">actions déléguées</span></div>
+        <div id="themeBars"></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Alertes de gouvernance</h3></div>
+        <div id="govAlerts"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>Prototype de démonstration — <b>OCP Nutricrops · D²nAI</b></footer>
+
+<div class="scrim" id="scrim"><div id="modalHost"></div></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ================= DONNÉES — matrice OCPNUTRI-ID-3 ================= */
+const DELEGATAIRES=[
+  {id:"coo",nom:"Karim Idrissi",role:"Chief Operating Officer",init:"KI"},
+  {id:"evp",nom:"Sophia Bennis",role:"Executive VP Commercial",init:"SB"},
+  {id:"cfo",nom:"Yasmine Kadiri",role:"Chief Financial Officer",init:"YK"},
+  {id:"chro",nom:"Rachid Ouazzani",role:"Chief HR Officer",init:"RO"},
+  {id:"cpo",nom:"Amine Sefrioui",role:"Chief Performance Officer",init:"AS"},
+];
+const delegById=id=>DELEGATAIRES.find(d=>d.id===id);
+
+const THEMES=[
+  {k:"nda",nom:"NDA & accords de confidentialité",ic:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'},
+  {k:"ops",nom:"Opérations commerciales",ic:'<path d="M3 3v18h18M7 14l4-4 3 3 5-6"/>'},
+  {k:"qual",nom:"Documents qualité",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'},
+  {k:"kyc",nom:"KYC / Legal",ic:'<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/>'},
+  {k:"export",nom:"Documents export",ic:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>'},
+  {k:"charg",nom:"Opérations de chargement",ic:'<path d="M2 20h20M4 20V9l5 3V9l5 3V6l5 3v11"/>'},
+  {k:"reclam",nom:"Réclamations clients",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'},
+];
+const themeById=k=>THEMES.find(t=>t.k===k);
+
+// 30 actions across 7 themes
+let ACTIONS=[
+  {id:"a1",theme:"nda",nom:"Signature d'un NDA fournisseur standard",deleg:"evp",ctrl:"Direction Juridique"},
+  {id:"a2",theme:"nda",nom:"Signature d'un NDA client international",deleg:"coo",ctrl:"Direction Juridique"},
+  {id:"a3",theme:"nda",nom:"Levée de confidentialité pour due diligence",deleg:"cfo",ctrl:"Direction Juridique"},
+  {id:"a4",theme:"nda",nom:"Accord de confidentialité mutuel (MNDA)",deleg:"evp",ctrl:"Direction Juridique"},
+
+  {id:"a5",theme:"ops",nom:"Validation d'un contrat de vente < 5 M MAD",deleg:"evp",ctrl:"Direction Financière"},
+  {id:"a6",theme:"ops",nom:"Validation d'un contrat de vente ≥ 5 M MAD",deleg:"coo",ctrl:"Comité de Direction"},
+  {id:"a7",theme:"ops",nom:"Approbation d'un achat de matière première",deleg:"cfo",ctrl:"Direction Achats"},
+  {id:"a8",theme:"ops",nom:"Négociation des conditions de paiement client",deleg:"evp",ctrl:"Direction Financière"},
+  {id:"a9",theme:"ops",nom:"Avenant à un contrat commercial existant",deleg:"evp",ctrl:"Direction Juridique"},
+  {id:"a10",theme:"ops",nom:"Résiliation anticipée d'un contrat fournisseur",deleg:"coo",ctrl:"Direction Achats"},
+
+  {id:"a11",theme:"qual",nom:"Approbation d'une fiche technique produit",deleg:"cpo",ctrl:"Direction Qualité"},
+  {id:"a12",theme:"qual",nom:"Validation d'un certificat de conformité",deleg:"cpo",ctrl:"Direction Qualité"},
+  {id:"a13",theme:"qual",nom:"Déclaration de non-conformité fournisseur",deleg:"cpo",ctrl:"Direction Qualité"},
+  {id:"a14",theme:"qual",nom:"Autorisation de dérogation qualité produit",deleg:"coo",ctrl:"Direction Qualité"},
+
+  {id:"a15",theme:"kyc",nom:"Validation KYC d'un nouveau client",deleg:"cfo",ctrl:"Direction Conformité"},
+  {id:"a16",theme:"kyc",nom:"Validation KYC d'un nouveau fournisseur",deleg:"cfo",ctrl:"Direction Conformité"},
+  {id:"a17",theme:"kyc",nom:"Approbation d'une contrepartie à risque élevé",deleg:"cfo",ctrl:"Comité de Conformité"},
+  {id:"a18",theme:"kyc",nom:"Signature de documents légaux courants",deleg:"coo",ctrl:"Direction Juridique"},
+
+  {id:"a19",theme:"export",nom:"Signature de certificats d'origine",deleg:"evp",ctrl:"Direction Export"},
+  {id:"a20",theme:"export",nom:"Validation des licences d'exportation",deleg:"coo",ctrl:"Direction Export"},
+  {id:"a21",theme:"export",nom:"Approbation des documents douaniers",deleg:"evp",ctrl:"Direction Export"},
+  {id:"a22",theme:"export",nom:"Autorisation de dérogation logistique export",deleg:"coo",ctrl:"Direction Export"},
+
+  {id:"a23",theme:"charg",nom:"Autorisation de chargement navire",deleg:"coo",ctrl:"Direction Opérations Portuaires"},
+  {id:"a24",theme:"charg",nom:"Validation d'un plan de chargement",deleg:"cpo",ctrl:"Direction Opérations Portuaires"},
+  {id:"a25",theme:"charg",nom:"Approbation d'un retard de chargement",deleg:"coo",ctrl:"Direction Opérations Portuaires"},
+  {id:"a26",theme:"charg",nom:"Autorisation de surestarie (demurrage)",deleg:"cfo",ctrl:"Direction Financière"},
+
+  {id:"a27",theme:"reclam",nom:"Traitement d'une réclamation client < 500 K MAD",deleg:"evp",ctrl:"Direction Qualité"},
+  {id:"a28",theme:"reclam",nom:"Traitement d'une réclamation client ≥ 500 K MAD",deleg:"coo",ctrl:"Comité de Direction"},
+  {id:"a29",theme:"reclam",nom:"Approbation d'un avoir commercial",deleg:"cfo",ctrl:"Direction Financière"},
+  {id:"a30",theme:"reclam",nom:"Gestion RH d'un litige lié à une réclamation",deleg:"chro",ctrl:"Direction RH"},
+];
+
+const DIRECTORY=[
+  {id:"u1",nom:"Hicham Berrada",email:"h.berrada@ocpnutricrops.com",entite:"Finance",role:"Contrôleur Financier"},
+  {id:"u2",nom:"Salma Tahiri",email:"s.tahiri@ocpnutricrops.com",entite:"Finance",role:"Analyste Trésorerie"},
+  {id:"u3",nom:"Omar Fassi",email:"o.fassi@ocpnutricrops.com",entite:"Commercial",role:"Responsable Grands Comptes"},
+  {id:"u4",nom:"Leila Chraibi",email:"l.chraibi@ocpnutricrops.com",entite:"Qualité",role:"Ingénieure Qualité"},
+  {id:"u5",nom:"Mehdi Alaoui",email:"m.alaoui@ocpnutricrops.com",entite:"Export",role:"Chargé Export"},
+  {id:"u6",nom:"Nawal Bensouda",email:"n.bensouda@ocpnutricrops.com",entite:"Conformité",role:"Analyste KYC"},
+  {id:"u7",nom:"Younes Amrani",email:"y.amrani@ocpnutricrops.com",entite:"Opérations Portuaires",role:"Coordinateur Chargement"},
+];
+
+// active/pending sub-delegations
+let SUBDELEGS=[
+  {id:"sd1",ref:"SD-OCPNUTRI-2026-0041",source:"cfo",actions:["a15","a16"],user:"u6",start:"2026-05-02",end:"2026-11-02",status:"active",valBy:"BPM Director",valDate:"2026-05-03",comment:"Backup KYC pendant montée en charge"},
+  {id:"sd2",ref:"SD-OCPNUTRI-2026-0038",source:"evp",actions:["a5","a8"],user:"u3",start:"2026-04-10",end:"2026-10-10",status:"active",valBy:"BPM Director",valDate:"2026-04-11",comment:"Délégation permanente Grands Comptes"},
+  {id:"sd3",ref:"SD-OCPNUTRI-2026-0045",source:"cpo",actions:["a11","a12"],user:"u4",start:"2026-06-01",end:"2026-09-01",status:"active",valBy:"BPM Director",valDate:"2026-06-02",comment:"Congé annuel CPO"},
+  {id:"sd4",ref:null,source:"evp",actions:["a19","a21"],user:"u5",start:"2026-06-16",end:"2026-12-16",status:"soumis",comment:"Renfort équipe export Q3"},
+  {id:"sd5",ref:null,source:"coo",actions:["a23"],user:"u7",start:"2026-06-14",end:"2026-08-14",status:"soumis",comment:"Absence COO — période estivale"},
+];
+
+let AUDIT=[
+  {d:"2026-06-12 09:14",who:"Admin — Fatima Zniber",act:"Import matrice OCPNUTRI-ID-3 (v4)","det":"30 actions chargées, 0 erreur"},
+  {d:"2026-06-02 11:05",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0045","det":"PDF généré et archivé"},
+  {d:"2026-04-11 14:22",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0038","det":"PDF généré et archivé"},
+  {d:"2026-05-03 08:47",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0041","det":"PDF généré et archivé"},
+];
+
+let ROLE="collab";
+let CURRENT_USER={collab:"Nadia Squalli", delegataire:"cfo", bpm:"Hassan Belkadi", admin:"Fatima Zniber"};
+
+const ROLES={
+  collab:{lab:"Opérationnel",tabs:["arbre"],banner:"Vous naviguez en <b>lecture seule</b> — consultez qui peut décider quoi, par thématique ou par délégataire."},
+  delegataire:{lab:"Délégataire",tabs:["mesdeleg","creer","actives","arbre"],banner:"Vous naviguez en tant que <b>délégataire (CFO)</b> — consultez vos délégations et créez des sous-délégations."},
+  bpm:{lab:"BPM Director",tabs:["workflow","actives","arbre"],banner:"Vous agissez en <b>BPM Director</b> — validez ou rejetez les sous-délégations soumises."},
+  admin:{lab:"Admin",tabs:["admin","pilotage","arbre"],banner:"Vous agissez en <b>Administrateur</b> — gérez la matrice, les utilisateurs et suivez la gouvernance."},
+};
+const TAB_META={
+  arbre:["Arborescence",'<path d="M3 3v18h18M9 9h9M9 15h6"/>'],
+  mesdeleg:["Mes délégations",'<path d="M20 6 9 17l-5-5"/>'],
+  creer:["Créer une sous-délégation",'<path d="M12 5v14M5 12h14"/>'],
+  workflow:["Workflow BPM",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
+  actives:["Sous-délégations actives",'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'],
+  admin:["Administration",'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 7.5 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 12.6a1.65 1.65 0 0 0-1.51-1H1a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 2.6 6.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 1.6V1a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 22.4 9H23a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'],
+  pilotage:["Pilotage",'<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'],
+};
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+function toast(msg,ic){const t=document.createElement("div");t.className="toast";t.innerHTML=`<span class="ti">${ic||"●"}</span><span>${msg}</span>`;$("#toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="all .35s";t.style.transform="translateY(12px)";setTimeout(()=>t.remove(),350);},3000);}
+function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();}
+function fmtDate(iso){const m=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];const d=new Date(iso);return d.getDate()+" "+m[d.getMonth()]+" "+d.getFullYear();}
+function userById(id){return DIRECTORY.find(u=>u.id===id);}
+function activeSubsFor(actionId){return SUBDELEGS.filter(s=>s.status==="active"&&s.actions.includes(actionId));}
+
+/* ================= ROLE / NAV ================= */
+function setRole(r){
+  ROLE=r; const R=ROLES[r];
+  $("#meRole").textContent=R.lab;
+  $("#meName").innerHTML=CURRENT_USER[r]+`<span>${R.lab}</span>`;
+  $("#meAv").textContent=initials(CURRENT_USER[r]);
+  $("#roleBanner").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>${R.banner}</span>`;
+  $("#tabs").innerHTML=R.tabs.map(t=>{
+    const badge=t==="workflow"?`<span class="n">${SUBDELEGS.filter(s=>s.status==="soumis").length}</span>`:"";
+    return `<button data-v="${t}" onclick="go('${t}')">${`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${TAB_META[t][1]}</svg>`}${TAB_META[t][0]}${badge}</button>`;
+  }).join("");
+  go(R.tabs[0]);
+}
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  const el=$("#v-"+v); if(el)el.classList.add("active");
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  if(v==="arbre")renderTree();
+  if(v==="mesdeleg")renderMyDeleg();
+  if(v==="creer")renderCreate();
+  if(v==="workflow")renderWorkflow();
+  if(v==="actives")renderActives();
+  if(v==="admin")renderAdmin();
+  if(v==="pilotage")renderPilotage();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ================= ARBORESCENCE ================= */
+let openThemes={};
+function renderTree(){
+  const fDeleg=$("#fDeleg"); if(fDeleg.options.length<=1){fDeleg.innerHTML=`<option value="">Tous les délégataires</option>`+DELEGATAIRES.map(d=>`<option value="${d.id}">${d.nom} — ${d.role}</option>`).join("");}
+  const q=($("#treeQ").value||"").toLowerCase();
+  const fd=fDeleg.value, fs=$("#fSub").value;
+  $("#treeList").innerHTML=THEMES.map(th=>{
+    let acts=ACTIONS.filter(a=>a.theme===th.k);
+    if(q)acts=acts.filter(a=>a.nom.toLowerCase().includes(q));
+    if(fd)acts=acts.filter(a=>a.deleg===fd);
+    if(fs==="yes")acts=acts.filter(a=>activeSubsFor(a.id).length>0);
+    if(fs==="no")acts=acts.filter(a=>activeSubsFor(a.id).length===0);
+    if(!acts.length)return "";
+    const isOpen=openThemes[th.k]||q;
+    return `<div class="theme-group ${isOpen?'open':''}">
+      <div class="theme-h" onclick="toggleTheme('${th.k}')">
+        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${th.ic}</svg></div>
+        <div class="tt">${th.nom}</div>
+        <div class="tc">${acts.length} action${acts.length>1?'s':''}</div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="theme-body"><div class="card" style="border-top:none;border-radius:0 0 12px 12px;margin-top:-1px">
+        ${acts.map(a=>{
+          const d=delegById(a.deleg); const subs=activeSubsFor(a.id);
+          return `<div class="act-row">
+            <div class="an">${a.nom}</div>
+            <div class="ad"><span class="lb">Délégataire</span><span class="vv">${d.nom} <span style="font-weight:400;color:var(--muted)">(${d.role.split(' ').map(w=>w[0]).join('')})</span></span></div>
+            <div class="ad"><span class="lb">Entité de contrôle</span><span class="vv" style="font-weight:500">${a.ctrl}</span></div>
+            <div>${subs.length?subs.map(s=>`<span class="subd-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><path d="M20 6 9 17l-5-5"/></svg>${userById(s.user).nom.split(' ')[0]} ${userById(s.user).nom.split(' ')[1][0]}.</span>`).join(" "):`<span style="color:var(--muted);font-size:12px">—</span>`}</div>
+          </div>`;
+        }).join("")}
+      </div></div>
+    </div>`;
+  }).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">Aucune action ne correspond à ce filtre.</div>`;
+}
+function toggleTheme(k){openThemes[k]=!openThemes[k];renderTree();}
+
+/* ================= MES DELEGATIONS ================= */
+function myDelegId(){return ROLE==="delegataire"?"cfo":null;}
+function renderMyDeleg(){
+  const did=myDelegId(); const d=delegById(did);
+  const mine=ACTIONS.filter(a=>a.deleg===did);
+  const byTheme={};
+  mine.forEach(a=>{(byTheme[a.theme]=byTheme[a.theme]||[]).push(a);});
+  const subCount=SUBDELEGS.filter(s=>s.source===did&&s.status==="active").length;
+  const pendCount=SUBDELEGS.filter(s=>s.source===did&&s.status==="soumis").length;
+  $("#myKpis").innerHTML=[
+    [mine.length,"Actions déléguées par le CEO"],
+    [subCount,"Sous-délégations actives"],
+    [pendCount,"En attente de validation BPM"],
+  ].map(k=>`<div class="card kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
+  $("#myDelegList").innerHTML=Object.entries(byTheme).map(([tk,acts])=>{
+    const th=themeById(tk);
+    return `<div class="card deleg-card">
+      <div class="dh"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${th.ic}</svg></div><div><div class="dt">${th.nom}</div><div class="dd">${acts.length} action(s) attribuée(s) par le CEO à ${d.nom}</div></div></div>
+      ${acts.map(a=>{const subs=activeSubsFor(a.id);return `<div class="action-item"><span class="an">${a.nom}<div style="font-size:11.5px;color:var(--muted)">Contrôle : ${a.ctrl}</div></span>${subs.length?`<span class="subd-tag">Sous-délégué à ${userById(subs[0].user).nom}</span>`:`<button class="btn ghost sm" onclick="go('creer');preselect('${a.id}')">+ Sous-déléguer</button>`}</div>`;}).join("")}
+    </div>`;
+  }).join("");
+}
+
+/* ================= CREER ================= */
+let selActions={}, selUser=null;
+function preselect(actId){selActions={};selActions[actId]=true;renderCreate();}
+function renderCreate(){
+  const did=myDelegId();
+  $("#f-source").innerHTML=`<option value="${did}">${delegById(did).nom} — toutes délégations CFO</option>`;
+  renderActPick(); renderDirPick(); updateRecap();
+}
+function renderActPick(){
+  const did=myDelegId();
+  const acts=ACTIONS.filter(a=>a.deleg===did);
+  $("#actPick").innerHTML=acts.map(a=>`<label class="act-opt"><input type="checkbox" ${selActions[a.id]?'checked':''} onchange="toggleAct('${a.id}',this.checked)"><span class="ao-t">${a.nom}<div class="ao-th">${themeById(a.theme).nom}</div></span></label>`).join("");
+}
+function toggleAct(id,v){selActions[id]=v;updateRecap();}
+function renderDirPick(){
+  const q=($("#dirQ").value||"").toLowerCase();
+  const list=DIRECTORY.filter(u=>!q||u.nom.toLowerCase().includes(q)||u.entite.toLowerCase().includes(q));
+  $("#dirPick").innerHTML=list.map(u=>`<div class="dir-item ${selUser===u.id?'on':''}" onclick="pickUser('${u.id}')"><div class="dav">${initials(u.nom)}</div><div><div class="dn">${u.nom}</div><div class="de">${u.role} · ${u.entite}</div></div></div>`).join("");
+}
+function pickUser(id){selUser=id;renderDirPick();updateRecap();}
+function updateRecap(){
+  const acts=Object.keys(selActions).filter(k=>selActions[k]);
+  const u=selUser?userById(selUser):null;
+  if(!acts.length||!u){$("#recapBox").innerHTML="Sélectionnez une délégation et des actions pour voir l'aperçu.";return;}
+  $("#recapBox").innerHTML=`
+    <div style="font-size:13px;color:var(--muted);margin-bottom:9px">${acts.length} action(s) seront sous-déléguées à :</div>
+    <div class="dir-item on" style="cursor:default;margin-bottom:12px"><div class="dav">${initials(u.nom)}</div><div><div class="dn">${u.nom}</div><div class="de">${u.role} · ${u.entite}</div></div></div>
+    ${acts.map(id=>{const a=ACTIONS.find(x=>x.id===id);return `<div style="font-size:13px;padding:6px 0;border-top:1px solid var(--line)">✓ ${a.nom}</div>`;}).join("")}
+    <div style="margin-top:10px;font-size:12px;color:var(--muted)">Période : ${fmtDate($("#f-start").value)} → ${fmtDate($("#f-end").value)}</div>`;
+}
+function submitSubDeleg(){
+  const acts=Object.keys(selActions).filter(k=>selActions[k]);
+  if(!acts.length){toast("Sélectionnez au moins une action");return;}
+  if(!selUser){toast("Sélectionnez un collaborateur");return;}
+  const id="sd"+Date.now();
+  SUBDELEGS.unshift({id,ref:null,source:myDelegId(),actions:acts,user:selUser,start:$("#f-start").value,end:$("#f-end").value,status:"soumis",comment:$("#f-com").value||"—"});
+  selActions={};selUser=null;
+  toast("Sous-délégation soumise au BPM Director","→");
+  go('mesdeleg');
+}
+
+/* ================= WORKFLOW BPM ================= */
+const WF_COLS=[["soumis","Soumis",""],["review","En revue","warn"],["valide","Validé",""],["active","Actif · PDF généré","ok"]];
+function renderWorkflow(){
+  $("#wfBoard").innerHTML=WF_COLS.map(([k,lab,cls])=>{
+    let items;
+    if(k==="soumis")items=SUBDELEGS.filter(s=>s.status==="soumis");
+    else if(k==="active")items=SUBDELEGS.filter(s=>s.status==="active");
+    else items=[];
+    return `<div class="wcol"><div class="wh"><span>${lab}</span><span class="pill ${cls||'info'}">${items.length}</span></div>${items.map(s=>{
+      const u=userById(s.user),src=delegById(s.source);
+      return `<div class="wcard" onclick="openSD('${s.id}')"><div class="wt">${src.nom.split(' ')[0]} → ${u.nom}</div><div class="wm2">${s.actions.length} action(s) · ${fmtDate(s.start)}</div></div>`;
+    }).join("")||'<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px">—</div>'}</div>`;
+  }).join("");
+}
+function openSD(id){
+  const s=SUBDELEGS.find(x=>x.id===id); const u=userById(s.user), src=delegById(s.source);
+  const actsHtml=s.actions.map(aid=>`<div style="font-size:13px;padding:6px 0;border-top:1px solid var(--line)">✓ ${ACTIONS.find(a=>a.id===aid).nom}</div>`).join("");
+  let actions="";
+  if(ROLE==="bpm"&&s.status==="soumis"){
+    actions=`<button class="btn bad" onclick="rejectSD('${id}')">⚠ Rejeter</button><button class="btn" onclick="approveSD('${id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Valider en un clic</button>`;
+  } else if(s.status==="active"){
+    actions=`<button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="downloadPdf('${id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 15V3m0 12l-4-4m4 4 4-4M2 17l.6 2.7A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.3L22 17"/></svg>Voir le PDF signé</button>`;
+  } else actions=`<button class="btn ghost" onclick="closeModal()">Fermer</button>`;
+  $("#modalHost").innerHTML=`<div class="modal"><div class="m-head"><div><h3>${src.nom.split(' ')[0]} → ${u.nom}</h3><p>${s.actions.length} action(s) · ${fmtDate(s.start)} → ${fmtDate(s.end)}</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="m-body">
+      <div class="card pad soft" style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--green-800);margin-bottom:4px">Justification</div><div style="font-size:13.5px">${s.comment}</div></div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px" class="caps">Actions concernées</div>${actsHtml}
+      ${s.ref?`<div style="margin-top:14px;padding:11px 14px;background:var(--green-50);border-radius:11px;font-size:12.5px"><b>Référence :</b> ${s.ref} · validé par ${s.valBy} le ${fmtDate(s.valDate)}</div>`:''}
+    </div>
+    <div class="m-foot">${actions}</div></div>`;
+  $("#scrim").classList.add("open");
+}
+function approveSD(id){
+  const s=SUBDELEGS.find(x=>x.id===id);
+  s.status="active"; s.ref="SD-OCPNUTRI-2026-"+String(Math.floor(60+Math.random()*40)).padStart(4,'0');
+  s.valBy="Hassan Belkadi"; s.valDate="2026-06-14";
+  AUDIT.unshift({d:"2026-06-14 10:32",who:"BPM Director — Hassan Belkadi",act:"Validation "+s.ref,det:"PDF généré et archivé automatiquement"});
+  closeModal(); renderWorkflow(); setBadges();
+  toast("Validé en un clic — activée immédiatement, PDF signé généré","●");
+}
+function rejectSD(id){
+  const s=SUBDELEGS.find(x=>x.id===id); s.status="rejete";
+  closeModal(); renderWorkflow(); setBadges();
+  toast("Sous-délégation rejetée — notifiée au délégataire","⚠");
+}
+function setBadges(){const b=document.querySelector('#tabs button[data-v="workflow"] .n');if(b)b.textContent=SUBDELEGS.filter(s=>s.status==="soumis").length;}
+
+/* ================= ACTIVES / PDF ================= */
+function renderActives(){
+  const act=SUBDELEGS.filter(s=>s.status==="active");
+  $("#activeCount").textContent=act.length+" actives";
+  $("#activeList").innerHTML=act.map(s=>{
+    const u=userById(s.user),src=delegById(s.source);
+    return `<div class="sd-row">
+      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+      <div class="sm"><div class="st">${src.nom} → ${u.nom}</div><div class="sd">${s.actions.length} action(s) · valable du ${fmtDate(s.start)} au ${fmtDate(s.end)}</div></div>
+      <div class="sref">${s.ref}</div>
+      <span class="pill ok">Actif</span>
+      <button class="btn ghost sm" onclick="downloadPdf('${s.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 15V3m0 12l-4-4m4 4 4-4M2 17l.6 2.7A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.3L22 17"/></svg>PDF</button>
+    </div>`;
+  }).join("")||`<div style="padding:24px;text-align:center;color:var(--muted)">Aucune sous-délégation active.</div>`;
+}
+function downloadPdf(id){
+  const s=SUBDELEGS.find(x=>x.id===id); const u=userById(s.user),src=delegById(s.source);
+  const actsHtml=s.actions.map(aid=>`<div class="prow"><span>${ACTIONS.find(a=>a.id===aid).nom}</span><b>✓</b></div>`).join("");
+  $("#modalHost").innerHTML=`<div class="modal wide"><div class="m-head"><div><h3>Document de sous-délégation</h3><p>${s.ref}</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="m-body">
+      <div class="pdf-doc">
+        <div class="ph"><h4>Sous-délégation de pouvoirs</h4><div class="ref">Réf. ${s.ref}<br>Matrice OCPNUTRI-ID-3</div></div>
+        <div class="prow"><span>Délégataire</span><b>${src.nom} — ${src.role}</b></div>
+        <div class="prow"><span>Sous-délégataire</span><b>${u.nom} — ${u.role} (${u.entite})</b></div>
+        <div class="prow"><span>Période de validité</span><b>${fmtDate(s.start)} → ${fmtDate(s.end)}</b></div>
+        <div class="prow"><span>Validé par (BPM Director)</span><b>${s.valBy}</b></div>
+        <div class="prow"><span>Date de validation</span><b>${fmtDate(s.valDate)}</b></div>
+        <div style="margin:16px 0 8px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)">Actions déléguées</div>
+        ${actsHtml}
+        <div class="seal"><div style="font-size:11px;color:var(--muted)">Document généré automatiquement · OCP Nutricrops<br>Archivé — conforme registre de gouvernance</div><div class="sig"><div class="sn">✓ Signé électroniquement</div><div style="font-size:11px;color:var(--muted)">${s.valBy}</div></div></div>
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="toast('PDF téléchargé et archivé')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 15V3m0 12l-4-4m4 4 4-4M2 17l.6 2.7A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.3L22 17"/></svg>Télécharger le PDF</button></div></div>`;
+  $("#scrim").classList.add("open");
+}
+
+/* ================= ADMIN ================= */
+function renderAdmin(){
+  $("#auditTbl").innerHTML=`<tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Détail</th></tr>`+AUDIT.map(a=>`<tr><td style="white-space:nowrap;color:var(--muted)">${a.d}</td><td style="font-weight:600">${a.who}</td><td>${a.act}</td><td style="color:var(--muted)">${a.det}</td></tr>`).join("");
+  $("#userList").innerHTML=DIRECTORY.slice(0,6).map(u=>`<div class="userow"><div class="uav">${initials(u.nom)}</div><div style="flex:1"><div style="font-weight:600">${u.nom}</div><div style="font-size:11.5px;color:var(--muted)">${u.role} · ${u.entite}</div></div><span class="pill ok">Sync ✓</span></div>`).join("");
+  const missing=ACTIONS.filter(a=>!a.ctrl).length;
+  $("#integrityBox").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Actions sans entité de contrôle</span><b style="color:${missing?'var(--warn)':'var(--green-800)'}">${missing}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Délégataires actifs</span><b>${DELEGATAIRES.length}/5</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Dernière synchro Entra ID</span><b>il y a 12 min</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0;border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><span>Statut global</span><span class="pill ok">● Conforme</span></div>`;
+}
+
+/* ================= PILOTAGE ================= */
+function renderPilotage(){
+  const total=SUBDELEGS.length,active=SUBDELEGS.filter(s=>s.status==="active").length,soumis=SUBDELEGS.filter(s=>s.status==="soumis").length;
+  const k=[
+    ["100%","Sous-délégations créées en autonomie","cible 100% — atteinte"],
+    ["<1 j","Délai moyen de traitement","vs plusieurs jours par email"],
+    ["30/30","Actions cartographiées","matrice OCPNUTRI-ID-3 à jour"],
+    [active+"/"+total,"Sous-délégations actives / totales",soumis+" en attente BPM"],
+  ];
+  $("#govKpis").innerHTML=k.map(x=>`<div class="card kpi"><div class="v">${x[0]}</div><div class="l">${x[1]}</div><div class="tgt"><span class="pill ok">${x[2]}</span></div></div>`).join("");
+  const byTheme=THEMES.map(t=>({t,n:ACTIONS.filter(a=>a.theme===t.k).length}));
+  const max=Math.max(...byTheme.map(x=>x.n));
+  $("#themeBars").innerHTML=byTheme.map(x=>`<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px"><span style="width:190px;flex:0 0 190px;font-size:13px;font-weight:600">${x.t.nom}</span><span style="flex:1;height:10px;background:var(--green-50);border-radius:6px;overflow:hidden"><i style="display:block;height:100%;width:${x.n/max*100}%;background:var(--green-600);border-radius:6px"></i></span><span style="width:24px;font-weight:700;font-size:13px;text-align:right">${x.n}</span></div>`).join("");
+  const alerts=[["3 sous-délégations arrivent à échéance sous 30 jours","warn"],["Aucune action orpheline détectée dans la matrice","ok"],["1 délégataire (COO) concentre 8 actions à enjeu élevé","info"]];
+  $("#govAlerts").innerHTML=alerts.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px"><span class="pill ${a[1]}" style="min-width:22px;text-align:center">${a[1]==='ok'?'●':a[1]==='warn'?'⚠':'→'}</span><span>${a[0]}</span></div>`).join("");
+}
+
+/* ================= MODAL ================= */
+function closeModal(){$("#scrim").classList.remove("open");$("#modalHost").innerHTML="";}
+$("#scrim").addEventListener("click",e=>{if(e.target===$("#scrim"))closeModal();});
+
+/* ================= INIT ================= */
+setRole("collab");
+</script>
+</body>
+</html>
