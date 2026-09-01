@@ -3,127 +3,148 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#1B5E20" />
+<meta name="theme-color" content="#1F5A4C" />
 <title>DelegNutri — Délégations de pouvoirs · OCP Nutricrops</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
+  /* Design language: heavily inspired by Aptly (aptlydone.com) — sage/teal minimal enterprise-governance UI.
+     Same CSS variable/class names as before are kept so every JS template string keeps working;
+     only the values + a few components are redesigned. */
   :root{
-    --green-900:#103d17; --green-800:#1B5E20; --green-700:#2E7D32; --green-600:#388E3C; --green-500:#4CAF50; --green-300:#66BB6A; --green-100:#D6EADB; --green-50:#EAF4EC;
-    --ink:#10231a; --muted:#5c6b62; --line:#e3ebe5; --dark:#07140c;
-    --warn:#B45309; --warn-bg:#FEF3C7; --bad:#B91C1C; --bad-bg:#FEE2E2; --amber:#D97706; --amber-bg:#FFFBEB;
+    --green-900:#153A32; --green-800:#1F5A4C; --green-700:#2B6F5E; --green-600:#39876F; --green-500:#4B9F84; --green-300:#84BCA9; --green-100:#DCEBE4; --green-50:#F1F7F4;
+    --ink:#16211C; --muted:#71827A; --line:#E5EAE7; --dark:#0D1712;
+    --warn:#9C6B12; --warn-bg:#FBF1DE; --bad:#B2453A; --bad-bg:#FBECEA; --amber:#9C6B12; --amber-bg:#FBF1DE;
     --card:#ffffff;
-    --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
     --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --sh:0 1px 2px rgba(16,35,26,.05),0 6px 20px rgba(16,35,26,.06);
-    --sh-2:0 10px 34px rgba(16,35,26,.10); --sh-lg:0 24px 60px rgba(16,35,26,.22);
+    --serif:var(--sans);
+    --sh:0 1px 2px rgba(20,40,32,.04),0 1px 1px rgba(20,40,32,.03);
+    --sh-2:0 10px 28px rgba(20,40,32,.08); --sh-lg:0 26px 60px rgba(13,23,18,.20);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:var(--sans);color:var(--ink);background:#f4f8f5;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body{font-family:var(--sans);color:var(--ink);background:#FAFBF9;line-height:1.55;-webkit-font-smoothing:antialiased}
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-  input,select,textarea{font-family:inherit;font-size:15px;color:var(--ink)}
+  input,select,textarea{font-family:inherit;font-size:14.5px;color:var(--ink)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
   .serif{font-family:var(--serif)}
-  .caps{text-transform:uppercase;letter-spacing:.09em}
+  .caps{text-transform:uppercase;letter-spacing:.08em}
   .hidden{display:none!important}
 
-  /* ===== HEADER ===== */
-  header{background:linear-gradient(120deg,var(--green-900),var(--green-700));color:#fff;padding-top:env(safe-area-inset-top)}
-  .hd{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:15px 22px}
-  .wm{display:flex;align-items:center;gap:12px;cursor:pointer}
-  .wm .logo{width:42px;height:42px;flex:0 0 42px}
-  .wm h1{font-family:var(--serif);font-size:23px;font-weight:700;line-height:1;letter-spacing:.2px}
-  .wm .tl{font-size:10.5px;color:#c7e0cc;font-weight:500;margin-top:2px}
+  /* ===== HEADER — flat single row, Aptly style ===== */
+  header{background:#fff;border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+  .hd{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:22px;padding:14px 22px}
+  .wm{display:flex;align-items:center;gap:10px;cursor:pointer}
+  .wm .logo{width:26px;height:26px;flex:0 0 26px;color:var(--green-800)}
+  .wm h1{font-size:15.5px;font-weight:700;line-height:1;letter-spacing:-.1px;color:var(--ink)}
+  .wm .tl{display:none}
+
+  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{display:flex;align-items:center;gap:7px;padding:8px 12px;color:var(--muted);font-size:13.5px;font-weight:600;white-space:nowrap;border-bottom:2px solid transparent;transition:.15s}
+  .tabs button svg{width:15px;height:15px;opacity:.85}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button.active{color:var(--green-800);border-bottom-color:var(--green-800)}
+  .tabs button .n{background:var(--green-800);color:#fff;font-size:10.5px;font-weight:800;border-radius:20px;padding:0 6px;min-width:17px;text-align:center;line-height:16px}
+
   .hd-r{margin-left:auto;display:flex;align-items:center;gap:12px}
-  .role-pick{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:11px;padding:6px 10px}
-  .role-pick svg{width:16px;height:16px;color:#c7e0cc}
-  .role-pick select{background:transparent;border:none;color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;outline:none}
-  .role-pick select option{color:#10231a}
+  .role-pick{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 9px}
+  .role-pick svg{width:14px;height:14px;color:var(--muted)}
+  .role-pick select{background:transparent;border:none;color:var(--ink);font-weight:600;font-size:12.5px;cursor:pointer;outline:none}
+  .role-pick select option{color:var(--ink)}
   .me{display:flex;align-items:center;gap:9px}
-  .me .av{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
-  .me .mn{font-size:13px;font-weight:600;line-height:1.15}.me .mn span{display:block;font-weight:400;color:#c7e0cc;font-size:11.5px}
+  .me .av{width:30px;height:30px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+  .me .mn{font-size:12.5px;font-weight:600;line-height:1.15}.me .mn span{display:block;font-weight:400;color:var(--muted);font-size:11px}
+  @media(max-width:900px){.tabs{display:none}}
   @media(max-width:640px){.me .mn{display:none}}
 
-  .tabs-wrap{background:linear-gradient(120deg,var(--green-900),var(--green-700));border-top:1px solid rgba(255,255,255,.1)}
-  .tabs{max-width:1180px;margin:0 auto;display:flex;gap:4px;padding:0 18px;overflow-x:auto;scrollbar-width:none}
-  .tabs::-webkit-scrollbar{display:none}
-  .tabs button{display:flex;align-items:center;gap:8px;padding:13px 15px;color:#bcd7c1;font-size:14px;font-weight:600;white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
-  .tabs button svg{width:17px;height:17px}
-  .tabs button:hover{color:#fff}
-  .tabs button.active{color:#fff;border-bottom-color:var(--green-300)}
-  .tabs button .n{background:var(--green-300);color:var(--green-900);font-size:11px;font-weight:800;border-radius:20px;padding:0 7px;min-width:19px;text-align:center}
-
-  .wrap{max-width:1180px;margin:0 auto;padding:24px 22px 40px}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 22px 44px}
   .view{display:none;animation:fade .3s ease}.view.active{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-  .role-banner{display:flex;align-items:center;gap:10px;background:var(--green-50);border:1px solid var(--green-100);border-radius:12px;padding:11px 15px;margin-bottom:18px;font-size:13.5px;color:var(--green-800)}
-  .role-banner svg{width:18px;height:18px;flex:0 0 18px}
+  .role-banner{display:flex;align-items:center;gap:10px;background:var(--green-50);border:1px solid var(--green-100);border-left:3px solid var(--green-700);border-radius:8px;padding:10px 14px;margin-bottom:18px;font-size:12.5px;color:var(--green-800)}
+  .role-banner svg{width:16px;height:16px;flex:0 0 16px}
   .role-banner b{font-weight:700}
 
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 17px;border-radius:11px;font-size:14.5px;font-weight:600;background:var(--green-800);color:#fff;transition:.14s;min-height:44px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:600;background:var(--green-800);color:#fff;transition:.14s;min-height:40px}
   .btn:hover{background:var(--green-900)}.btn:active{transform:scale(.98)}
-  .btn svg{width:17px;height:17px}
+  .btn svg{width:16px;height:16px}
   .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
-  .btn.ghost:hover{background:var(--green-50);border-color:var(--green-100)}
-  .btn.amber{background:var(--amber)}.btn.amber:hover{background:#B45309}
-  .btn.bad{background:#fff;color:var(--bad);border:1px solid #f3c6c6}.btn.bad:hover{background:var(--bad-bg)}
-  .btn.sm{padding:8px 13px;font-size:13px;min-height:38px;border-radius:9px}
+  .btn.ghost:hover{background:var(--green-50);border-color:var(--green-300)}
+  .btn.amber{background:var(--amber)}.btn.amber:hover{background:#7C5610}
+  .btn.bad{background:#fff;color:var(--bad);border:1px solid #edc9c5}.btn.bad:hover{background:var(--bad-bg)}
+  .btn.sm{padding:7px 12px;font-size:12.5px;min-height:34px;border-radius:8px}
   .btn.block{width:100%}
   .btn:disabled{opacity:.5;cursor:not-allowed}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh)}
   .card.pad{padding:20px}
   .soft{background:var(--green-50)}
-  .sec-h{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-  .sec-h h2{font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:.2px}
-  .sec-h h3{font-size:16px;font-weight:700}
-  .sec-h .hint{font-size:13px;color:var(--muted)}
-  .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--green-700)}
+  .sec-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .sec-h h2{font-size:22px;font-weight:700;letter-spacing:-.3px;color:var(--ink)}
+  .sec-h h3{font-size:14.5px;font-weight:700}
+  .sec-h .hint{font-size:12.5px;color:var(--muted)}
+  .sub-muted{font-size:13px;color:var(--muted);margin-top:4px}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green-700)}
 
-  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
-  .pill.ok{background:var(--green-100);color:var(--green-800)}
-  .pill.warn{background:var(--warn-bg);color:var(--warn)}
-  .pill.bad{background:var(--bad-bg);color:var(--bad)}
-  .pill.info{background:var(--amber-bg);color:var(--amber)}
+  /* status pill — dot + tinted text, Aptly STATUS-column look */
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.02em;padding:3px 10px 3px 8px;border-radius:20px;white-space:nowrap;background:transparent}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;flex:0 0 6px}
+  .pill.ok{color:var(--green-800)}.pill.ok::before{background:var(--green-600)}
+  .pill.warn{color:var(--warn)}.pill.warn::before{background:var(--warn)}
+  .pill.bad{color:var(--bad)}.pill.bad::before{background:var(--bad)}
+  .pill.info{color:var(--amber)}.pill.info::before{background:var(--amber)}
+  .pill.muted{color:var(--muted)}.pill.muted::before{background:var(--muted-2,#A9B6AF)}
+
+  /* authority pill — outlined, Aptly's Approval/Signatory tag */
+  .auth-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid var(--green-300);color:var(--green-800);background:#fff;white-space:nowrap}
+  .auth-pill svg{width:12px;height:12px}
+  .auth-pill.muted{border-color:var(--line);color:var(--muted)}
 
   .grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
   @media(max-width:900px){.grid2{grid-template-columns:1fr}}
 
   /* KPIs */
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   @media(max-width:820px){.kpis{grid-template-columns:1fr 1fr}}
-  .kpi{padding:18px}
-  .kpi .v{font-family:var(--serif);font-size:32px;font-weight:700;letter-spacing:-.5px;line-height:1;color:var(--green-800)}
-  .kpi .l{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+  .kpi{padding:16px 18px}
+  .kpi .v{font-size:27px;font-weight:700;letter-spacing:-.6px;line-height:1;color:var(--ink)}
+  .kpi .l{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:8px}
   .kpi .tgt{font-size:12px;margin-top:8px}
 
-  /* ===== ARBORESCENCE ===== */
+  /* ===== ARBORESCENCE — flat table, Aptly "Contract authority" look ===== */
   .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-  .filters select,.filters .search{padding:9px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:500;font-size:13.5px}
+  .filters select,.filters .search{padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;font-weight:500;font-size:13px}
   .filters .search{position:relative;flex:1;min-width:200px}
   .filters .search input{border:none;outline:none;width:100%;padding-left:24px}
-  .filters .search svg{position:absolute;left:0;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
-  .theme-group{margin-bottom:14px}
-  .theme-h{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-radius:12px;background:#fff;border:1px solid var(--line);transition:.14s}
-  .theme-h:hover{border-color:var(--green-300)}
-  .theme-h .ti{width:38px;height:38px;border-radius:10px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 38px}
-  .theme-h .ti svg{width:19px;height:19px}
-  .theme-h .tt{font-weight:700;font-size:14.5px;flex:1}
-  .theme-h .tc{font-size:12px;color:var(--muted)}
-  .theme-h .chev{width:18px;height:18px;color:var(--muted);transition:transform .2s}
+  .filters .search svg{position:absolute;left:0;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted)}
+  .activity-strip{display:flex;gap:10px;overflow-x:auto;margin-bottom:18px;scrollbar-width:none}
+  .activity-strip::-webkit-scrollbar{display:none}
+  .activity-strip .ac{flex:0 0 auto;min-width:260px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start;box-shadow:var(--sh)}
+  .activity-strip .ac .ai{width:24px;height:24px;border-radius:7px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 24px}
+  .activity-strip .ac .ai svg{width:13px;height:13px}
+  .activity-strip .ac .at{font-size:12.5px;font-weight:600;line-height:1.4}
+  .activity-strip .ac .atm{font-size:11px;color:var(--muted);margin-top:2px}
+
+  .theme-group{margin-bottom:2px}
+  .theme-h{display:flex;align-items:center;gap:10px;padding:10px 4px 8px;cursor:pointer}
+  .theme-h .tt{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);flex:1}
+  .theme-h .tc{font-size:11.5px;color:var(--muted-2,#A9B6AF)}
+  .theme-h .chev{width:14px;height:14px;color:var(--muted);transition:transform .2s}
   .theme-group.open .chev{transform:rotate(90deg)}
   .theme-body{max-height:0;overflow:hidden;transition:max-height .28s ease}
-  .theme-group.open .theme-body{max-height:2400px}
-  .act-row{display:flex;gap:14px;align-items:center;padding:13px 16px 13px 66px;border-bottom:1px solid var(--line);font-size:13.5px}
+  .theme-group.open .theme-body{max-height:2600px}
+  .theme-group .card{border-radius:12px;overflow:hidden;margin-bottom:14px}
+
+  .act-row{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);font-size:13.5px;cursor:pointer;transition:background .12s}
   .act-row:last-child{border-bottom:none}
-  .act-row .an{flex:1;min-width:180px;font-weight:600}
-  .act-row .ad{display:flex;flex-direction:column;gap:2px;min-width:150px}
-  .act-row .ad .lb{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-  .act-row .ad .vv{font-weight:600}
-  .subd-tag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--green-700);background:var(--green-50);padding:2px 9px;border-radius:20px}
-  @media(max-width:760px){.act-row{flex-wrap:wrap;padding-left:20px}}
+  .act-row:hover{background:var(--green-50)}
+  .act-row .ref{font-size:11px;font-weight:700;color:var(--green-700);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+  .act-row .an{font-weight:600;color:var(--ink);margin-top:2px;line-height:1.4}
+  .act-row .auths{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;min-width:0}
+  @media(max-width:900px){.act-row{grid-template-columns:1fr;gap:8px}.act-row .auths{justify-content:flex-start}}
+
+  .subd-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green-700);background:var(--green-50);padding:2px 9px;border-radius:20px}
 
   /* ===== MES DELEGATIONS ===== */
   .deleg-card{padding:18px;margin-bottom:14px}
@@ -233,13 +254,13 @@
 <header>
   <div class="hd">
     <div class="wm" onclick="go('arbre')">
-      <svg class="logo" viewBox="0 0 48 48" fill="none">
-        <rect width="48" height="48" rx="13" fill="#EAF4EC"/>
-        <path d="M24 8c-8 5-12 11-12 17a12 12 0 0 0 24 0c0-6-4-12-12-17z" fill="#66BB6A"/>
-        <path d="M24 13v22M24 21c-3-1.2-5-3-6-5.5M24 26c3-1.2 5-3 6-5.5" stroke="#103d17" stroke-width="2" stroke-linecap="round"/>
+      <svg class="logo" viewBox="0 0 32 32" fill="none">
+        <path d="M16 2l12 7v14l-12 7-12-7V9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M16 2v14M16 16 4 9M16 16l12-7M16 16v14M16 16 4 23M16 16l12 7" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
       </svg>
-      <div><h1>DelegNutri</h1><div class="tl">Délégations de pouvoirs · OCPNUTRI-ID-3</div></div>
+      <h1>DelegNutri</h1>
     </div>
+    <nav class="tabs" id="tabs"></nav>
     <div class="hd-r">
       <div class="role-pick">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/></svg>
@@ -253,7 +274,6 @@
       <div class="me"><div class="mn" id="meName">Nadia Squalli<span id="meRole">Opérationnel</span></div><div class="av" id="meAv">NS</div></div>
     </div>
   </div>
-  <div class="tabs-wrap"><nav class="tabs" id="tabs"></nav></div>
 </header>
 
 <main class="wrap">
@@ -261,17 +281,20 @@
 
   <!-- ARBORESCENCE -->
   <section class="view active" id="v-arbre">
-    <div class="sec-h"><div><span class="eyebrow">Matrice OCPNUTRI-ID-3</span><h2>Délégations — cycle commercial & achat MP</h2></div><span class="pill ok">28 actions · 8 thématiques</span></div>
-    <div class="role-banner" style="margin-bottom:16px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-      <span>Note de délégation signée par <b>Faris Derrij</b>, CEO OCP Nutricrops, effective depuis le <b>30 mars 2026</b> — Casablanca, le 17 avril 2026. Objet : délégations rentrant dans le cycle d'exécution des ventes et d'achat de matières premières.</span>
+    <div class="sec-h">
+      <div><h2>Autorité de délégation</h2><div class="sub-muted">OCP Nutricrops · Cycle commercial & achat MP · 28 actions · 8 thématiques</div></div>
     </div>
+    <div class="activity-strip" id="activityStrip"></div>
     <div class="filters">
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="treeQ" placeholder="Rechercher une action…" oninput="renderTree()"/></div>
       <select id="fDeleg" onchange="renderTree()"><option value="">Tous les délégataires</option></select>
       <select id="fSub" onchange="renderTree()"><option value="">Sous-délégation : tous</option><option value="yes">Avec sous-délégation active</option><option value="no">Sans sous-délégation</option></select>
     </div>
     <div id="treeList"></div>
+    <div class="role-banner" style="margin-top:18px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      <span>Note de délégation signée par <b>Faris Derrij</b>, CEO OCP Nutricrops, effective depuis le <b>30 mars 2026</b> — Casablanca, le 17 avril 2026. Objet : délégations rentrant dans le cycle d'exécution des ventes et d'achat de matières premières.</span>
+    </div>
   </section>
 
   <!-- MES DELEGATIONS -->
@@ -357,7 +380,7 @@
 
   <!-- PILOTAGE -->
   <section class="view" id="v-pilotage">
-    <div class="sec-h"><div><span class="eyebrow">Direction Générale</span><h2>Pilotage de la gouvernance</h2></div><span class="pill ok">● Temps réel</span></div>
+    <div class="sec-h"><div><span class="eyebrow">Direction Générale</span><h2>Pilotage de la gouvernance</h2></div><span class="pill ok">Temps réel</span></div>
     <div class="kpis" id="govKpis"></div>
     <div class="grid2" style="margin-top:18px">
       <div class="card pad">
@@ -528,8 +551,21 @@ function go(v){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-/* ================= ARBORESCENCE ================= */
+/* ================= ARBORESCENCE — table à deux pastilles d'autorité (façon Aptly) ================= */
 let openThemes={};
+const ICO_DELEG='<path d="M20 6 9 17l-5-5"/>';
+const ICO_CTRL='<circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/>';
+const ICO_NONE='<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>';
+
+function doaRef(id){const idx=ACTIONS.findIndex(a=>a.id===id)+1;return "DOA-"+String(idx).padStart(2,"0");}
+function actionStatus(a){
+  if(a.deleg==="none")return {label:"NON DÉLÉGABLE",cls:"muted"};
+  const active=activeSubsFor(a.id);
+  if(active.length)return {label:"SOUS-DÉLÉGUÉE",cls:"ok"};
+  const pending=SUBDELEGS.filter(s=>s.actions.includes(a.id)&&s.status==="soumis");
+  if(pending.length)return {label:"EN ATTENTE BPM",cls:"warn"};
+  return {label:"DÉLÉGUÉE",cls:"ok"};
+}
 function renderTree(){
   const fDeleg=$("#fDeleg"); if(fDeleg.options.length<=1){fDeleg.innerHTML=`<option value="">Tous les délégataires</option>`+DELEGATAIRES.map(d=>`<option value="${d.id}">${d.nom} — ${d.role}</option>`).join("");}
   const q=($("#treeQ").value||"").toLowerCase();
@@ -541,29 +577,125 @@ function renderTree(){
     if(fs==="yes")acts=acts.filter(a=>activeSubsFor(a.id).length>0);
     if(fs==="no")acts=acts.filter(a=>activeSubsFor(a.id).length===0);
     if(!acts.length)return "";
-    const isOpen=openThemes[th.k]||q;
+    const isOpen=openThemes[th.k]!==false;
     return `<div class="theme-group ${isOpen?'open':''}">
       <div class="theme-h" onclick="toggleTheme('${th.k}')">
-        <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${th.ic}</svg></div>
         <div class="tt">${th.nom}</div>
         <div class="tc">${acts.length} action${acts.length>1?'s':''}</div>
         <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
       </div>
-      <div class="theme-body"><div class="card" style="border-top:none;border-radius:0 0 12px 12px;margin-top:-1px">
+      <div class="theme-body"><div class="card">
         ${acts.map(a=>{
-          const d=delegById(a.deleg); const subs=activeSubsFor(a.id); const nonDeleg=a.deleg==="none";
-          return `<div class="act-row">
-            <div class="an">${a.nom}${a.sub?`<div style="font-size:11px;color:var(--muted);font-weight:400;margin-top:3px">Sous-délégataire prévu (matrice) : ${a.sub}</div>`:''}${a.note?`<div style="font-size:11px;color:var(--muted);font-weight:400;margin-top:2px">${a.note}</div>`:''}</div>
-            <div class="ad"><span class="lb">Délégataire</span><span class="vv" style="${nonDeleg?'color:var(--muted);font-weight:600':''}">${nonDeleg?'Non déléguée — reste au CEO':d.nom+' <span style=\"font-weight:400;color:var(--muted)\">('+d.role.split(' ').map(w=>w[0]).join('')+')</span>'}</span></div>
-            <div class="ad"><span class="lb">Entité de contrôle</span><span class="vv" style="font-weight:500">${ctrlText(a)}</span></div>
-            <div>${subs.length?subs.map(s=>`<span class="subd-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><path d="M20 6 9 17l-5-5"/></svg>${userById(s.user).nom.split(' ')[0]} ${userById(s.user).nom.split(' ')[1][0]}.</span>`).join(" "):nonDeleg?`<span class="pill bad" style="font-size:10.5px">Non délégable</span>`:`<span style="color:var(--muted);font-size:12px">—</span>`}</div>
+          const d=delegById(a.deleg); const nonDeleg=a.deleg==="none"; const st=actionStatus(a);
+          const authDeleg=nonDeleg
+            ? `<span class="auth-pill muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_NONE}</svg>Non délégable</span>`
+            : `<span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">${ICO_DELEG}</svg>${d.nom.split(' ')[0]} — ${d.role.split(' ').map(w=>w[0]).join('')}</span>`;
+          const authCtrl=a.ctrl&&a.ctrl.length
+            ? `<span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_CTRL}</svg>Contrôle</span>`
+            : '';
+          return `<div class="act-row" onclick="openActionDetail('${a.id}')">
+            <div><span class="ref">${doaRef(a.id)}</span><div class="an">${a.nom}</div></div>
+            <div class="auths">${authDeleg}${authCtrl}</div>
+            <span class="pill ${st.cls}">${st.label}</span>
           </div>`;
         }).join("")}
       </div></div>
     </div>`;
   }).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">Aucune action ne correspond à ce filtre.</div>`;
+  renderActivityStrip();
 }
-function toggleTheme(k){openThemes[k]=!openThemes[k];renderTree();}
+function toggleTheme(k){openThemes[k]=openThemes[k]===false?true:false;renderTree();}
+
+/* ================= DÉTAIL D'UNE ACTION (carte flottante façon Aptly) ================= */
+function openActionDetail(id){
+  const a=ACTIONS.find(x=>x.id===id); const d=delegById(a.deleg); const th=themeById(a.theme);
+  const nonDeleg=a.deleg==="none"; const st=actionStatus(a);
+  const related=SUBDELEGS.filter(s=>s.actions.includes(a.id)).sort((x,y)=>new Date(x.start)-new Date(y.start));
+  const active=related.find(s=>s.status==="active"); const pending=related.find(s=>s.status==="soumis");
+
+  // stat box — who effectively holds authority right now
+  let statBox;
+  if(active){
+    statBox=`<div class="v" style="font-size:22px;font-weight:700">${userById(active.user).nom}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Sous-délégataire actif · ${fmtDate(active.start)} → ${fmtDate(active.end)}</div>`;
+  } else if(pending){
+    statBox=`<div class="v" style="font-size:22px;font-weight:700">${userById(pending.user).nom}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">Sous-délégation soumise · en attente de validation BPM</div>`;
+  } else if(nonDeleg){
+    statBox=`<div class="v" style="font-size:22px;font-weight:700">${CEO.nom}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">${CEO.role} · action non délégable</div>`;
+  } else {
+    statBox=`<div class="v" style="font-size:22px;font-weight:700">${d.nom}</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px">${d.role} · délégataire titulaire</div>`;
+  }
+
+  const condLine = a.sub ? "Sous-délégataire prévu par la matrice : "+a.sub
+    : a.note ? a.note
+    : nonDeleg ? "Cette action reste réservée au CEO — aucune sous-délégation possible."
+    : "Aucune condition particulière associée dans la matrice.";
+
+  // audit trail
+  let trail;
+  if(related.length){
+    const nodes=[];
+    related.forEach(s=>{
+      nodes.push({lab:"Soumis",who:delegById(s.source).nom,d:s.start,done:true});
+      if(s.status==="active")nodes.push({lab:"Validé & activé",who:s.valBy,d:s.valDate,done:true,cur:true});
+      else nodes.push({lab:"En attente de validation BPM",who:"BPM Director",d:null,done:false,cur:true});
+    });
+    trail=nodes.map(n=>`<div class="audit"><div class="ad" style="background:${n.done?'var(--green-600)':'#fff'};border:${n.done?'none':'1.5px solid var(--line)'}"></div><div><div class="at">${n.lab} <span style="font-weight:400;color:var(--muted)">— ${n.who}</span></div><div class="atm">${n.d?fmtDate(n.d):'en cours'}</div></div></div>`).join("");
+  } else {
+    trail=`<div class="audit"><div class="ad"></div><div><div class="at">Défini dans la note CEO — OCPNUTRI-ID-3</div><div class="atm">30 mars 2026</div></div></div>`;
+  }
+
+  let footActions="";
+  if(ROLE==="bpm"&&pending){
+    footActions=`<button class="btn bad" onclick="rejectSD('${pending.id}')">⚠ Rejeter</button><button class="btn" onclick="approveSD('${pending.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Valider en un clic</button>`;
+  } else if(active){
+    footActions=`<button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="downloadPdf('${active.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 15V3m0 12l-4-4m4 4 4-4M2 17l.6 2.7A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.3L22 17"/></svg>Voir le PDF signé</button>`;
+  } else if(ROLE==="delegataire"&&a.deleg===myDelegId()&&!nonDeleg){
+    footActions=`<button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="closeModal();go('creer');preselect('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 5v14M5 12h14"/></svg>Créer une sous-délégation</button>`;
+  } else {
+    footActions=`<button class="btn ghost" onclick="closeModal()">Fermer</button>`;
+  }
+
+  $("#modalHost").innerHTML=`<div class="modal wide">
+    <div class="m-head">
+      <div><h3>${doaRef(a.id)} <span style="font-weight:500;color:var(--muted);font-size:15px"> · ${th.nom}</span></h3><p>${a.nom}</p></div>
+      <span class="pill ${st.cls}" style="margin-top:2px">${st.label}</span>
+      <button class="m-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-body">
+      <div class="card pad soft" style="margin-bottom:16px">${statBox}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div class="card pad">
+          <div class="eyebrow" style="margin-bottom:9px">Délégataire</div>
+          ${nonDeleg?`<span class="auth-pill muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_NONE}</svg>Non délégable</span>`:`<span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">${ICO_DELEG}</svg>Délégataire</span>`}
+          <div style="font-weight:700;font-size:15px;margin-top:11px">${nonDeleg?CEO.nom:d.nom}</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:2px">${nonDeleg?CEO.role:d.role}</div>
+        </div>
+        <div class="card pad" style="border-color:var(--green-300);position:relative">
+          <div class="eyebrow" style="margin-bottom:9px">Contrôle</div>
+          <span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_CTRL}</svg>Contrôle</span>
+          <div style="font-weight:700;font-size:15px;margin-top:11px">${a.ctrl&&a.ctrl.length?a.ctrl[0]:'Aucune'}</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:2px">${a.ctrl&&a.ctrl.length>1?a.ctrl.slice(1).join(' · '):'Autorité de contrôle, suivie séparément'}</div>
+        </div>
+      </div>
+      <div class="role-banner" style="margin-bottom:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/></svg><span>${condLine}</span></div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Audit trail</div>
+      ${trail}
+    </div>
+    <div class="m-foot">${footActions}</div>
+  </div>`;
+  $("#scrim").classList.add("open");
+}
+
+/* ================= FIL D'ACTIVITÉ ================= */
+function renderActivityStrip(){
+  const el=$("#activityStrip"); if(!el)return;
+  const pendCount=SUBDELEGS.filter(s=>s.status==="soumis").length;
+  const items=[
+    {ic:ICO_CTRL,t:AUDIT[0]?AUDIT[0].act:"Aucune activité récente",tm:AUDIT[0]?AUDIT[0].who:""},
+    {ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',t:pendCount+" sous-délégation(s) en attente de validation BPM",tm:"À traiter"},
+  ];
+  el.innerHTML=items.map(i=>`<div class="ac"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${i.ic}</svg></div><div><div class="at">${i.t}</div><div class="atm">${i.tm}</div></div></div>`).join("");
+}
 
 /* ================= MES DELEGATIONS ================= */
 function myDelegId(){return ROLE==="delegataire"?"coo_evp":null;}
@@ -715,14 +847,14 @@ function downloadPdf(id){
 /* ================= ADMIN ================= */
 function renderAdmin(){
   $("#auditTbl").innerHTML=`<tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Détail</th></tr>`+AUDIT.map(a=>`<tr><td style="white-space:nowrap;color:var(--muted)">${a.d}</td><td style="font-weight:600">${a.who}</td><td>${a.act}</td><td style="color:var(--muted)">${a.det}</td></tr>`).join("");
-  $("#userList").innerHTML=DIRECTORY.slice(0,6).map(u=>`<div class="userow"><div class="uav">${initials(u.nom)}</div><div style="flex:1"><div style="font-weight:600">${u.nom}</div><div style="font-size:11.5px;color:var(--muted)">${u.role} · ${u.entite}</div></div><span class="pill ok">Sync ✓</span></div>`).join("");
+  $("#userList").innerHTML=DIRECTORY.slice(0,6).map(u=>`<div class="userow"><div class="uav">${initials(u.nom)}</div><div style="flex:1"><div style="font-weight:600">${u.nom}</div><div style="font-size:11.5px;color:var(--muted)">${u.role} · ${u.entite}</div></div><span class="pill ok">Sync</span></div>`).join("");
   const missing=ACTIONS.filter(a=>a.deleg!=="none"&&(!a.ctrl||a.ctrl.length===0)).length;
   const nonDelegCount=ACTIONS.filter(a=>a.deleg==="none").length;
   $("#integrityBox").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Actions sans entité de contrôle formelle</span><b style="color:var(--muted)">${missing}</b></div>
     <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Actions non délégables (réservées au CEO)</span><b>${nonDelegCount}</b></div>
     <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Délégataires actifs</span><b>${DELEGATAIRES.length}/5</b></div>
     <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Dernière synchro Entra ID</span><b>il y a 12 min</b></div>
-    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0;border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><span>Statut global</span><span class="pill ok">● Conforme</span></div>`;
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0;border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><span>Statut global</span><span class="pill ok">Conforme</span></div>`;
 }
 
 /* ================= PILOTAGE ================= */
@@ -745,7 +877,8 @@ function renderPilotage(){
     ["3 sous-délégations arrivent à échéance sous 30 jours","warn"],
     ["Aucune action orpheline détectée dans la matrice","ok"],
   ];
-  $("#govAlerts").innerHTML=alerts.map(a=>`<div style="display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px"><span class="pill ${a[1]}" style="min-width:22px;text-align:center">${a[1]==='ok'?'●':a[1]==='warn'?'⚠':'→'}</span><span>${a[0]}</span></div>`).join("");
+  const alertColor={ok:"var(--green-600)",warn:"var(--warn)",info:"var(--amber)"};
+  $("#govAlerts").innerHTML=alerts.map(a=>`<div style="display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px"><span style="width:7px;height:7px;border-radius:50%;background:${alertColor[a[1]]};margin-top:6px;flex:0 0 7px"></span><span>${a[0]}</span></div>`).join("");
 }
 
 /* ================= MODAL ================= */
