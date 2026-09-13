@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1B5E20" />
+<title>NutriGov — Gouvernance des délégations · OCP Nutricrops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green-900:#103d17; --green-800:#1B5E20; --green-700:#2E7D32; --green-600:#388E3C; --green-500:#4CAF50; --green-300:#66BB6A; --green-100:#D6EADB; --green-50:#EAF4EC;
+    --ink:#10231a; --muted:#5c6b62; --muted-2:#8a978f; --line:#e3ebe5; --dark:#07140c;
+    --warn:#B45309; --warn-bg:#FEF3C7; --bad:#B91C1C; --bad-bg:#FEE2E2; --amber:#D97706; --amber-bg:#FFFBEB;
+    --card:#ffffff;
+    --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --sh:0 1px 2px rgba(16,35,26,.05),0 6px 20px rgba(16,35,26,.06);
+    --sh-2:0 10px 34px rgba(16,35,26,.10); --sh-lg:0 24px 60px rgba(16,35,26,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:#f4f8f5;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:14.5px;color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  .serif{font-family:var(--serif)}
+  .caps{text-transform:uppercase;letter-spacing:.08em}
+  .hidden{display:none!important}
+
+  /* ===== HEADER — sober green gradient, per charte ===== */
+  header{background:linear-gradient(120deg,var(--green-900),var(--green-700));color:#fff;padding-top:env(safe-area-inset-top)}
+  .hd{max-width:1220px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:14px 22px}
+  .wm{display:flex;align-items:center;gap:11px;cursor:pointer}
+  .wm .logo{width:36px;height:36px;flex:0 0 36px}
+  .wm h1{font-family:var(--serif);font-size:22px;font-weight:700;line-height:1;letter-spacing:.2px}
+  .wm .tl{font-size:10px;color:#c7e0cc;font-weight:500;margin-top:2px}
+  .hd-r{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .role-pick{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:6px 9px}
+  .role-pick svg{width:14px;height:14px;color:#c7e0cc}
+  .role-pick select{background:transparent;border:none;color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;outline:none}
+  .role-pick select option{color:#10231a}
+  .me{display:flex;align-items:center;gap:8px}
+  .me .av{width:32px;height:32px;border-radius:50%;background:#fff;color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+  .me .mn{font-size:12px;font-weight:600;line-height:1.15}.me .mn span{display:block;font-weight:400;color:#c7e0cc;font-size:10.5px}
+  @media(max-width:640px){.me .mn{display:none}}
+
+  .tabs-wrap{background:rgba(0,0,0,.1);border-top:1px solid rgba(255,255,255,.1)}
+  .tabs{max-width:1220px;margin:0 auto;display:flex;gap:2px;padding:0 18px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{display:flex;align-items:center;gap:7px;padding:11px 13px;color:#bcd7c1;font-size:13.5px;font-weight:600;white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
+  .tabs button svg{width:15px;height:15px;opacity:.85}
+  .tabs button:hover{color:#fff}
+  .tabs button.active{color:#fff;border-bottom-color:var(--green-300)}
+  .tabs button .n{background:var(--amber);color:#fff;font-size:10.5px;font-weight:800;border-radius:20px;padding:0 6px;min-width:17px;text-align:center;line-height:16px}
+
+  .wrap{max-width:1220px;margin:0 auto;padding:24px 22px 44px}
+  .view{display:none;animation:fade .3s ease}.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .role-banner{display:flex;align-items:center;gap:10px;background:var(--green-50);border:1px solid var(--green-100);border-left:3px solid var(--green-700);border-radius:9px;padding:10px 14px;margin-bottom:18px;font-size:12.5px;color:var(--green-800)}
+  .role-banner svg{width:16px;height:16px;flex:0 0 16px}
+  .role-banner b{font-weight:700}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:600;background:var(--green-800);color:#fff;transition:.14s;min-height:40px}
+  .btn:hover{background:var(--green-900)}.btn:active{transform:scale(.98)}
+  .btn svg{width:16px;height:16px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--green-50);border-color:var(--green-300)}
+  .btn.amber{background:var(--amber)}.btn.amber:hover{background:#B45309}
+  .btn.bad{background:#fff;color:var(--bad);border:1px solid #f3c6c6}.btn.bad:hover{background:var(--bad-bg)}
+  .btn.sm{padding:7px 12px;font-size:12.5px;min-height:34px;border-radius:8px}
+  .btn.block{width:100%}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh)}
+  .card.pad{padding:20px}
+  .soft{background:var(--green-50)}
+  .sec-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .sec-h h2{font-family:var(--serif);font-size:25px;font-weight:700;letter-spacing:.2px;color:var(--ink)}
+  .sec-h h3{font-size:14.5px;font-weight:700}
+  .sec-h .hint{font-size:12.5px;color:var(--muted)}
+  .sub-muted{font-size:13px;color:var(--muted);margin-top:4px}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green-700)}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.02em;padding:3px 10px 3px 8px;border-radius:20px;white-space:nowrap;background:transparent}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;flex:0 0 6px}
+  .pill.ok{color:var(--green-800);background:var(--green-100)}.pill.ok::before{background:var(--green-600)}
+  .pill.warn{color:var(--warn);background:var(--warn-bg)}.pill.warn::before{background:var(--warn)}
+  .pill.bad{color:var(--bad);background:var(--bad-bg)}.pill.bad::before{background:var(--bad)}
+  .pill.info{color:var(--amber);background:var(--amber-bg)}.pill.info::before{background:var(--amber)}
+  .pill.muted{color:var(--muted);background:#f1f4f2}.pill.muted::before{background:var(--muted-2)}
+  .pill.flat{background:transparent;padding-left:0}
+
+  .auth-pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:20px;border:1px solid var(--green-300);color:var(--green-800);background:#fff;white-space:nowrap}
+  .auth-pill svg{width:12px;height:12px}
+  .auth-pill.muted{border-color:var(--line);color:var(--muted)}
+  .scope-tag{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:#f1f4f2;padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .scope-tag.poste{color:var(--green-700);background:var(--green-50)}
+
+  /* ===== CASCADE D'AUTORITÉ ===== */
+  .cascade{margin-bottom:6px}
+  .cascade-item{width:84%;border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:#fff}
+  .cascade-item.dashed{border-style:dashed;text-align:center;color:var(--muted);font-size:13px;padding:20px 18px}
+  .cascade-item .ce-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .cascade-item h4{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--green-800);margin-top:5px}
+  .cascade-item .ce-sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .cascade-item .ce-holders{font-size:12px;color:var(--ink);margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+  .cascade-item .ce-holders span{background:var(--green-50);color:var(--green-800);padding:2px 8px;border-radius:6px;font-weight:600}
+  .cascade-item .ce-bar-wrap{margin-top:13px}
+  .cascade-item .ce-bar-lbl{font-size:10.5px;color:var(--muted);margin-bottom:5px}
+  .cascade-item .ce-bar{height:6px;border-radius:4px;background:var(--line);overflow:hidden}
+  .cascade-item .ce-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green-600),var(--green-800));border-radius:4px}
+  .cascade-item .ce-status{margin-top:11px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .cascade-link{position:relative;height:52px}
+  .cascade-link svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .cascade-link .cl-label{position:absolute;top:18px;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+  .cl-pill{font-size:10.5px;font-weight:700;color:var(--green-800);background:var(--green-100);padding:3px 11px;border-radius:20px;white-space:nowrap}
+  .cl-cap{font-size:10.5px;color:var(--muted);white-space:nowrap}
+  .cl-cond{position:absolute;right:0;top:8px;font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);padding:3px 11px;border-radius:20px;white-space:nowrap}
+  @media(max-width:520px){.cascade-item{width:97%}.cl-cond{position:static;display:inline-block;margin-top:6px}.cascade-link{height:64px}}
+
+  .grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:820px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{padding:16px 18px}
+  .kpi .v{font-family:var(--serif);font-size:30px;font-weight:700;letter-spacing:-.5px;line-height:1;color:var(--green-800)}
+  .kpi .l{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+  .kpi .tgt{font-size:12px;margin-top:8px}
+
+  /* ===== ARBORESCENCE — table + chips + search ===== */
+  .chips-row{display:flex;gap:7px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}
+  .chips-row::-webkit-scrollbar{display:none}
+  .chips-row button{flex:0 0 auto;padding:7px 13px;border-radius:20px;border:1px solid var(--line);background:#fff;font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap;transition:.14s}
+  .chips-row button:hover{border-color:var(--green-300)}
+  .chips-row button.on{background:var(--green-800);color:#fff;border-color:var(--green-800)}
+  .chips-row button .ct{opacity:.75;margin-left:4px;font-weight:500}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .filters select,.filters .search{padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;font-weight:500;font-size:13px}
+  .filters .search{position:relative;flex:1;min-width:220px}
+  .filters .search input{border:none;outline:none;width:100%;padding-left:24px}
+  .filters .search svg{position:absolute;left:0;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted)}
+
+  .activity-strip{display:flex;gap:10px;overflow-x:auto;margin-bottom:18px;scrollbar-width:none}
+  .activity-strip::-webkit-scrollbar{display:none}
+  .activity-strip .ac{flex:0 0 auto;min-width:260px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start;box-shadow:var(--sh)}
+  .activity-strip .ac .ai{width:24px;height:24px;border-radius:7px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 24px}
+  .activity-strip .ac .ai svg{width:13px;height:13px}
+  .activity-strip .ac .at{font-size:12.5px;font-weight:600;line-height:1.4}
+  .activity-strip .ac .atm{font-size:11px;color:var(--muted);margin-top:2px}
+
+  .empty-flag{display:flex;gap:10px;align-items:flex-start;background:var(--amber-bg);border:1px solid #fde5b0;border-radius:12px;padding:14px 16px;font-size:13px;color:#7c4a06;margin-bottom:14px}
+  .empty-flag svg{width:17px;height:17px;flex:0 0 17px;margin-top:1px}
+
+  .theme-group{margin-bottom:2px}
+  .theme-h{display:flex;align-items:center;gap:10px;padding:10px 4px 8px;cursor:pointer}
+  .theme-h .tt{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);flex:1}
+  .theme-h .tc{font-size:11.5px;color:var(--muted-2)}
+  .theme-h .chev{width:14px;height:14px;color:var(--muted);transition:transform .2s}
+  .theme-group.open .chev{transform:rotate(90deg)}
+  .theme-body{max-height:0;overflow:hidden;transition:max-height .28s ease}
+  .theme-group.open .theme-body{max-height:2600px}
+  .theme-group .card{border-radius:12px;overflow:hidden;margin-bottom:14px}
+
+  .act-row{display:grid;grid-template-columns:1fr auto auto;gap:16px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);font-size:13.5px;cursor:pointer;transition:background .12s}
+  .act-row:last-child{border-bottom:none}
+  .act-row:hover{background:var(--green-50)}
+  .act-row .ref{font-size:11px;font-weight:700;color:var(--green-700);letter-spacing:.02em;font-variant-numeric:tabular-nums}
+  .act-row .an{font-weight:600;color:var(--ink);margin-top:2px;line-height:1.4}
+  .act-row .auths{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center;min-width:0}
+  @media(max-width:900px){.act-row{grid-template-columns:1fr}.act-row .auths{justify-content:flex-start}}
+
+  .subd-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green-700);background:var(--green-50);padding:2px 9px;border-radius:20px}
+
+  /* ===== MES DELEGATIONS ===== */
+  .deleg-card{padding:18px;margin-bottom:14px}
+  .deleg-card .dh{display:flex;align-items:flex-start;gap:13px;margin-bottom:12px}
+  .deleg-card .di{width:42px;height:42px;border-radius:11px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 42px}
+  .deleg-card .di svg{width:21px;height:21px}
+  .deleg-card .dt{font-weight:700;font-size:15.5px}
+  .deleg-card .dd{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .action-item{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .action-item .an{flex:1}
+
+  /* ===== FORM ===== */
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+  .field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:#fff;transition:.15s;min-height:46px}
+  .field textarea{min-height:80px;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--green-600);box-shadow:0 0 0 3px rgba(56,142,60,.14)}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.frow{grid-template-columns:1fr}}
+  .act-pick{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:11px;padding:10px}
+  .act-opt{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer}
+  .act-opt:hover{background:var(--green-50)}
+  .act-opt input{width:18px;height:18px;accent-color:var(--green-700)}
+  .act-opt .ao-t{flex:1;font-size:13.5px}
+  .act-opt .ao-th{font-size:11px;color:var(--muted)}
+  .dir-pick{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto}
+  .dir-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;cursor:pointer;transition:.14s}
+  .dir-item:hover{border-color:var(--green-300)}
+  .dir-item.on{border-color:var(--green-700);background:var(--green-50)}
+  .dir-item .dav{width:34px;height:34px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex:0 0 34px}
+  .dir-item .dn{font-weight:600;font-size:13.5px}.dir-item .de{font-size:11.5px;color:var(--muted)}
+  .seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+  .seg button{flex:1;padding:8px 10px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--muted)}
+  .seg button.on{background:var(--green-800);color:#fff}
+  .poste-pick{display:flex;flex-wrap:wrap;gap:7px}
+  .poste-chip{padding:7px 12px;border:1px solid var(--line);border-radius:20px;font-size:12.5px;font-weight:600;color:var(--muted)}
+  .poste-chip.on{background:var(--green-100);border-color:var(--green-300);color:var(--green-800)}
+
+  /* ===== CHECKLIST / POINTS DE CONTROLE ===== */
+  .checklist{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px}
+  .cl-item{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:13px}
+  .cl-item:last-child{border-bottom:none}
+  .cl-item .cb{width:21px;height:21px;border-radius:6px;border:2px solid var(--line);flex:0 0 21px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.14s;margin-top:1px}
+  .cl-item.checked .cb{background:var(--green-700);border-color:var(--green-700)}
+  .cl-item .cb svg{width:12px;height:12px;color:#fff;opacity:0}
+  .cl-item.checked .cb svg{opacity:1}
+  .cl-item .ct{flex:1;cursor:pointer}
+  .cl-item.checked .ct{color:var(--muted);text-decoration:line-through}
+  .cl-item .cm{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .cl-progress{display:flex;align-items:center;gap:9px;margin:10px 0 4px}
+  .cl-progress .bar{flex:1;height:6px;background:var(--line);border-radius:4px;overflow:hidden}
+  .cl-progress .bar i{display:block;height:100%;background:var(--green-600);border-radius:4px;transition:width .25s}
+
+  /* ===== WORKFLOW ===== */
+  .wf{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:820px){.wf{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.wf{grid-template-columns:1fr}}
+  .wcol{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;min-height:110px}
+  .wcol .wh{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:700;padding:4px 6px 10px;color:var(--green-800)}
+  .wcard{border:1px solid var(--line);border-radius:11px;padding:11px;margin-bottom:9px;cursor:pointer;transition:.14s}
+  .wcard:hover{box-shadow:var(--sh);border-color:var(--green-300)}
+  .wcard .wt{font-size:13px;font-weight:600;line-height:1.3}
+  .wcard .wm2{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .audit{font-size:12.5px;display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .audit:last-child{border:none}
+  .audit .ad{width:9px;height:9px;border-radius:50%;background:var(--green-500);margin-top:5px;flex:0 0 9px}
+  .audit .at{font-weight:600}.audit .atm{color:var(--muted);font-size:11px}
+
+  /* ===== ACTIVE / PDF ===== */
+  .sd-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .sd-row:last-child{border-bottom:none}
+  .sd-row .si{width:38px;height:38px;border-radius:10px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 38px}
+  .sd-row .si svg{width:19px;height:19px}
+  .sd-row .sm{flex:1;min-width:180px}
+  .sd-row .st{font-weight:600;font-size:14px}
+  .sd-row .sd{font-size:12px;color:var(--muted);margin-top:1px}
+  .sd-row .sref{font-family:var(--serif);font-size:13px;color:var(--green-800);font-weight:700}
+
+  .pdf-doc{background:#fff;border:1px solid var(--line);border-radius:12px;padding:30px 34px;font-size:12.5px;line-height:1.7;color:#1a2b20}
+  .pdf-doc .ph{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--green-800);padding-bottom:14px;margin-bottom:18px}
+  .pdf-doc .ph h4{font-family:var(--serif);font-size:20px;color:var(--green-800)}
+  .pdf-doc .ref{font-family:var(--serif);font-size:13px;color:var(--muted);text-align:right}
+  .pdf-doc .prow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .pdf-doc .prow b{font-weight:600}
+  .pdf-doc .seal{margin-top:22px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .pdf-doc .seal .sig{text-align:right}
+  .pdf-doc .seal .sig .sn{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--green-800)}
+
+  /* ===== ADMIN ===== */
+  .upload-box{border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;transition:.14s}
+  .upload-box:hover{border-color:var(--green-300);background:var(--green-50)}
+  .upload-box svg{width:32px;height:32px;color:var(--green-600);margin-bottom:9px}
+  .upload-box input[type=file]{display:block;margin:12px auto 0;font-size:12.5px}
+  .userow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
+  .userow:last-child{border-bottom:none}
+  .userow .uav{width:32px;height:32px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;flex:0 0 32px}
+
+  table.audit-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  table.audit-tbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line)}
+  table.audit-tbl td{padding:11px 10px;border-bottom:1px solid var(--line)}
+  table.audit-tbl tr:last-child td{border:none}
+  table.csv-prev{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+  table.csv-prev th{background:var(--green-50);text-align:left;padding:6px 8px;font-weight:700;color:var(--green-800)}
+  table.csv-prev td{padding:6px 8px;border-bottom:1px solid var(--line)}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(16,35,26,.55);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
+  .scrim.open{display:flex}
+  .modal{background:#fff;border-radius:18px;width:100%;max-width:620px;box-shadow:var(--sh-lg);animation:pop .26s ease;overflow:hidden}
+  .modal.wide{max-width:760px}
+  @keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  .m-head{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .m-head h3{font-family:var(--serif);font-size:21px;font-weight:700}
+  .m-head p{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .m-x{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 32px}.m-x:hover{background:var(--green-50)}
+  .m-body{padding:20px 22px;max-height:72vh;overflow-y:auto}
+  .m-foot{padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;background:#fbfdfb;flex-wrap:wrap}
+
+  .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:120;display:flex;flex-direction:column;gap:10px;width:calc(100% - 32px);max-width:400px}
+  .toast{display:flex;align-items:center;gap:11px;background:var(--green-900);color:#fff;padding:13px 17px;border-radius:12px;box-shadow:var(--sh-lg);font-size:14px;font-weight:500;animation:tin .3s ease}
+  .toast.err{background:var(--bad)}
+  .toast .ti{font-size:16px;flex:0 0 auto}
+  @keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  footer{text-align:center;padding:22px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:20px}
+  footer b{color:var(--green-800);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="wm" onclick="go('arbre')">
+      <svg class="logo" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="13" fill="#EAF4EC"/>
+        <path d="M24 8c-8 5-12 11-12 17a12 12 0 0 0 24 0c0-6-4-12-12-17z" fill="#66BB6A"/>
+        <path d="M24 13v22M24 21c-3-1.2-5-3-6-5.5M24 26c3-1.2 5-3 6-5.5" stroke="#103d17" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div><h1>NutriGov</h1><div class="tl">Gouvernance des délégations · OCPNUTRI-ID-3</div></div>
+    </div>
+    <div class="hd-r">
+      <div class="role-pick" id="personaPick" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <select id="personaSel" onchange="setPersona(this.value)" aria-label="Connecté en tant que"></select>
+      </div>
+      <div class="role-pick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/></svg>
+        <select id="roleSel" onchange="setRole(this.value)" aria-label="Choisir la vue">
+          <option value="collab">Vue : Opérationnel</option>
+          <option value="delegataire">Vue : Délégataire</option>
+          <option value="bpm">Vue : BPM Director</option>
+          <option value="admin">Vue : Admin</option>
+        </select>
+      </div>
+      <div class="me"><div class="mn" id="meName">Nadia Squalli<span id="meRole">Opérationnel</span></div><div class="av" id="meAv">NS</div></div>
+    </div>
+  </div>
+  <div class="tabs-wrap"><nav class="tabs" id="tabs"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="role-banner" id="roleBanner"></div>
+
+  <!-- ARBORESCENCE -->
+  <section class="view active" id="v-arbre">
+    <div class="sec-h">
+      <div><h2>Autorité de délégation</h2><div class="sub-muted">OCP Nutricrops · Cycle commercial & achat MP · <span id="actCount">28</span> actions · 8 thématiques</div></div>
+    </div>
+    <div class="activity-strip" id="activityStrip"></div>
+    <div class="chips-row" id="chipsRow"></div>
+    <div class="filters">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="treeQ" placeholder="Rechercher une action, un délégataire, une thématique…" oninput="renderTree()"/></div>
+      <select id="fDeleg" onchange="renderTree()"><option value="">Tous les postes</option></select>
+      <select id="fSub" onchange="renderTree()"><option value="">Sous-délégation : tous</option><option value="yes">Avec sous-délégation active</option><option value="no">Sans sous-délégation</option></select>
+    </div>
+    <div id="emptyFlag"></div>
+    <div id="treeList"></div>
+    <div class="role-banner" style="margin-top:18px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+      <span>Note de délégation signée par <b>Faris Derrij</b>, CEO OCP Nutricrops, effective depuis le <b>30 mars 2026</b> — Casablanca, le 17 avril 2026.</span>
+    </div>
+  </section>
+
+  <!-- MES DELEGATIONS -->
+  <section class="view" id="v-mesdeleg">
+    <div class="sec-h"><div><span class="eyebrow">Filtré automatiquement pour vous</span><h2>Mes délégations</h2><div class="sub-muted" id="myDelegSub"></div></div></div>
+    <div class="kpis" style="margin-bottom:18px" id="myKpis"></div>
+    <div id="myDelegList"></div>
+  </section>
+
+  <!-- CREER SOUS-DELEGATION -->
+  <section class="view" id="v-creer">
+    <div class="sec-h"><div><span class="eyebrow">Nouvelle sous-délégation</span><h2>Déléguer des actions</h2></div></div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="field"><label>Actions à sous-déléguer</label><div class="act-pick" id="actPick"></div></div>
+        <div class="field">
+          <label>Portée de la sous-délégation</label>
+          <div class="seg" id="scopeSeg">
+            <button class="on" onclick="setSubScope('nominatif')">Nominatif — une personne</button>
+            <button onclick="setSubScope('poste')">Par poste — tous les titulaires</button>
+          </div>
+        </div>
+        <div class="field" id="dirPickWrap">
+          <label>Collaborateur (annuaire Entra ID)</label>
+          <div class="search" style="margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="dirQ" placeholder="Rechercher un collaborateur…" oninput="renderDirPick()"/></div>
+          <div class="dir-pick" id="dirPick"></div>
+        </div>
+        <div class="field hidden" id="postePickWrap">
+          <label>Poste cible (s'applique à tous les titulaires actuels et futurs)</label>
+          <div class="poste-pick" id="postePick"></div>
+        </div>
+        <div class="frow">
+          <div class="field"><label>Début de validité</label><input type="date" id="f-start" value="2026-06-15"/></div>
+          <div class="field"><label>Fin de validité</label><input type="date" id="f-end" value="2026-12-15"/></div>
+        </div>
+        <div class="field"><label>Justification / commentaire (facultatif)</label><textarea id="f-com" placeholder="Ex. congé annuel, surcharge d'activité, backup opérationnel…"></textarea></div>
+        <button class="btn block" onclick="submitSubDeleg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Soumettre au BPM Director</button>
+      </div>
+      <div>
+        <div class="card pad soft" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:9px;font-weight:700;color:var(--green-800);margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/></svg>Circuit de validation</div>
+          <div style="font-size:13px;color:var(--muted)">Soumission → points de contrôle → notification BPM Director → validation en un clic → activation immédiate + PDF signé généré automatiquement.</div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Récapitulatif</h3></div>
+          <div id="recapBox" style="font-size:13.5px;color:var(--muted)">Sélectionnez des actions et un destinataire pour voir l'aperçu.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKFLOW BPM -->
+  <section class="view" id="v-workflow">
+    <div class="sec-h"><div><span class="eyebrow">Workflow de validation</span><h2>Délégations à valider</h2></div><span class="hint">Soumis → points de contrôle → validé → PDF généré</span></div>
+    <div class="wf" id="wfBoard"></div>
+  </section>
+
+  <!-- SOUS-DELEGATIONS ACTIVES -->
+  <section class="view" id="v-actives">
+    <div class="sec-h"><div><span class="eyebrow">Registre</span><h2>Sous-délégations actives</h2></div><span class="pill ok" id="activeCount"></span></div>
+    <div class="card"><div id="activeList"></div></div>
+  </section>
+
+  <!-- ADMIN -->
+  <section class="view" id="v-admin">
+    <div class="sec-h"><div><span class="eyebrow">Administration</span><h2>Matrice, utilisateurs & postes</h2></div></div>
+    <div class="grid2">
+      <div>
+        <div class="card pad" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:10px"><h3>Import en masse (Excel / CSV)</h3></div>
+          <div class="upload-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div style="font-weight:600;font-size:14px">Déposer un fichier structuré (.csv ou .xlsx)</div>
+            <div class="frow" style="margin-top:12px;text-align:left">
+              <div class="field" style="margin-bottom:0"><label>Catégorie / thématique</label><select id="impTheme"></select></div>
+              <div class="field" style="margin-bottom:0"><label>Fichier</label><input type="file" id="impFile" accept=".csv,.xlsx" onchange="handleImportFile()"/></div>
+            </div>
+            <div id="impPreview"></div>
+          </div>
+        </div>
+        <div class="card pad" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Éditer une délégation</h3><span class="hint">attribution, affectation, rôle</span></div>
+          <select id="editActSel" onchange="openEditAction(this.value)" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:4px"></select>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Historique & audit trail</h3></div>
+          <div style="overflow-x:auto"><table class="audit-tbl" id="auditTbl"></table></div>
+        </div>
+      </div>
+      <div>
+        <div class="card pad" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:6px"><h3>Utilisateurs & postes</h3><span class="hint">sync Entra ID</span></div>
+          <div id="userList"></div>
+        </div>
+        <div class="card pad soft" style="margin-bottom:16px">
+          <div class="sec-h" style="margin-bottom:8px"><h3>Changer le poste d'un titulaire</h3></div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:11px">Les délégations héritées se recalculent immédiatement, sans action supplémentaire.</div>
+          <select id="posUserSel" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:9px"></select>
+          <select id="posNewSel" style="width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;margin-bottom:11px"></select>
+          <button class="btn amber block sm" onclick="changePoste()">Mettre à jour le poste</button>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:8px"><h3>Intégrité de la matrice</h3></div>
+          <div id="integrityBox"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILOTAGE -->
+  <section class="view" id="v-pilotage">
+    <div class="sec-h"><div><span class="eyebrow">Direction Générale</span><h2>Pilotage de la gouvernance</h2></div><span class="pill ok">Temps réel</span></div>
+    <div class="kpis" id="govKpis"></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Répartition par thématique</h3><span class="hint">actions déléguées</span></div>
+        <div id="themeBars"></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Alertes de gouvernance</h3></div>
+        <div id="govAlerts"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>Prototype de démonstration — <b>OCP Nutricrops · D²nAI</b></footer>
+
+<div class="scrim" id="scrim"><div id="modalHost"></div></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ================= DONNÉES — matrice OCPNUTRI-ID-3 (source réelle) ================= */
+// Note de délégation signée par Faris Derrij, CEO OCP Nutricrops — Casablanca, 17-04-2026
+// Objet : délégations rentrant dans le cycle d'exécution des ventes et d'achat de matières premières
+// Effective depuis le 30 mars 2026 — annule et remplace les dispositions antérieures.
+const CEO={nom:"Faris Derrij",role:"Chief Executive Officer"};
+const POSTES={
+  ceo:{lab:"Chief Executive Officer",short:"CEO"},
+  coo:{lab:"Chief Operating Officer",short:"COO"},
+  evp:{lab:"EVP de l'entité concernée",short:"EVP"},
+  cfo:{lab:"Chief Financial Officer",short:"CFO"},
+  chro:{lab:"Chief HR Officer",short:"CHRO"},
+  cpo:{lab:"Chief Performance Officer",short:"CPO"},
+  dpo:{lab:"Responsable Data Management",short:"DPO"},
+  ctrl_fin:{lab:"Contrôleur Financier",short:"Contrôleur Fin."},
+};
+function holderPoste(postes){return {type:"poste",postes};}
+function holderUser(userId){return {type:"nominatif",userId};}
+function holderPeople(h){ if(!h) return []; if(h.type==="nominatif") return [userById(h.userId)]; return DIRECTORY.filter(u=>u.postes&&u.postes.some(p=>h.postes.includes(p))); }
+function holderLabel(h){ if(!h) return "—"; if(h.type==="nominatif") return userById(h.userId).nom; return h.postes.map(p=>POSTES[p].short).join(" / "); }
+function holderScope(h){ return h && h.type==="nominatif" ? "Nominatif" : "Poste"; }
+
+const DIRECTORY=[
+  {id:"u1",nom:"Karim Idrissi",email:"k.idrissi@ocpnutricrops.com",entite:"Direction Générale",role:"Chief Operating Officer",postes:["coo"]},
+  {id:"u2",nom:"Sophia Bennis",email:"s.bennis@ocpnutricrops.com",entite:"Entité Maroc",role:"Executive VP — entité Maroc",postes:["evp"]},
+  {id:"u3",nom:"Ahmed Tazi",email:"a.tazi@ocpnutricrops.com",entite:"Entité Afrique subsaharienne",role:"Executive VP — entité Afrique",postes:["evp"]},
+  {id:"u4",nom:"Yasmine Kadiri",email:"y.kadiri@ocpnutricrops.com",entite:"Finance",role:"Chief Financial Officer",postes:["cfo"]},
+  {id:"u5",nom:"Rachid Ouazzani",email:"r.ouazzani@ocpnutricrops.com",entite:"Ressources Humaines",role:"Chief HR Officer",postes:["chro"]},
+  {id:"u6",nom:"Amine Sefrioui",email:"a.sefrioui@ocpnutricrops.com",entite:"Performance",role:"Chief Performance Officer",postes:["cpo"]},
+  {id:"u7",nom:"Imane Rifai",email:"i.rifai@ocpnutricrops.com",entite:"Data Management",role:"Responsable Data Management",postes:["dpo"]},
+  {id:"u8",nom:"Hicham Berrada",email:"h.berrada@ocpnutricrops.com",entite:"Finance",role:"Contrôleur Financier",postes:["ctrl_fin"]},
+  {id:"u9",nom:"Salma Tahiri",email:"s.tahiri@ocpnutricrops.com",entite:"Finance",role:"Analyste Trésorerie",postes:["ctrl_fin"]},
+  {id:"u10",nom:"Omar Fassi",email:"o.fassi@ocpnutricrops.com",entite:"Commercial",role:"Responsable Grands Comptes",postes:[]},
+  {id:"u11",nom:"Nadia Bouayad",email:"n.bouayad@ocpnutricrops.com",entite:"Commercial",role:"Chargée Grands Comptes",postes:[]},
+  {id:"u12",nom:"Leila Chraibi",email:"l.chraibi@ocpnutricrops.com",entite:"Qualité",role:"Ingénieure Qualité",postes:[]},
+  {id:"u13",nom:"Mehdi Alaoui",email:"m.alaoui@ocpnutricrops.com",entite:"Export",role:"Chargé Export",postes:[]},
+  {id:"u14",nom:"Nawal Bensouda",email:"n.bensouda@ocpnutricrops.com",entite:"Conformité",role:"Analyste KYC",postes:[]},
+  {id:"u15",nom:"Younes Amrani",email:"y.amrani@ocpnutricrops.com",entite:"Opérations Portuaires",role:"Coordinateur Chargement",postes:[]},
+  {id:"u16",nom:"Aicha Lahlou",email:"a.lahlou@ocpnutricrops.com",entite:"Ressources Humaines",role:"Chargée Conformité RH",postes:[]},
+];
+function userById(id){return DIRECTORY.find(u=>u.id===id);}
+
+const THEMES=[
+  {k:"nda",nom:"Non-Disclosure Agreements (NDA)",ic:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'},
+  {k:"ops",nom:"Opérations commerciales & enregistrement produits",ic:'<path d="M3 3v18h18M7 14l4-4 3 3 5-6"/>'},
+  {k:"qual",nom:"Documents qualité",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'},
+  {k:"kyc",nom:"KYC – Legal – Compliance",ic:'<path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"/>'},
+  {k:"export",nom:"Documents d'export",ic:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>'},
+  {k:"confirm",nom:"Confirmation client",ic:'<path d="M20 6 9 17l-5-5"/>'},
+  {k:"charg",nom:"Opérations de chargement",ic:'<path d="M2 20h20M4 20V9l5 3V9l5 3V6l5 3v11"/>'},
+  {k:"reclam",nom:"Régularisations & réclamations (claims) logistique",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'},
+];
+function themeById(k){return THEMES.find(t=>t.k===k);}
+
+const TYPE_LABELS={sig:"Signature",pay:"Paiement",ord:"Ordonnancement",rec:"Réception",val:"Validation"};
+const CHECKLIST_TEMPLATES={
+  sig:["Identité et habilitation du signataire vérifiées","Document conforme au modèle validé par le Legal","Pièces justificatives jointes au dossier"],
+  pay:["Montant conforme au contrat / à l'engagement","Bénéficiaire vérifié (KYC à jour)","Disponibilité budgétaire confirmée","Pièces justificatives (facture, BL, rapport) jointes"],
+  ord:["Service fait constaté et documenté","Conformité au contrat vérifiée","Autorisation budgétaire confirmée"],
+  rec:["Quantité / qualité conforme au bon de commande","Rapport d'inspection joint au dossier","Écarts éventuels documentés et justifiés"],
+  val:["Conformité réglementaire vérifiée","Dossier documentaire complet","Absence de conflit d'intérêt déclaré"],
+};
+
+// 28 actions réparties sur 8 thématiques — transcrites de l'annexe OCPNUTRI-ID-3
+let ACTIONS=[
+  {id:"a1",theme:"nda",type:"sig",nom:"Signature d'un NDA dans le cadre d'une vente",deleg:"none",ctrl:["Responsable de l'entité en charge du Juridique"]},
+
+  {id:"a2",theme:"ops",type:"sig",nom:"Signature du Free Sale Certificate",deleg:holderPoste(["coo","evp"]),sub:"Responsable de l'entité en charge du Customer Service",ctrl:["Entité Quality Management","Entité Legal"]},
+  {id:"a3",theme:"ops",type:"sig",nom:"Signature du Beneficiary's Confirmation Certificate",deleg:holderPoste(["coo","evp"]),ctrl:[]},
+  {id:"a4",theme:"ops",type:"sig",nom:"Signature de la Letter of authorization for the registration process of product",deleg:holderPoste(["coo","evp"]),ctrl:[]},
+  {id:"a5",theme:"ops",type:"sig",nom:"Signature de la lettre d'invitation",deleg:holderPoste(["coo","evp"]),ctrl:[]},
+  {id:"a6",theme:"ops",type:"sig",nom:"Signature du programme de visite lié à l'invitation du client",deleg:holderPoste(["coo","evp"]),ctrl:[]},
+
+  {id:"a7",theme:"qual",type:"sig",nom:"Signature des documents qualité (COA, Certificate of Composition, MSDS, spécifications techniques, certificat métaux lourds, méthode d'analyse, composition détaillée, process flow chart, application for registration, certificat fabricant, et tout autre document qualité vente/tender)",deleg:holderPoste(["coo","evp"]),ctrl:["Entité Quality Management"]},
+
+  {id:"a8",theme:"kyc",type:"sig",nom:"KYC-Compliance related NDA",deleg:holderPoste(["coo","evp"]),ctrl:["Entité Legal"]},
+  {id:"a9",theme:"kyc",type:"val",nom:"Certificats / déclarations de conformité — sanctions, anti-corruption, LAB/FT, clause de conformité tiers",deleg:holderPoste(["coo","evp"]),ctrl:["Entité Legal"]},
+  {id:"a10",theme:"kyc",type:"sig",nom:"Settlement letter",deleg:holderPoste(["coo","evp"]),ctrl:["Entité Legal"]},
+  {id:"a11",theme:"kyc",type:"val",nom:"CNDP Declaration",deleg:holderPoste(["dpo"]),ctrl:[]},
+  {id:"a12",theme:"kyc",type:"val",nom:"Authorization for the processing of personal data",deleg:holderPoste(["dpo"]),ctrl:[]},
+  {id:"a13",theme:"kyc",type:"val",nom:"Certificats / déclarations relatifs au travail des enfants et aux droits humains",deleg:holderPoste(["chro"]),ctrl:[]},
+  {id:"a14",theme:"kyc",type:"val",nom:"Counterparty onboarding form",deleg:holderPoste(["cfo"]),ctrl:[]},
+  {id:"a15",theme:"kyc",type:"sig",nom:"Signature des formulaires requis par les clients (informations juridiques, commerciales et financières)",deleg:holderPoste(["coo","evp"]),ctrl:["Entités responsables de la donnée dans le formulaire (Legal / Finance / Contrôle permanent)"]},
+  {id:"a16",theme:"kyc",type:"val",nom:"Validation et signature des dossiers Office Des Changes (autorisation et/ou dérogation)",deleg:holderPoste(["cpo"]),ctrl:[]},
+
+  {id:"a17",theme:"export",type:"sig",nom:"Signature des documents d'exportation liés aux modalités de paiement (LC / SBLC / CAD…) — process Trade Finance",deleg:holderPoste(["coo","evp"]),sub:"Responsable de l'entité en charge du Customer Service",ctrl:[]},
+  {id:"a18",theme:"export",type:"sig",nom:"Signature du One pager contract (exigé par les banques — LC, SBLC)",deleg:holderPoste(["coo","evp"]),ctrl:["Entité en charge du Legal"]},
+
+  {id:"a19",theme:"confirm",type:"sig",nom:"Partager la confirmation de la vente avec le client",deleg:holderPoste(["coo","evp"]),sub:"Entité en charge des ventes",ctrl:[]},
+
+  {id:"a20",theme:"charg",type:"sig",nom:"Signature d'une demande de Certificate of Origin (COO) auprès de la chambre de commerce",deleg:holderPoste(["coo","evp"]),sub:"Responsable de l'entité en charge du Customer Service",ctrl:[]},
+  {id:"a21",theme:"charg",type:"pay",nom:"Signature de la facture du Certificate of Origin délivrée par la chambre de commerce",deleg:holderPoste(["coo","evp"]),sub:"Responsable de l'entité en charge du Customer Service",ctrl:["Entité en charge du contrôle permanent"]},
+  {id:"a22",theme:"charg",type:"sig",nom:"Signature du Certificate of Origin — transactionnel / chambre de commerce",deleg:holderPoste(["coo","evp"]),sub:"Responsable de l'entité en charge du Customer Service",ctrl:[]},
+
+  {id:"a23",theme:"reclam",type:"pay",nom:"Signature des ordres de paiement (demurrage, despatch, overage ou shortage)",deleg:holderPoste(["coo","evp"]),ctrl:["Accord sur quantité : Responsable en charge du contrôle permanent","Conforme à l'engagement : COO*/EVP entité concernée"]},
+  {id:"a24",theme:"reclam",type:"pay",nom:"Note de justification des ristournes — réclamation qualité matérialisée par une Credit Note, dans la limite de 100 000 $",deleg:holderPoste(["coo","evp"]),ctrl:["Entité en charge de la Qualité","Entité en charge du contrôle permanent"]},
+  {id:"a25",theme:"reclam",type:"rec",nom:"Shortage / Overage — validation sur rapport d'inspection (non contractuel)",deleg:holderPoste(["coo","evp"]),note:"Habilitation directe COO (hors filiales)",ctrl:[]},
+  {id:"a26",theme:"reclam",type:"rec",nom:"Shortage / Overage — validation sur rapport d'inspection (contractuel)",deleg:holderPoste(["coo","evp"]),ctrl:[]},
+  {id:"a27",theme:"reclam",type:"pay",nom:"Note justifiant l'octroi d'un Bonus/Discount annuel — contractuel",deleg:holderPoste(["coo","evp"]),ctrl:["Entité en charge du contrôle permanent"]},
+  {id:"a28",theme:"reclam",type:"pay",nom:"Note justifiant l'octroi d'un Bonus/Discount annuel — non contractuel",deleg:"none",ctrl:[]},
+];
+
+// sous-délégations dynamiques (créées via le workflow — distinctes des sous-délégataires structurels de la matrice)
+let SUBDELEGS=[
+  {id:"sd1",ref:"SD-OCPNUTRI-2026-0041",source:"u7",actions:["a11","a12"],to:holderUser("u14"),start:"2026-05-02",end:"2026-11-02",status:"active",valBy:"BPM Director",valDate:"2026-05-03",comment:"Backup déclarations CNDP pendant montée en charge",checkpoints:{}},
+  {id:"sd2",ref:"SD-OCPNUTRI-2026-0038",source:"u1",actions:["a5","a6"],to:holderUser("u10"),start:"2026-04-10",end:"2026-10-10",status:"active",valBy:"BPM Director",valDate:"2026-04-11",comment:"Gestion des invitations clients Grands Comptes",checkpoints:{}},
+  {id:"sd3",ref:"SD-OCPNUTRI-2026-0045",source:"u4",actions:["a14"],to:holderPoste(["ctrl_fin"]),start:"2026-06-01",end:"2026-09-01",status:"active",valBy:"BPM Director",valDate:"2026-06-02",comment:"Délégation permanente à la fonction contrôle financier (poste, pas nominatif)",checkpoints:{}},
+  {id:"sd4",ref:null,source:"u3",actions:["a18"],to:holderUser("u13"),start:"2026-06-16",end:"2026-12-16",status:"soumis",comment:"Renfort équipe export Q3",checkpoints:{}},
+  {id:"sd5",ref:null,source:"u5",actions:["a13"],to:holderUser("u16"),start:"2026-06-14",end:"2026-08-14",status:"soumis",comment:"Absence CHRO — période estivale",checkpoints:{}},
+  {id:"sd6",ref:"SD-OCPNUTRI-2026-0052",source:"u2",actions:["a19"],to:holderUser("u11"),start:"2026-03-01",end:"2026-12-31",status:"active",valBy:"BPM Director",valDate:"2026-03-02",comment:"Gestion opérationnelle courante des confirmations de vente — entité Maroc",checkpoints:{}},
+];
+
+let AUDIT=[
+  {d:"2026-06-12 09:14",who:"Admin — Fatima Zniber",act:"Import matrice OCPNUTRI-ID-3 (v4)",det:"28 actions chargées, 0 erreur"},
+  {d:"2026-06-02 11:05",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0045",det:"Points de contrôle vérifiés — PDF généré et archivé"},
+  {d:"2026-04-11 14:22",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0038",det:"Points de contrôle vérifiés — PDF généré et archivé"},
+  {d:"2026-05-03 08:47",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0041",det:"Points de contrôle vérifiés — PDF généré et archivé"},
+  {d:"2026-03-02 10:03",who:"BPM Director — Hassan Belkadi",act:"Validation SD-2026-0052",det:"Points de contrôle vérifiés — PDF généré et archivé"},
+];
+
+let ROLE="collab";
+let CURRENT_PERSONA="u1"; // délégataire actuellement "connecté" en démo
+let CURRENT_USER={collab:"Nadia Squalli", bpm:"Hassan Belkadi", admin:"Fatima Zniber"};
+
+const ROLES={
+  collab:{lab:"Opérationnel",tabs:["arbre"],banner:"Vous naviguez en <b>lecture seule</b> — consultez qui peut décider quoi, par thématique ou par délégataire."},
+  delegataire:{lab:"Délégataire",tabs:["mesdeleg","creer","actives","arbre"],banner:"Vous naviguez en tant que délégataire connecté — vos délégations sont <b>filtrées automatiquement</b> selon votre poste."},
+  bpm:{lab:"BPM Director",tabs:["workflow","actives","arbre"],banner:"Vous agissez en <b>BPM Director</b> — validez ou rejetez les sous-délégations soumises, points de contrôle à l'appui."},
+  admin:{lab:"Admin",tabs:["admin","pilotage","arbre"],banner:"Vous agissez en <b>Administrateur</b> — gérez la matrice, les utilisateurs, les postes et suivez la gouvernance."},
+};
+const TAB_META={
+  arbre:["Arborescence",'<path d="M3 3v18h18M9 9h9M9 15h6"/>'],
+  mesdeleg:["Mes délégations",'<path d="M20 6 9 17l-5-5"/>'],
+  creer:["Créer une sous-délégation",'<path d="M12 5v14M5 12h14"/>'],
+  workflow:["Délégations à valider",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
+  actives:["Sous-délégations actives",'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'],
+  admin:["Administration",'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 7.5 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 12.6a1.65 1.65 0 0 0-1.51-1H1a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 2.6 6.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 1.6V1a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 22.4 9H23a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'],
+  pilotage:["Pilotage",'<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'],
+};
+const THEMATIC_CHIPS=[
+  {lab:"Toutes",themes:null},
+  {lab:"Sales",themes:["confirm","ops"]},
+  {lab:"Achat MP",themes:[]},
+  {lab:"NDA",themes:["nda"]},
+  {lab:"Qualité",themes:["qual"]},
+  {lab:"KYC / Legal",themes:["kyc"]},
+  {lab:"Export",themes:["export"]},
+  {lab:"Chargement",themes:["charg"]},
+  {lab:"Réclamations",themes:["reclam"]},
+];
+const ICO_DELEG='<path d="M20 6 9 17l-5-5"/>';
+const ICO_CTRL='<circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/>';
+const ICO_NONE='<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>';
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+function toast(msg,ic,err){const t=document.createElement("div");t.className="toast"+(err?" err":"");t.innerHTML=`<span class="ti">${ic||"●"}</span><span>${msg}</span>`;$("#toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="all .35s";t.style.transform="translateY(12px)";setTimeout(()=>t.remove(),350);},err?4200:3000);}
+function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();}
+function fmtDate(iso){const m=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];const d=new Date(iso);return d.getDate()+" "+m[d.getMonth()]+" "+d.getFullYear();}
+function activeSubsFor(actionId){return SUBDELEGS.filter(s=>s.status==="active"&&s.actions.includes(actionId));}
+function pendingSubsFor(actionId){return SUBDELEGS.filter(s=>s.status==="soumis"&&s.actions.includes(actionId));}
+function ctrlText(a){const c=a.ctrl;if(!c||!c.length)return "—";return Array.isArray(c)?c.join(" · "):c;}
+function doaRef(id){const idx=ACTIONS.findIndex(a=>a.id===id)+1;return "DOA-"+String(idx).padStart(2,"0");}
+function personaHoldsAction(a,userId){ if(a.deleg==="none")return false; return holderPeople(a.deleg).some(p=>p.id===userId); }
+function actionStatus(a){
+  if(a.deleg==="none")return {label:"NON DÉLÉGABLE",cls:"muted"};
+  if(activeSubsFor(a.id).length)return {label:"SOUS-DÉLÉGUÉE",cls:"ok"};
+  if(pendingSubsFor(a.id).length)return {label:"EN ATTENTE BPM",cls:"warn"};
+  return {label:"DÉLÉGUÉE",cls:"ok"};
+}
+
+/* ================= ROLE / PERSONA / NAV ================= */
+function personaOptions(){ return DIRECTORY.filter(u=>u.postes&&u.postes.length&&!u.postes.includes("ctrl_fin")); }
+function setPersona(id){ CURRENT_PERSONA=id; const u=userById(id); $("#meName").innerHTML=u.nom+"<span>"+ROLES.delegataire.lab+" · "+POSTES[u.postes[0]].short+"</span>"; $("#meAv").textContent=initials(u.nom); refreshCurrentView(); }
+function setRole(r){
+  ROLE=r; const R=ROLES[r];
+  const pp=$("#personaPick");
+  if(r==="delegataire"){ pp.style.display="flex"; $("#personaSel").innerHTML=personaOptions().map(u=>`<option value="${u.id}">${u.nom} — ${POSTES[u.postes[0]].short}</option>`).join(""); $("#personaSel").value=CURRENT_PERSONA; const u=userById(CURRENT_PERSONA); $("#meName").innerHTML=u.nom+"<span>"+R.lab+" · "+POSTES[u.postes[0]].short+"</span>"; $("#meAv").textContent=initials(u.nom); }
+  else { pp.style.display="none"; $("#meRole").textContent=R.lab; $("#meName").innerHTML=CURRENT_USER[r]+`<span>${R.lab}</span>`; $("#meAv").textContent=initials(CURRENT_USER[r]); }
+  $("#roleBanner").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>${R.banner}</span>`;
+  $("#tabs").innerHTML=R.tabs.map(t=>{
+    const badge=t==="workflow"?`<span class="n">${SUBDELEGS.filter(s=>s.status==="soumis").length}</span>`:"";
+    return `<button data-v="${t}" onclick="go('${t}')">${`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${TAB_META[t][1]}</svg>`}${TAB_META[t][0]}${badge}</button>`;
+  }).join("");
+  go(R.tabs[0]);
+}
+function refreshCurrentView(){ const active=document.querySelector("#tabs button.active"); if(active) go(active.dataset.v); }
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  const el=$("#v-"+v); if(el)el.classList.add("active");
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  if(v==="arbre")renderTree();
+  if(v==="mesdeleg")renderMyDeleg();
+  if(v==="creer")renderCreate();
+  if(v==="workflow")renderWorkflow();
+  if(v==="actives")renderActives();
+  if(v==="admin")renderAdmin();
+  if(v==="pilotage")renderPilotage();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ================= ARBORESCENCE ================= */
+let openThemes={}, activeChip="Toutes";
+function renderChips(){
+  $("#chipsRow").innerHTML=THEMATIC_CHIPS.map(c=>{
+    const n=c.themes===null?ACTIONS.length:ACTIONS.filter(a=>c.themes.includes(a.theme)).length;
+    return `<button class="${activeChip===c.lab?'on':''}" onclick="activeChip='${c.lab}';renderTree()">${c.lab}<span class="ct">${n}</span></button>`;
+  }).join("");
+}
+function renderTree(){
+  const fDeleg=$("#fDeleg"); if(fDeleg.options.length<=1){fDeleg.innerHTML=`<option value="">Tous les postes</option>`+Object.entries(POSTES).filter(([k])=>k!=="ctrl_fin"&&k!=="ceo").map(([k,p])=>`<option value="${k}">${p.lab}</option>`).join("");}
+  const q=($("#treeQ").value||"").toLowerCase();
+  const fd=fDeleg.value, fs=$("#fSub").value;
+  const chip=THEMATIC_CHIPS.find(c=>c.lab===activeChip);
+  renderChips();
+  let flagHtml="";
+  if(chip.themes&&chip.themes.length===0){
+    flagHtml=`<div class="empty-flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div><b>« Achat MP » n'est pas couverte par la matrice OCPNUTRI-ID-3 actuelle.</b><br>La note CEO cite « ventes et achat de matières premières » dans son objet, mais l'annexe signée ne détaille que le cycle commercial. Signalé à l'Admin pour complément de matrice.</div></div>`;
+  }
+  $("#emptyFlag").innerHTML=flagHtml;
+  $("#treeList").innerHTML=THEMES.map(th=>{
+    let acts=ACTIONS.filter(a=>a.theme===th.k);
+    if(chip.themes)acts=acts.filter(a=>chip.themes.includes(a.theme));
+    if(q)acts=acts.filter(a=>a.nom.toLowerCase().includes(q)||th.nom.toLowerCase().includes(q)||(a.deleg!=="none"&&holderLabel(a.deleg).toLowerCase().includes(q))||holderPeople(a.deleg).some(p=>p.nom.toLowerCase().includes(q)));
+    if(fd)acts=acts.filter(a=>a.deleg!=="none"&&a.deleg.postes&&a.deleg.postes.includes(fd));
+    if(fs==="yes")acts=acts.filter(a=>activeSubsFor(a.id).length>0);
+    if(fs==="no")acts=acts.filter(a=>activeSubsFor(a.id).length===0);
+    if(!acts.length)return "";
+    const isOpen=openThemes[th.k]!==false;
+    return `<div class="theme-group ${isOpen?'open':''}">
+      <div class="theme-h" onclick="toggleTheme('${th.k}')">
+        <div class="tt">${th.nom}</div>
+        <div class="tc">${acts.length} action${acts.length>1?'s':''}</div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="theme-body"><div class="card">
+        ${acts.map(a=>{
+          const nonDeleg=a.deleg==="none"; const st=actionStatus(a);
+          const authDeleg=nonDeleg
+            ? `<span class="auth-pill muted"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_NONE}</svg>Non délégable</span>`
+            : `<span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">${ICO_DELEG}</svg>${holderLabel(a.deleg)}</span><span class="scope-tag poste">Poste</span>`;
+          return `<div class="act-row" onclick="openActionDetail('${a.id}')">
+            <div><span class="ref">${doaRef(a.id)}</span><div class="an">${a.nom}</div></div>
+            <div class="auths">${authDeleg}</div>
+            <span class="pill ${st.cls}">${st.label}</span>
+          </div>`;
+        }).join("")}
+      </div></div>
+    </div>`;
+  }).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">Aucune action ne correspond à ce filtre.</div>`;
+  renderActivityStrip();
+}
+function toggleTheme(k){openThemes[k]=openThemes[k]===false?true:false;renderTree();}
+
+/* ================= CASCADE D'AUTORITÉ ================= */
+function cascadeCard(eyebrow,name,sub,holdersHtml,scopePct,pillCls,pillLabel,barLabel){
+  return `<div class="cascade-item">
+    <div class="ce-eyebrow">${eyebrow}</div>
+    <h4>${name}</h4>
+    <div class="ce-sub">${sub}</div>
+    ${holdersHtml?`<div class="ce-holders">${holdersHtml}</div>`:''}
+    <div class="ce-bar-wrap"><div class="ce-bar-lbl">${barLabel}</div><div class="ce-bar"><i style="width:${scopePct}%"></i></div></div>
+    <div class="ce-status"><span class="pill ${pillCls}">${pillLabel}</span></div>
+  </div>`;
+}
+function cascadeLink(label,caption,condition,leftPct){
+  const uid="cl"+Math.random().toString(36).slice(2,8);
+  const endX=leftPct+8;
+  return `<div class="cascade-link">
+    <svg viewBox="0 0 100 44" preserveAspectRatio="none">
+      <defs><marker id="a-${uid}" markerWidth="6" markerHeight="6" refX="4.5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--green-700)"/></marker></defs>
+      <path d="M6 2 C 6 22, ${endX-4} 22, ${endX} 40" fill="none" stroke="var(--green-700)" stroke-width="1.5" marker-end="url(#a-${uid})"/>
+    </svg>
+    <div class="cl-label" style="left:${leftPct}%"><span class="cl-pill">${label}</span><div class="cl-cap">${caption}</div></div>
+    ${condition?`<span class="cl-cond">${condition}</span>`:''}
+  </div>`;
+}
+function renderCascade(a){
+  const th=themeById(a.theme); const nonDeleg=a.deleg==="none"; const total=ACTIONS.length;
+  let html=`<div class="cascade">`;
+  html+=cascadeCard("ISSUER",CEO.nom,"Thématique : "+th.nom,"",100,"ok","Accepté","Autorité source · note du 30 mars 2026");
+  if(nonDeleg){
+    html+=`<div class="cascade-link"><svg viewBox="0 0 100 44" preserveAspectRatio="none"><path d="M6 2 C 6 22, 6 22, 6 40" fill="none" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="3 3"/></svg><div class="cl-label" style="left:14%"><span class="cl-pill" style="background:var(--line);color:var(--muted)">ne délègue pas</span><div class="cl-cap">réservée au CEO</div></div></div>`;
+    html+=`<div class="cascade-item dashed">Action non délégable — traitée directement par le CEO.</div>`;
+    html+=`</div>`;
+    return html;
+  }
+  const holders=holderPeople(a.deleg);
+  const delegCount=ACTIONS.filter(x=>x.deleg!=="none"&&x.deleg.postes&&x.deleg.postes.join()===a.deleg.postes.join()).length;
+  const delegScope=Math.round(delegCount/total*100);
+  const holdersHtml=holders.map(h=>`<span>${h.nom} · ${POSTES[h.postes[0]].short}</span>`).join("");
+  html+=cascadeLink("délègue","dans la limite de la note CEO",null,18);
+  html+=cascadeCard("RECIPIENT",holderLabel(a.deleg)+" <span class=\"scope-tag poste\" style=\"vertical-align:middle;margin-left:6px\">Poste</span>",th.nom+" · "+holders.length+" titulaire(s) actuel(s)",holdersHtml,delegScope,"ok","Accepté",delegCount+"/"+total+" actions détenues par ce poste");
+  const active=SUBDELEGS.find(s=>s.actions.includes(a.id)&&s.status==="active");
+  const pending=SUBDELEGS.find(s=>s.actions.includes(a.id)&&s.status==="soumis");
+  const sub=active||pending;
+  if(sub){
+    const peopleTo=holderPeople(sub.to);
+    const subScope=Math.round(sub.actions.length/Math.max(delegCount,1)*100);
+    const cond=active?"Validité : "+fmtDate(sub.start)+" → "+fmtDate(sub.end):"Condition : validation BPM Director";
+    const subHoldersHtml=peopleTo.map(h=>`<span>${h.nom}</span>`).join("");
+    html+=cascadeLink("redélègue","ne dépasse jamais le périmètre du délégataire",cond,30);
+    html+=cascadeCard("SUB-RECIPIENT",holderLabel(sub.to)+` <span class="scope-tag ${holderScope(sub.to)==='Poste'?'poste':''}" style="vertical-align:middle;margin-left:6px">${holderScope(sub.to)}</span>`,th.nom,subHoldersHtml,subScope,active?"ok":"warn",active?"Accepté":"Émis · en attente d'acceptation",sub.actions.length+" action(s) sous-déléguée(s)");
+  } else {
+    const canCreate=ROLE==="delegataire"&&personaHoldsAction(a,CURRENT_PERSONA);
+    html+=cascadeLink("redélègue","aucune sous-délégation active","",30);
+    html+=`<div class="cascade-item dashed">Aucun sous-délégataire pour l'instant${canCreate?`<br><button class="btn ghost sm" style="margin-top:10px" onclick="closeModal();go('creer');preselect('${a.id}')">+ Créer une sous-délégation</button>`:''}</div>`;
+  }
+  html+=`</div>`;
+  return html;
+}
+
+/* ================= DÉTAIL D'UNE ACTION ================= */
+function openActionDetail(id){
+  const a=ACTIONS.find(x=>x.id===id); const th=themeById(a.theme); const nonDeleg=a.deleg==="none"; const st=actionStatus(a);
+  const related=SUBDELEGS.filter(s=>s.actions.includes(a.id)).sort((x,y)=>new Date(x.start)-new Date(y.start));
+  const active=related.find(s=>s.status==="active"); const pending=related.find(s=>s.status==="soumis");
+
+  const condLine = a.sub ? "Sous-délégataire structurel prévu par la matrice : "+a.sub
+    : a.note ? a.note
+    : nonDeleg ? "Cette action reste réservée au CEO — aucune sous-délégation possible."
+    : "Aucune condition particulière associée dans la matrice.";
+
+  let trail;
+  if(related.length){
+    const nodes=[];
+    related.forEach(s=>{
+      nodes.push({lab:"Soumis",who:userById(s.source).nom,d:s.start,done:true});
+      if(s.status==="active")nodes.push({lab:"Validé & activé",who:s.valBy,d:s.valDate,done:true});
+      else nodes.push({lab:"En attente de validation BPM",who:"BPM Director",d:null,done:false});
+    });
+    trail=nodes.map(n=>`<div class="audit"><div class="ad" style="background:${n.done?'var(--green-600)':'#fff'};border:${n.done?'none':'1.5px solid var(--line)'}"></div><div><div class="at">${n.lab} <span style="font-weight:400;color:var(--muted)">— ${n.who}</span></div><div class="atm">${n.d?fmtDate(n.d):'en cours'}</div></div></div>`).join("");
+  } else {
+    trail=`<div class="audit"><div class="ad"></div><div><div class="at">Défini dans la note CEO — OCPNUTRI-ID-3</div><div class="atm">30 mars 2026</div></div></div>`;
+  }
+
+  let footActions="";
+  if(ROLE==="bpm"&&pending){
+    footActions=`<button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="closeModal();openSD('${pending.id}')">Ouvrir le dossier de validation</button>`;
+  } else if(active){
+    footActions=`<button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="downloadPdf('${active.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 15V3m0 12l-4-4m4 4 4-4M2 17l.6 2.7A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.3L22 17"/></svg>Voir le PDF signé</button>`;
+  } else if(ROLE==="delegataire"&&personaHoldsAction(a,CURRENT_PERSONA)){
+    footActions=`<button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="closeModal();go('creer');preselect('${a.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 5v14M5 12h14"/></svg>Créer une sous-délégation</button>`;
+  } else {
+    footActions=`<button class="btn ghost" onclick="closeModal()">Fermer</button>`;
+  }
+
+  $("#modalHost").innerHTML=`<div class="modal wide">
+    <div class="m-head">
+      <div><h3>${doaRef(a.id)} <span style="font-weight:500;color:var(--muted);font-size:15px"> · ${th.nom}</span></h3><p>${a.nom}</p></div>
+      <span class="pill ${st.cls}" style="margin-top:2px">${st.label}</span>
+      <button class="m-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-body">
+      ${renderCascade(a)}
+      <div class="card pad" style="margin:4px 0 16px;display:flex;align-items:center;gap:11px;flex-wrap:wrap">
+        <span class="auth-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICO_CTRL}</svg>Contrôle</span>
+        <span style="font-size:13px;color:var(--ink)">${ctrlText(a)}</span>
+        <span class="scope-tag" style="margin-left:auto">Type : ${TYPE_LABELS[a.type]}</span>
+      </div>
+      <div class="role-banner" style="margin-bottom:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/></svg><span>${condLine}</span></div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Audit trail</div>
+      ${trail}
+    </div>
+    <div class="m-foot">${footActions}</div>
+  </div>`;
+  $("#scrim").classList.add("open");
+}
+
+/* ================= FIL D'ACTIVITÉ ================= */
+function renderActivityStrip(){
+  const el=$("#activityStrip"); if(!el)return;
+  const pendCount=SUBDELEGS.filter(s=>s.status==="soumis").length;
+  const items=[
+    {ic:ICO_CTRL,t:AUDIT[0]?AUDIT[0].act:"Aucune activité récente",tm:AUDIT[0]?AUDIT[0].who:""},
+    {ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',t:pendCount+" sous-délégation(s) en attente de validation BPM",tm:"À traiter"},
+  ];
+  el.innerHTML=items.map(i=>`<div class="ac"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${i.ic}</svg></div><div><div class="at">${i.t}</div><div class="atm">${i.tm}</div></div></div>`).join("");
+}
+
+/* ================= MES DELEGATIONS ================= */
+function myActions(){ return ACTIONS.filter(a=>personaHoldsAction(a,CURRENT_PERSONA)); }
+function renderMyDeleg(){
+  const u=userById(CURRENT_PERSONA); const posteLab=POSTES[u.postes[0]].lab;
+  $("#myDelegSub").textContent=u.nom+" — "+posteLab+" · délégations attribuées par le CEO à ce poste";
+  const mine=myActions();
+  const byTheme={};
+  mine.forEach(a=>{(byTheme[a.theme]=byTheme[a.theme]||[]).push(a);});
+  const subCount=SUBDELEGS.filter(s=>s.source===CURRENT_PERSONA&&s.status==="active").length;
+  const pendCount=SUBDELEGS.filter(s=>s.source===CURRENT_PERSONA&&s.status==="soumis").length;
+  $("#myKpis").innerHTML=[
+    [mine.length,"Actions détenues (poste "+POSTES[u.postes[0]].short+")"],
+    [subCount,"Sous-délégations actives créées"],
+    [pendCount,"En attente de validation BPM"],
+  ].map(k=>`<div class="card kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
+  $("#myDelegList").innerHTML=Object.entries(byTheme).map(([tk,acts])=>{
+    const th=themeById(tk);
+    return `<div class="card deleg-card">
+      <div class="dh"><div class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${th.ic}</svg></div><div><div class="dt">${th.nom}</div><div class="dd">${acts.length} action(s) — poste ${holderLabel(acts[0].deleg)}</div></div></div>
+      ${acts.map(a=>{const subs=activeSubsFor(a.id);return `<div class="action-item"><span class="an">${a.nom}<div style="font-size:11.5px;color:var(--muted)">Contrôle : ${ctrlText(a)}</div></span>${subs.length?`<span class="subd-tag">Sous-délégué à ${holderLabel(subs[0].to)}</span>`:`<button class="btn ghost sm" onclick="go('creer');preselect('${a.id}')">+ Sous-déléguer</button>`}</div>`;}).join("")}
+    </div>`;
+  }).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">Aucune délégation pour ce poste.</div>`;
+}
+
+/* ================= CREER ================= */
+let selActions={}, selUser=null, subScope="nominatif", selPostes={};
+function preselect(actId){selActions={};selActions[actId]=true;renderCreate();}
+function setSubScope(s){
+  subScope=s;
+  document.querySelectorAll("#scopeSeg button").forEach((b,i)=>b.classList.toggle("on",(i===0&&s==="nominatif")||(i===1&&s==="poste")));
+  $("#dirPickWrap").classList.toggle("hidden",s!=="nominatif");
+  $("#postePickWrap").classList.toggle("hidden",s!=="poste");
+  updateRecap();
+}
+function renderCreate(){
+  renderActPick(); renderDirPick(); renderPostePick(); updateRecap();
+}
+function renderActPick(){
+  const acts=myActions();
+  $("#actPick").innerHTML=acts.map(a=>`<label class="act-opt"><input type="checkbox" ${selActions[a.id]?'checked':''} onchange="toggleAct('${a.id}',this.checked)"><span class="ao-t">${a.nom}<div class="ao-th">${themeById(a.theme).nom}</div></span></label>`).join("")||`<div style="padding:12px;color:var(--muted);font-size:13px">Aucune action détenue par votre poste.</div>`;
+}
+function toggleAct(id,v){selActions[id]=v;updateRecap();}
+function renderDirPick(){
+  const q=($("#dirQ").value||"").toLowerCase();
+  const list=DIRECTORY.filter(u=>!q||u.nom.toLowerCase().includes(q)||u.entite.toLowerCase().includes(q));
+  $("#dirPick").innerHTML=list.map(u=>`<div class="dir-item ${selUser===u.id?'on':''}" onclick="pickUser('${u.id}')"><div class="dav">${initials(u.nom)}</div><div><div class="dn">${u.nom}</div><div class="de">${u.role} · ${u.entite}</div></div></div>`).join("");
+}
+function renderPostePick(){
+  const list=Object.entries(POSTES).filter(([k])=>k!=="ceo");
+  $("#postePick").innerHTML=list.map(([k,p])=>`<button class="poste-chip ${selPostes[k]?'on':''}" onclick="togglePoste('${k}')">${p.short}</button>`).join("");
+}
+function togglePoste(k){selPostes[k]=!selPostes[k];renderPostePick();updateRecap();}
+function pickUser(id){selUser=id;renderDirPick();updateRecap();}
+function updateRecap(){
+  const acts=Object.keys(selActions).filter(k=>selActions[k]);
+  let target=null, targetHtml="";
+  if(subScope==="nominatif"&&selUser){ const u=userById(selUser); target=u; targetHtml=`<div class="dir-item on" style="cursor:default;margin-bottom:12px"><div class="dav">${initials(u.nom)}</div><div><div class="dn">${u.nom}</div><div class="de">${u.role} · ${u.entite}<span class="scope-tag" style="margin-left:6px">Nominatif</span></div></div></div>`; }
+  if(subScope==="poste"){ const ks=Object.keys(selPostes).filter(k=>selPostes[k]); if(ks.length){ target=ks; const holders=DIRECTORY.filter(u=>u.postes&&u.postes.some(p=>ks.includes(p))); targetHtml=`<div style="font-size:13px;margin-bottom:10px"><b>${ks.map(k=>POSTES[k].short).join(" / ")}</b> <span class="scope-tag poste">Poste</span><br><span style="color:var(--muted);font-size:12px">${holders.length} titulaire(s) actuel(s) : ${holders.map(h=>h.nom).join(", ")||"aucun pour l'instant"}</span></div>`; } }
+  if(!acts.length||!target){$("#recapBox").innerHTML="Sélectionnez des actions et un destinataire pour voir l'aperçu.";return;}
+  $("#recapBox").innerHTML=targetHtml+
+    `<div style="font-size:13px;color:var(--muted);margin:9px 0">${acts.length} action(s) seront sous-déléguées :</div>`+
+    acts.map(id=>{const a=ACTIONS.find(x=>x.id===id);return `<div style="font-size:13px;padding:6px 0;border-top:1px solid var(--line)">✓ ${a.nom}</div>`;}).join("")+
+    `<div style="margin-top:10px;font-size:12px;color:var(--muted)">Période : ${fmtDate($("#f-start").value)} → ${fmtDate($("#f-end").value)}</div>`;
+}
+function submitSubDeleg(){
+  const acts=Object.keys(selActions).filter(k=>selActions[k]);
+  if(!acts.length){toast("Sélectionnez au moins une action",null,true);return;}
+  let to;
+  if(subScope==="nominatif"){ if(!selUser){toast("Sélectionnez un collaborateur",null,true);return;} to=holderUser(selUser); }
+  else { const ks=Object.keys(selPostes).filter(k=>selPostes[k]); if(!ks.length){toast("Sélectionnez au moins un poste cible",null,true);return;} to=holderPoste(ks); }
+  const id="sd"+Date.now();
+  SUBDELEGS.unshift({id,ref:null,source:CURRENT_PERSONA,actions:acts,to,start:$("#f-start").value,end:$("#f-end").value,status:"soumis",comment:$("#f-com").value||"—",checkpoints:{}});
+  selActions={};selUser=null;selPostes={};
+  toast("Sous-délégation soumise au BPM Director","→");
+  go('mesdeleg');
+}
+
+/* ================= CHECKLIST / POINTS DE CONTRÔLE ================= */
+function checklistItemsFor(s){
+  const types=[...new Set(s.actions.map(id=>ACTIONS.find(a=>a.id===id).type))];
+  const items=[];
+  types.forEach(t=>CHECKLIST_TEMPLATES[t].forEach(txt=>{ if(!items.some(i=>i.txt===txt))items.push({txt,type:t}); }));
+  return items;
+}
+function renderChecklist(s){
+  const items=checklistItemsFor(s);
+  const done=items.filter((_,i)=>s.checkpoints[i]&&s.checkpoints[i].checked).length;
+  const pct=Math.round(done/items.length*100);
+  return `<div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px">Points de contrôle obligatoires</div>
+    <div class="cl-progress"><div class="bar"><i style="width:${pct}%"></i></div><span style="font-size:12px;font-weight:700;color:var(--green-800)">${done}/${items.length}</span></div>
+    <div class="checklist">${items.map((it,i)=>{const cp=s.checkpoints[i];return `<div class="cl-item ${cp&&cp.checked?'checked':''}" onclick="toggleCheckpoint('${s.id}',${i})"><div class="cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><div class="ct">${it.txt}<div class="cm">${TYPE_LABELS[it.type]}${cp&&cp.checked?' · vérifié par '+cp.by+' · '+cp.date:''}</div></div></div>`;}).join("")}</div>`;
+}
+function toggleCheckpoint(sdId,idx){
+  const s=SUBDELEGS.find(x=>x.id===sdId); s.checkpoints=s.checkpoints||{};
+  const was=s.checkpoints[idx]&&s.checkpoints[idx].checked;
+  if(was){ s.checkpoints[idx]={checked:false}; }
+  else {
+    const by=CURRENT_USER.bpm||"BPM Director";
+    s.checkpoints[idx]={checked:true,by,date:fmtDate("2026-06-14")};
+    AUDIT.unshift({d:"2026-06-14 —",who:"BPM Director — "+by,act:"Point de contrôle vérifié",det:checklistItemsFor(s)[idx].txt+" ("+(s.ref||sdId)+")"});
+  }
+  openSD(sdId);
+}
+
+/* ================= WORKFLOW BPM ================= */
+const WF_COLS=[["soumis","Soumis",""],["review","En revue","warn"],["valide","Validé",""],["active","Actif · PDF généré","ok"]];
+function renderWorkflow(){
+  $("#wfBoard").innerHTML=WF_COLS.map(([k,lab,cls])=>{
+    let items;
+    if(k==="soumis")items=SUBDELEGS.filter(s=>s.status==="soumis");
+    else if(k==="active")items=SUBDELEGS.filter(s=>s.status==="active");
+    else items=[];
+    return `<div class="wcol"><div class="wh"><span>${lab}</span><span class="pill ${cls||'info'}">${items.length}</span></div>${items.map(s=>{
+      return `<div class="wcard" onclick="openSD('${s.id}')"><div class="wt">${userById(s.source).nom.split(' ')[0]} → ${holderLabel(s.to)}</div><div class="wm2">${s.actions.length} action(s) · ${fmtDate(s.start)}</div></div>`;
+    }).join("")||'<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px">—</div>'}</div>`;
+  }).join("");
+}
+function openSD(id){
+  const s=SUBDELEGS.find(x=>x.id===id); s.checkpoints=s.checkpoints||{};
+  const actsHtml=s.actions.map(aid=>`<div style="font-size:13px;padding:6px 0;border-top:1px solid var(--line)">✓ ${ACTIONS.find(a=>a.id===aid).nom}</div>`).join("");
+  const items=checklistItemsFor(s);
+  const allChecked=items.every((_,i)=>s.checkpoints[i]&&s.checkpoints[i].checked);
+  let actions="";
+  if(ROLE==="bpm"&&s.status==="soumis"){
+    actions=`<button class="btn bad" onclick="rejectSD('${id}')">⚠ Rejeter</button><button class="btn" ${allChecked?'':'disabled title="Complétez tous les points de contrôle"'} onclick="approveSD('${id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Valider en un clic</button>`;
+  } else if(s.status==="active"){
+    actions=`<button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="downloadPdf('${id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 15V3m0 12l-4-4m4 4 4-4M2 17l.6 2.7A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.3L22 17"/></svg>Voir le PDF signé</button>`;
+  } else actions=`<button class="btn ghost" onclick="closeModal()">Fermer</button>`;
+  $("#modalHost").innerHTML=`<div class="modal wide"><div class="m-head"><div><h3>${userById(s.source).nom.split(' ')[0]} → ${holderLabel(s.to)}</h3><p>${s.actions.length} action(s) · ${fmtDate(s.start)} → ${fmtDate(s.end)}</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="m-body">
+      <div class="card pad soft" style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--green-800);margin-bottom:4px">Justification</div><div style="font-size:13.5px">${s.comment}</div></div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px" class="caps">Actions concernées</div>${actsHtml}
+      ${s.status==="soumis"?renderChecklist(s):(s.status==="active"?`<div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px">Points de contrôle — historique</div><div class="checklist">${items.map((it,i)=>`<div class="cl-item checked"><div class="cb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></div><div class="ct">${it.txt}<div class="cm">${(s.checkpoints[i]&&s.checkpoints[i].by)?'vérifié par '+s.checkpoints[i].by+' · '+s.checkpoints[i].date:'vérifié lors de la validation'}</div></div></div>`).join("")}</div>`:'')}
+      ${s.ref?`<div style="margin-top:14px;padding:11px 14px;background:var(--green-50);border-radius:11px;font-size:12.5px"><b>Référence :</b> ${s.ref} · validé par ${s.valBy} le ${fmtDate(s.valDate)}</div>`:''}
+    </div>
+    <div class="m-foot">${actions}</div></div>`;
+  $("#scrim").classList.add("open");
+}
+function approveSD(id){
+  const s=SUBDELEGS.find(x=>x.id===id);
+  const items=checklistItemsFor(s);
+  const allChecked=items.every((_,i)=>s.checkpoints[i]&&s.checkpoints[i].checked);
+  if(!allChecked){ toast("Complétez tous les points de contrôle avant de valider",null,true); return; }
+  s.status="active"; s.ref="SD-OCPNUTRI-2026-"+String(Math.floor(60+Math.random()*40)).padStart(4,'0');
+  s.valBy="Hassan Belkadi"; s.valDate="2026-06-14";
+  AUDIT.unshift({d:"2026-06-14 10:32",who:"BPM Director — Hassan Belkadi",act:"Validation "+s.ref,det:"Points de contrôle vérifiés — PDF généré et archivé automatiquement"});
+  closeModal(); renderWorkflow(); setBadges();
+  toast("Validé en un clic — activée immédiatement, PDF signé généré","●");
+}
+function rejectSD(id){
+  const s=SUBDELEGS.find(x=>x.id===id); s.status="rejete";
+  closeModal(); renderWorkflow(); setBadges();
+  toast("Sous-délégation rejetée — notifiée au délégataire","⚠");
+}
+function setBadges(){const b=document.querySelector('#tabs button[data-v="workflow"] .n');if(b)b.textContent=SUBDELEGS.filter(s=>s.status==="soumis").length;}
+
+/* ================= ACTIVES / PDF ================= */
+function renderActives(){
+  const act=SUBDELEGS.filter(s=>s.status==="active");
+  $("#activeCount").textContent=act.length+" actives";
+  $("#activeList").innerHTML=act.map(s=>{
+    return `<div class="sd-row">
+      <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+      <div class="sm"><div class="st">${userById(s.source).nom} → ${holderLabel(s.to)} <span class="scope-tag ${holderScope(s.to)==='Poste'?'poste':''}">${holderScope(s.to)}</span></div><div class="sd">${s.actions.length} action(s) · valable du ${fmtDate(s.start)} au ${fmtDate(s.end)}</div></div>
+      <div class="sref">${s.ref}</div>
+      <span class="pill ok">Actif</span>
+      <button class="btn ghost sm" onclick="downloadPdf('${s.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 15V3m0 12l-4-4m4 4 4-4M2 17l.6 2.7A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.3L22 17"/></svg>PDF</button>
+    </div>`;
+  }).join("")||`<div style="padding:24px;text-align:center;color:var(--muted)">Aucune sous-délégation active.</div>`;
+}
+function downloadPdf(id){
+  const s=SUBDELEGS.find(x=>x.id===id);
+  const actsHtml=s.actions.map(aid=>`<div class="prow"><span>${ACTIONS.find(a=>a.id===aid).nom}</span><b>✓</b></div>`).join("");
+  const items=checklistItemsFor(s);
+  const clHtml=items.map((it,i)=>`<div class="prow"><span>${it.txt}</span><b>✓ ${(s.checkpoints[i]&&s.checkpoints[i].by)||s.valBy}</b></div>`).join("");
+  $("#modalHost").innerHTML=`<div class="modal wide"><div class="m-head"><div><h3>Document de sous-délégation</h3><p>${s.ref}</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="m-body">
+      <div class="pdf-doc">
+        <div class="ph"><h4>Sous-délégation de pouvoirs</h4><div class="ref">Réf. ${s.ref}<br>NutriGov · Matrice OCPNUTRI-ID-3</div></div>
+        <div class="prow"><span>Délégataire (émetteur)</span><b>${userById(s.source).nom} — ${userById(s.source).role}</b></div>
+        <div class="prow"><span>Sous-délégataire</span><b>${holderLabel(s.to)} (${holderScope(s.to)})</b></div>
+        <div class="prow"><span>Période de validité</span><b>${fmtDate(s.start)} → ${fmtDate(s.end)}</b></div>
+        <div class="prow"><span>Validé par (BPM Director)</span><b>${s.valBy}</b></div>
+        <div class="prow"><span>Date de validation</span><b>${fmtDate(s.valDate)}</b></div>
+        <div style="margin:16px 0 8px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)">Actions déléguées</div>
+        ${actsHtml}
+        <div style="margin:16px 0 8px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)">Points de contrôle vérifiés</div>
+        ${clHtml}
+        <div class="seal"><div style="font-size:11px;color:var(--muted)">Document généré automatiquement · OCP Nutricrops<br>Archivé — conforme registre de gouvernance</div><div class="sig"><div class="sn">✓ Signé électroniquement</div><div style="font-size:11px;color:var(--muted)">${s.valBy}</div></div></div>
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal()">Fermer</button><button class="btn" onclick="toast('PDF téléchargé et archivé')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 15V3m0 12l-4-4m4 4 4-4M2 17l.6 2.7A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.9-1.3L22 17"/></svg>Télécharger le PDF</button></div></div>`;
+  $("#scrim").classList.add("open");
+}
+
+/* ================= ADMIN — IMPORT CSV ================= */
+function handleImportFile(){
+  const f=$("#impFile").files[0]; if(!f)return;
+  const ext=f.name.split(".").pop().toLowerCase();
+  if(ext==="xlsx"){
+    $("#impPreview").innerHTML=`<div class="role-banner" style="margin-top:12px;text-align:left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/></svg><span>Fichier .xlsx reçu (${f.name}). Le parsing binaire s'effectue côté serveur dans le pipeline PostgreSQL de production. Pour cette démo hors-ligne, utilisez un export .csv pour un aperçu immédiat.</span></div>`;
+    toast("Fichier .xlsx reçu — traitement serveur simulé");
+    AUDIT.unshift({d:"2026-09-13 —",who:"Admin — Fatima Zniber",act:"Import xlsx reçu : "+f.name,det:"Catégorie : "+$("#impTheme").selectedOptions[0].textContent+" — traitement serveur"});
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=e.target.result;
+    const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
+    if(!lines.length){toast("Fichier CSV vide",null,true);return;}
+    const rows=lines.map(l=>l.split(",").map(c=>c.trim().replace(/^"|"$/g,"")));
+    const header=rows[0]; const data=rows.slice(1);
+    let html=`<table class="csv-prev"><thead><tr>${header.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${data.slice(0,5).map(r=>`<tr>${r.map(c=>`<td>${c||''}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    html+=`<div style="font-size:12px;color:var(--muted);margin-top:8px">${data.length} ligne(s) détectée(s)${data.length>5?' · aperçu des 5 premières':''}. Catégorie : <b>${$("#impTheme").selectedOptions[0].textContent}</b>.</div>`;
+    html+=`<button class="btn amber sm" style="margin-top:10px" onclick="confirmImport(${data.length})">Confirmer l'import (${data.length} lignes)</button>`;
+    $("#impPreview").innerHTML=html;
+  };
+  reader.readAsText(f);
+}
+function confirmImport(n){
+  const cat=$("#impTheme").selectedOptions[0].textContent;
+  AUDIT.unshift({d:"2026-09-13 —",who:"Admin — Fatima Zniber",act:"Import CSV confirmé : "+n+" ligne(s)",det:"Catégorie : "+cat+" — écriture en base après contrôle qualité automatique"});
+  toast(n+" ligne(s) validées pour la catégorie « "+cat+" » — traçabilité conservée");
+  $("#impPreview").innerHTML="";
+  $("#impFile").value="";
+  renderAdmin();
+}
+
+/* ================= ADMIN — EDIT ACTION ================= */
+function openEditAction(id){
+  if(!id)return;
+  const a=ACTIONS.find(x=>x.id===id);
+  const posteOpts=Object.entries(POSTES).filter(([k])=>k!=="ceo"&&k!=="ctrl_fin").map(([k,p])=>`<label class="poste-chip ${a.deleg!=="none"&&a.deleg.postes&&a.deleg.postes.includes(k)?'on':''}" style="cursor:pointer" onclick="event.preventDefault();this.classList.toggle('on')" data-k="${k}">${p.short}</label>`).join(" ");
+  $("#modalHost").innerHTML=`<div class="modal wide"><div class="m-head"><div><h3>${doaRef(a.id)}</h3><p>${a.nom}</p></div><button class="m-x" onclick="closeModal();$('#editActSel').value=''">✕</button></div>
+    <div class="m-body">
+      <div class="field"><label>Délégataire (poste — sélection multiple)</label><div class="poste-pick" id="editPostes">${posteOpts}</div><div style="font-size:11.5px;color:var(--muted);margin-top:6px">Aucune sélection = action non délégable (reste au CEO).</div></div>
+      <div class="field"><label>Sous-délégataire structurel (matrice)</label><input id="editSub" value="${a.sub||''}" placeholder="Ex. Responsable de l'entité en charge du Customer Service"/></div>
+      <div class="field"><label>Entité(s) de contrôle — séparées par une virgule</label><textarea id="editCtrl">${(a.ctrl||[]).join(", ")}</textarea></div>
+      <div class="field"><label>Type (détermine les points de contrôle)</label><select id="editType">${Object.entries(TYPE_LABELS).map(([k,l])=>`<option value="${k}" ${a.type===k?'selected':''}>${l}</option>`).join("")}</select></div>
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal();$('#editActSel').value=''">Annuler</button><button class="btn" onclick="saveEditAction('${a.id}')">Enregistrer</button></div>
+  </div>`;
+  $("#scrim").classList.add("open");
+}
+function saveEditAction(id){
+  const a=ACTIONS.find(x=>x.id===id);
+  const ks=[...document.querySelectorAll("#editPostes .poste-chip.on")].map(el=>el.dataset.k);
+  const before=JSON.stringify({deleg:a.deleg,sub:a.sub,ctrl:a.ctrl,type:a.type});
+  a.deleg = ks.length? holderPoste(ks) : "none";
+  a.sub = $("#editSub").value.trim()||undefined;
+  a.ctrl = $("#editCtrl").value.split(",").map(s=>s.trim()).filter(Boolean);
+  a.type = $("#editType").value;
+  AUDIT.unshift({d:"2026-09-13 —",who:"Admin — Fatima Zniber",act:"Édition "+doaRef(a.id)+" — "+a.nom.slice(0,40)+"…",det:"Avant : "+before+" → Après : "+JSON.stringify({deleg:a.deleg,sub:a.sub,ctrl:a.ctrl,type:a.type})});
+  closeModal(); $("#editActSel").value="";
+  toast("Délégation mise à jour — traçabilité conservée dans l'audit trail");
+  renderAdmin();
+}
+
+/* ================= ADMIN — POSTE CHANGE (sync temps réel) ================= */
+function renderPosteControls(){
+  $("#posUserSel").innerHTML=DIRECTORY.map(u=>`<option value="${u.id}">${u.nom} — ${u.postes&&u.postes.length?u.postes.map(p=>POSTES[p].short).join("/"):"aucun poste"}</option>`).join("");
+  $("#posNewSel").innerHTML=`<option value="">Aucun poste (retirer)</option>`+Object.entries(POSTES).filter(([k])=>k!=="ceo").map(([k,p])=>`<option value="${k}">${p.lab}</option>`).join("");
+}
+function changePoste(){
+  const uid=$("#posUserSel").value; const newP=$("#posNewSel").value;
+  const u=userById(uid); const before=(u.postes||[]).map(p=>POSTES[p].short).join("/")||"aucun";
+  u.postes = newP? [newP] : [];
+  const after=(u.postes||[]).map(p=>POSTES[p].short).join("/")||"aucun";
+  AUDIT.unshift({d:"2026-09-13 —",who:"Admin — Fatima Zniber",act:"Changement de poste : "+u.nom,det:before+" → "+after+" — délégations héritées recalculées automatiquement"});
+  toast(u.nom+" : poste mis à jour ("+before+" → "+after+") — synchronisé en temps réel","●");
+  renderAdmin(); renderPosteControls();
+  if(ROLE==="delegataire")refreshCurrentView();
+}
+
+/* ================= ADMIN — misc ================= */
+function renderAdmin(){
+  $("#impTheme").innerHTML=THEMES.map(t=>`<option value="${t.k}">${t.nom}</option>`).join("")+`<option value="achat_mp">Achat MP (nouvelle catégorie)</option>`;
+  $("#editActSel").innerHTML=`<option value="">— Choisir une action à éditer —</option>`+ACTIONS.map(a=>`<option value="${a.id}">${doaRef(a.id)} — ${a.nom.slice(0,52)}${a.nom.length>52?'…':''}</option>`).join("");
+  $("#auditTbl").innerHTML=`<tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Détail</th></tr>`+AUDIT.slice(0,12).map(a=>`<tr><td style="white-space:nowrap;color:var(--muted)">${a.d}</td><td style="font-weight:600">${a.who}</td><td>${a.act}</td><td style="color:var(--muted)">${a.det}</td></tr>`).join("");
+  $("#userList").innerHTML=DIRECTORY.map(u=>`<div class="userow"><div class="uav">${initials(u.nom)}</div><div style="flex:1;min-width:140px"><div style="font-weight:600">${u.nom}</div><div style="font-size:11.5px;color:var(--muted)">${u.role} · ${u.entite}</div></div>${u.postes&&u.postes.length?u.postes.map(p=>`<span class="scope-tag poste">${POSTES[p].short}</span>`).join(""):'<span class="scope-tag">Sans poste</span>'}<span class="pill ok">Sync</span></div>`).join("");
+  renderPosteControls();
+  const missing=ACTIONS.filter(a=>a.deleg!=="none"&&(!a.ctrl||a.ctrl.length===0)).length;
+  const nonDelegCount=ACTIONS.filter(a=>a.deleg==="none").length;
+  $("#integrityBox").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Actions sans entité de contrôle formelle</span><b style="color:var(--muted)">${missing}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Actions non délégables (réservées au CEO)</span><b>${nonDelegCount}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Postes actifs</span><b>${Object.keys(POSTES).length-1}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0"><span>Dernière synchro Entra ID</span><b>il y a 12 min</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:13.5px;padding:6px 0;border-top:1px solid var(--line);margin-top:4px;padding-top:10px"><span>Statut global</span><span class="pill ok">Conforme</span></div>`;
+}
+
+/* ================= PILOTAGE ================= */
+function renderPilotage(){
+  const total=SUBDELEGS.length,active=SUBDELEGS.filter(s=>s.status==="active").length,soumis=SUBDELEGS.filter(s=>s.status==="soumis").length;
+  const k=[
+    ["100%","Sous-délégations créées en autonomie","cible 100% — atteinte"],
+    ["<1 j","Délai moyen de traitement","vs plusieurs jours par email"],
+    ["28/28","Actions cartographiées","matrice OCPNUTRI-ID-3 à jour"],
+    [active+"/"+total,"Sous-délégations actives / totales",soumis+" en attente BPM"],
+  ];
+  $("#govKpis").innerHTML=k.map(x=>`<div class="card kpi"><div class="v">${x[0]}</div><div class="l">${x[1]}</div><div class="tgt"><span class="pill ok">${x[2]}</span></div></div>`).join("");
+  const byTheme=THEMES.map(t=>({t,n:ACTIONS.filter(a=>a.theme===t.k).length}));
+  const max=Math.max(...byTheme.map(x=>x.n));
+  $("#themeBars").innerHTML=byTheme.map(x=>`<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px"><span style="width:190px;flex:0 0 190px;font-size:13px;font-weight:600">${x.t.nom}</span><span style="flex:1;height:10px;background:var(--green-50);border-radius:6px;overflow:hidden"><i style="display:block;height:100%;width:${x.n/max*100}%;background:var(--green-600);border-radius:6px"></i></span><span style="width:24px;font-weight:700;font-size:13px;text-align:right">${x.n}</span></div>`).join("");
+  const cooEvpCount=ACTIONS.filter(a=>a.deleg!=="none"&&a.deleg.postes&&a.deleg.postes.join()===["coo","evp"].join()).length;
+  const alertColor={ok:"var(--green-600)",warn:"var(--warn)",info:"var(--amber)"};
+  const alerts=[
+    ["Le poste COO / EVP concentre "+cooEvpCount+" des 28 actions ("+Math.round(cooEvpCount/28*100)+"%) — point de vigilance gouvernance","warn"],
+    ["2 actions restent non délégables et réservées au CEO (NDA vente, Bonus/Discount non contractuel)","info"],
+    ["« Achat MP » cité dans l'objet de la note CEO mais absent de l'annexe signée — matrice à compléter","warn"],
+    [soumis+" sous-délégation(s) en attente de validation BPM","warn"],
+    ["Aucune action orpheline détectée dans la matrice","ok"],
+  ];
+  $("#govAlerts").innerHTML=alerts.map(a=>`<div style="display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px"><span style="width:7px;height:7px;border-radius:50%;background:${alertColor[a[1]]};margin-top:6px;flex:0 0 7px"></span><span>${a[0]}</span></div>`).join("");
+}
+
+/* ================= MODAL ================= */
+function closeModal(){$("#scrim").classList.remove("open");$("#modalHost").innerHTML="";}
+$("#scrim").addEventListener("click",e=>{if(e.target===$("#scrim"))closeModal();});
+
+/* ================= INIT ================= */
+setSubScope("nominatif");
+setRole("collab");
+</script>
+</body>
+</html>
