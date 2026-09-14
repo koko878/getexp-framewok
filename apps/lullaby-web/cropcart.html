@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1B5E20" />
+<title>Crop Cart — Agri-Input Sample Orchestration · OCP Nutricrops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --green-900:#103d17; --green-800:#1B5E20; --green-700:#2E7D32; --green-600:#388E3C; --green-500:#4CAF50; --green-300:#66BB6A; --green-100:#D6EADB; --green-50:#EAF4EC;
+    --ink:#10231a; --muted:#5c6b62; --muted-2:#8a978f; --line:#e3ebe5; --dark:#07140c;
+    --warn:#B45309; --warn-bg:#FEF3C7; --bad:#B91C1C; --bad-bg:#FEE2E2; --amber:#D97706; --amber-bg:#FFFBEB;
+    --blue:#2563EB; --blue-bg:#EFF6FF;
+    --card:#ffffff;
+    --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --sh:0 1px 2px rgba(16,35,26,.05),0 6px 20px rgba(16,35,26,.06);
+    --sh-2:0 10px 34px rgba(16,35,26,.10); --sh-lg:0 24px 60px rgba(16,35,26,.22);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:#f4f8f5;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:14.5px;color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  .serif{font-family:var(--serif)}
+  .caps{text-transform:uppercase;letter-spacing:.08em}
+  .hidden{display:none!important}
+
+  header{background:linear-gradient(120deg,var(--green-900),var(--green-700));color:#fff;padding-top:env(safe-area-inset-top)}
+  .hd{max-width:1260px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:14px 22px}
+  .wm{display:flex;align-items:center;gap:11px;cursor:pointer}
+  .wm .logo{width:36px;height:36px;flex:0 0 36px}
+  .wm h1{font-family:var(--serif);font-size:22px;font-weight:700;line-height:1;letter-spacing:.2px}
+  .wm .tl{font-size:10px;color:#c7e0cc;font-weight:500;margin-top:2px}
+  .hd-r{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .role-pick{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:6px 9px}
+  .role-pick svg{width:14px;height:14px;color:#c7e0cc}
+  .role-pick select{background:transparent;border:none;color:#fff;font-weight:600;font-size:12.5px;cursor:pointer;outline:none}
+  .role-pick select option{color:#10231a}
+  .me{display:flex;align-items:center;gap:8px}
+  .me .av{width:32px;height:32px;border-radius:50%;background:#fff;color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
+  .me .mn{font-size:12px;font-weight:600;line-height:1.15}.me .mn span{display:block;font-weight:400;color:#c7e0cc;font-size:10.5px}
+  @media(max-width:640px){.me .mn{display:none}}
+
+  .tabs-wrap{background:rgba(0,0,0,.1);border-top:1px solid rgba(255,255,255,.1)}
+  .tabs{max-width:1260px;margin:0 auto;display:flex;gap:2px;padding:0 18px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{display:flex;align-items:center;gap:7px;padding:11px 13px;color:#bcd7c1;font-size:13.5px;font-weight:600;white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
+  .tabs button svg{width:15px;height:15px;opacity:.85}
+  .tabs button:hover{color:#fff}
+  .tabs button.active{color:#fff;border-bottom-color:var(--green-300)}
+  .tabs button .n{background:var(--amber);color:#fff;font-size:10.5px;font-weight:800;border-radius:20px;padding:0 6px;min-width:17px;text-align:center;line-height:16px}
+
+  .wrap{max-width:1260px;margin:0 auto;padding:24px 22px 44px}
+  .view{display:none;animation:fade .3s ease}.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .role-banner{display:flex;align-items:center;gap:10px;background:var(--green-50);border:1px solid var(--green-100);border-left:3px solid var(--green-700);border-radius:9px;padding:10px 14px;margin-bottom:18px;font-size:12.5px;color:var(--green-800)}
+  .role-banner svg{width:16px;height:16px;flex:0 0 16px}
+  .role-banner b{font-weight:700}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:600;background:var(--green-800);color:#fff;transition:.14s;min-height:40px}
+  .btn:hover{background:var(--green-900)}.btn:active{transform:scale(.98)}
+  .btn svg{width:16px;height:16px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{background:var(--green-50);border-color:var(--green-300)}
+  .btn.amber{background:var(--amber)}.btn.amber:hover{background:#B45309}
+  .btn.bad{background:#fff;color:var(--bad);border:1px solid #f3c6c6}.btn.bad:hover{background:var(--bad-bg)}
+  .btn.blue{background:var(--blue)}.btn.blue:hover{background:#1D4ED8}
+  .btn.sm{padding:7px 12px;font-size:12.5px;min-height:34px;border-radius:8px}
+  .btn.block{width:100%}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh)}
+  .card.pad{padding:20px}
+  .soft{background:var(--green-50)}
+  .sec-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .sec-h h2{font-family:var(--serif);font-size:25px;font-weight:700;letter-spacing:.2px;color:var(--ink)}
+  .sec-h h3{font-size:14.5px;font-weight:700}
+  .sec-h .hint{font-size:12.5px;color:var(--muted)}
+  .sub-muted{font-size:13px;color:var(--muted);margin-top:4px}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green-700)}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.02em;padding:3px 10px 3px 8px;border-radius:20px;white-space:nowrap;background:transparent}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;flex:0 0 6px}
+  .pill.ok{color:var(--green-800);background:var(--green-100)}.pill.ok::before{background:var(--green-600)}
+  .pill.warn{color:var(--warn);background:var(--warn-bg)}.pill.warn::before{background:var(--warn)}
+  .pill.bad{color:var(--bad);background:var(--bad-bg)}.pill.bad::before{background:var(--bad)}
+  .pill.info{color:var(--amber);background:var(--amber-bg)}.pill.info::before{background:var(--amber)}
+  .pill.blue{color:var(--blue);background:var(--blue-bg)}.pill.blue::before{background:var(--blue)}
+  .pill.muted{color:var(--muted);background:#f1f4f2}.pill.muted::before{background:var(--muted-2)}
+
+  .grid2{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:820px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{padding:16px 18px}
+  .kpi .v{font-family:var(--serif);font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1;color:var(--green-800)}
+  .kpi .l{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+  .kpi .tgt{font-size:11.5px;margin-top:8px;color:var(--muted)}
+
+  /* ===== KANBAN ===== */
+  .kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+  .kcol{flex:0 0 250px;background:#fff;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;max-height:70vh}
+  .kcol-h{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+  .kcol-h .dot{width:8px;height:8px;border-radius:50%}
+  .kcol-h .kn{font-weight:700;font-size:12.5px}
+  .kcol-h .kc{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--muted);background:#f1f4f2;border-radius:20px;padding:1px 8px}
+  .kcol-b{padding:10px;display:flex;flex-direction:column;gap:9px;overflow-y:auto}
+  .kcard{border:1px solid var(--line);border-radius:11px;padding:11px;cursor:pointer;transition:.14s;background:#fff}
+  .kcard:hover{box-shadow:var(--sh);border-color:var(--green-300);transform:translateY(-1px)}
+  .kcard .kref{font-size:10.5px;font-weight:700;color:var(--green-700)}
+  .kcard .kt{font-size:12.5px;font-weight:600;margin-top:3px;line-height:1.3}
+  .kcard .kd{font-size:11px;color:var(--muted);margin-top:5px}
+  .kcard .kflags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+  .flag-dot{width:16px;height:16px;border-radius:5px;display:flex;align-items:center;justify-content:center}
+  .flag-dot svg{width:9px;height:9px}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .filters select,.filters .search{padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;font-weight:500;font-size:13px}
+  .filters .search{position:relative;flex:1;min-width:220px}
+  .filters .search input{border:none;outline:none;width:100%;padding-left:24px}
+  .filters .search svg{position:absolute;left:0;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted)}
+
+  .empty-flag{display:flex;gap:10px;align-items:flex-start;background:var(--amber-bg);border:1px solid #fde5b0;border-radius:12px;padding:14px 16px;font-size:13px;color:#7c4a06;margin-bottom:14px}
+  .empty-flag.bad{background:var(--bad-bg);border-color:#f3c6c6;color:#7a2118}
+  .empty-flag svg{width:17px;height:17px;flex:0 0 17px;margin-top:1px}
+
+  /* ===== QUEUE (coordinateur) ===== */
+  .queue-group{margin-bottom:22px}
+  .queue-group h4{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:10px;color:var(--green-800)}
+  .queue-row{display:flex;align-items:center;gap:13px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:.14s;background:#fff}
+  .queue-row:hover{border-color:var(--green-300);box-shadow:var(--sh)}
+  .queue-row .qi{width:36px;height:36px;border-radius:10px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 36px}
+  .queue-row .qi svg{width:18px;height:18px}
+  .queue-row .qm{flex:1;min-width:0}
+  .queue-row .qt{font-weight:600;font-size:13.5px}
+  .queue-row .qd{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .sla{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .sla.ok{background:var(--green-100);color:var(--green-800)}
+  .sla.warn{background:var(--warn-bg);color:var(--warn)}
+  .sla.bad{background:var(--bad-bg);color:var(--bad)}
+
+  /* ===== FORM ===== */
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+  .field label .req{color:var(--bad)}
+  .field input,.field select,.field textarea{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:#fff;transition:.15s;min-height:46px}
+  .field textarea{min-height:80px;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--green-600);box-shadow:0 0 0 3px rgba(56,142,60,.14)}
+  .field .fhint{font-size:11.5px;color:var(--muted);margin-top:5px}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:560px){.frow,.frow3{grid-template-columns:1fr}}
+  .seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+  .seg button{flex:1;padding:8px 10px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--muted)}
+  .seg button.on{background:var(--green-800);color:#fff}
+
+  /* ===== DOC CHECKLIST (3-state) ===== */
+  .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .doc-item{border:1px solid var(--line);border-radius:11px;padding:11px}
+  .doc-item .dn{font-size:12.5px;font-weight:700;margin-bottom:8px}
+  .doc-toggle{display:flex;background:#f1f4f2;border-radius:8px;padding:2px;gap:2px}
+  .doc-toggle button{flex:1;padding:6px 4px;border-radius:6px;font-size:10.5px;font-weight:700}
+  .doc-toggle button.yes.on{background:var(--green-700);color:#fff}
+  .doc-toggle button.no.on{background:var(--bad);color:#fff}
+  .doc-toggle button.na.on{background:var(--muted-2);color:#fff}
+
+  /* ===== STOCK GAUGE ===== */
+  .stock-box{display:flex;align-items:center;gap:16px}
+  .stock-box .sv{font-family:var(--serif);font-size:26px;font-weight:700}
+  .stock-gauge{flex:1;height:10px;border-radius:6px;background:var(--line);overflow:hidden}
+  .stock-gauge i{display:block;height:100%;border-radius:6px}
+
+  /* ===== TIMELINE (7 étapes) ===== */
+  .pipeline{display:flex;gap:0;overflow-x:auto;padding:4px 0 10px}
+  .pstep{flex:1;min-width:88px;text-align:center;position:relative;padding:0 4px}
+  .pstep .pb{height:5px;border-radius:4px;background:var(--line);margin-bottom:10px}
+  .pstep.done .pb,.pstep.cur .pb{background:var(--green-600)}
+  .pstep .pd{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;margin:-19px auto 7px;color:var(--muted)}
+  .pstep .pd svg{width:13px;height:13px}
+  .pstep.done .pd{background:var(--green-700);border-color:var(--green-700);color:#fff}
+  .pstep.cur .pd{border-color:var(--amber);background:var(--amber);color:#fff;box-shadow:0 0 0 4px var(--amber-bg)}
+  .pstep .pl{font-size:10px;font-weight:700;color:var(--muted)}
+  .pstep.done .pl,.pstep.cur .pl{color:var(--ink)}
+
+  .audit{font-size:12.5px;display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .audit:last-child{border:none}
+  .audit .ad{width:9px;height:9px;border-radius:50%;background:var(--green-500);margin-top:5px;flex:0 0 9px}
+  .audit .at{font-weight:600}.audit .atm{color:var(--muted);font-size:11px}
+
+  /* ===== FEEDBACK ===== */
+  .fb-card{padding:18px;margin-bottom:14px}
+  .fb-card .fh{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .fb-card .fav{width:38px;height:38px;border-radius:10px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 38px}
+  .fb-card .fav svg{width:19px;height:19px}
+  .stars{color:var(--amber);font-size:15px;letter-spacing:2px}
+
+  /* ===== CATALOGUE ===== */
+  .prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .prod-card{padding:16px}
+  .prod-card .pcode{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--green-800)}
+  .prod-card .pfam{font-size:12px;color:var(--muted);margin-top:2px}
+  .country-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:var(--green-50);color:var(--green-800);padding:3px 9px;border-radius:20px;margin:3px 4px 0 0}
+
+  /* ===== INTEGRATIONS ===== */
+  .integ-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .integ{padding:16px;display:flex;gap:12px;align-items:flex-start}
+  .integ .ii{width:38px;height:38px;border-radius:10px;flex:0 0 38px;display:flex;align-items:center;justify-content:center}
+  .integ .ii svg{width:19px;height:19px}
+  .integ h4{font-size:13.5px;font-weight:700}
+  .integ p{font-size:12px;color:var(--muted);margin-top:3px}
+
+  table.audit-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  table.audit-tbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line)}
+  table.audit-tbl td{padding:11px 10px;border-bottom:1px solid var(--line)}
+  table.audit-tbl tr:last-child td{border:none}
+
+  .scrim{position:fixed;inset:0;background:rgba(16,35,26,.55);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
+  .scrim.open{display:flex}
+  .modal{background:#fff;border-radius:18px;width:100%;max-width:640px;box-shadow:var(--sh-lg);animation:pop .26s ease;overflow:hidden}
+  .modal.wide{max-width:820px}
+  @keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  .m-head{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+  .m-head h3{font-family:var(--serif);font-size:21px;font-weight:700}
+  .m-head p{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .m-x{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 32px}.m-x:hover{background:var(--green-50)}
+  .m-body{padding:20px 22px;max-height:74vh;overflow-y:auto}
+  .m-foot{padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;background:#fbfdfb;flex-wrap:wrap}
+
+  .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:120;display:flex;flex-direction:column;gap:10px;width:calc(100% - 32px);max-width:400px}
+  .toast{display:flex;align-items:center;gap:11px;background:var(--green-900);color:#fff;padding:13px 17px;border-radius:12px;box-shadow:var(--sh-lg);font-size:14px;font-weight:500;animation:tin .3s ease}
+  .toast.err{background:var(--bad)}
+  .toast .ti{font-size:16px;flex:0 0 auto}
+  @keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  footer{text-align:center;padding:22px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:20px}
+  footer b{color:var(--green-800);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd">
+    <div class="wm" onclick="go('dash')">
+      <svg class="logo" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="13" fill="#EAF4EC"/>
+        <path d="M24 8c-8 5-12 11-12 17a12 12 0 0 0 24 0c0-6-4-12-12-17z" fill="#66BB6A"/>
+        <path d="M24 13v22M24 21c-3-1.2-5-3-6-5.5M24 26c3-1.2 5-3 6-5.5" stroke="#103d17" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div><h1>Crop Cart</h1><div class="tl">Agri-Input Sample Orchestration · OCP Nutricrops</div></div>
+    </div>
+    <div class="hd-r">
+      <div class="role-pick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/></svg>
+        <select id="roleSel" onchange="setRole(this.value)" aria-label="Choisir la vue">
+          <option value="demandeur">Vue : Demandeur (Agronome)</option>
+          <option value="coord">Vue : Coordinateur</option>
+          <option value="direction">Vue : Direction / Board</option>
+        </select>
+      </div>
+      <div class="me"><div class="mn" id="meName">Ibrahim Owusu<span id="meRole">Sales Agronomist</span></div><div class="av" id="meAv">IO</div></div>
+    </div>
+  </div>
+  <div class="tabs-wrap"><nav class="tabs" id="tabs"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="role-banner" id="roleBanner"></div>
+
+  <!-- DASHBOARD -->
+  <section class="view active" id="v-dash">
+    <div class="sec-h"><div><h2>Pilotage des demandes d'échantillons</h2><div class="sub-muted">Lane 1 · produits homologués · <span id="reqCount">9</span> demandes suivies</div></div><span class="pill ok">Temps réel</span></div>
+    <div class="kpis" id="kpis"></div>
+    <div id="dashFlags" style="margin-top:16px"></div>
+    <div class="sec-h" style="margin-top:22px"><div><h3 style="font-size:16px">Pipeline opérationnel</h3><span class="hint">cliquer une carte pour le détail complet</span></div></div>
+    <div class="filters">
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="dashQ" placeholder="Rechercher pays, produit, référence…" oninput="renderKanban()"/></div>
+      <select id="fRegion" onchange="renderKanban()"><option value="">Toutes régions</option></select>
+      <select id="fPrio" onchange="renderKanban()"><option value="">Toutes priorités</option><option>Critical</option><option>High</option><option>Medium</option></select>
+    </div>
+    <div class="kanban" id="kanban"></div>
+  </section>
+
+  <!-- NOUVELLE DEMANDE -->
+  <section class="view" id="v-nouvelle">
+    <div class="sec-h"><div><span class="eyebrow">Étape 1 — Need Submission</span><h2>Nouvelle demande d'échantillon</h2></div></div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="frow3">
+          <div class="field"><label>SPOC <span class="req">*</span></label><input id="nf-spoc" value="Ibrahim Owusu"/></div>
+          <div class="field"><label>Business Unit <span class="req">*</span></label><select id="nf-bu"><option>Customization</option><option>Standard</option><option>Specialty</option></select></div>
+          <div class="field"><label>Région <span class="req">*</span></label><select id="nf-region" onchange="onRegionChange()"><option>Africa</option><option>Europe</option><option>LATAM</option><option>Asia</option></select></div>
+        </div>
+        <div class="frow">
+          <div class="field"><label>Pays de destination <span class="req">*</span></label><select id="nf-country" onchange="checkEligibility()"></select></div>
+          <div class="field"><label>Produit (catalogue Lane 1 homologué) <span class="req">*</span></label><select id="nf-product" onchange="checkEligibility()"></select></div>
+        </div>
+        <div id="eligBox"></div>
+        <div class="frow">
+          <div class="field"><label>Quantité (kg) <span class="req">*</span></label><input type="number" id="nf-qty" value="500" min="1"/></div>
+          <div class="field"><label>Priorité <span class="req">*</span></label><select id="nf-prio"><option>Medium</option><option>High</option><option>Critical</option></select></div>
+        </div>
+        <div class="field"><label>Type de demande <span class="req">*</span></label><div class="seg" id="nf-type"><button class="on" onclick="setReqType(this,'Agronomic testing')">Essai agronomique</button><button onclick="setReqType(this,'Registration')">Homologation / Registration</button></div></div>
+        <div class="frow">
+          <div class="field"><label>Culture <span class="req">*</span></label><input id="nf-crop" placeholder="Ex. Maïs, Café, Riz…"/></div>
+          <div class="field"><label>Contexte sol</label><input id="nf-soil" placeholder="Ex. Sol ferralitique acide"/></div>
+        </div>
+        <div class="field"><label>Résultat attendu <span class="req">*</span></label><textarea id="nf-outcome" placeholder="Ex. Évaluer la réponse de la culture à un apport starter…"></textarea></div>
+        <button class="btn block" onclick="submitRequest()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Soumettre la demande</button>
+      </div>
+      <div>
+        <div class="card pad soft" style="margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:9px;font-weight:700;color:var(--green-800);margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/></svg>Ce qui se passe ensuite</div>
+          <div style="font-size:13px;color:var(--muted)">Routage automatique vers le coordinateur compétent → contrôle réglementaire & qualité → vérification stock (SAP) → logistique → confirmation de réception → retour terrain.</div>
+        </div>
+        <div class="card pad">
+          <div class="sec-h" style="margin-bottom:12px"><h3>Pourquoi le contrôle en amont ?</h3></div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.7">Crop Cart vérifie l'éligibilité pays × produit <b style="color:var(--ink)">avant même la soumission</b> — fini les demandes qui remontent la chaîne pour être bloquées des semaines plus tard faute d'homologation.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MES DEMANDES -->
+  <section class="view" id="v-mesdemandes">
+    <div class="sec-h"><div><span class="eyebrow">Filtré automatiquement pour vous</span><h2>Mes demandes</h2></div></div>
+    <div id="myReqList"></div>
+  </section>
+
+  <!-- FILE COORDINATEUR -->
+  <section class="view" id="v-file">
+    <div class="sec-h"><div><span class="eyebrow">Guichet opérationnel</span><h2>Demandes à traiter</h2></div><span class="hint">Triées par urgence SLA</span></div>
+    <div id="queueBox"></div>
+  </section>
+
+  <!-- RETOURS TERRAIN -->
+  <section class="view" id="v-feedback">
+    <div class="sec-h"><div><span class="eyebrow">Étape 7 — Feedback & Intelligence</span><h2>Retours terrain</h2></div></div>
+    <div class="kpis" style="margin-bottom:18px" id="fbKpis"></div>
+    <div id="feedbackList"></div>
+  </section>
+
+  <!-- CATALOGUE -->
+  <section class="view" id="v-catalogue">
+    <div class="sec-h"><div><span class="eyebrow">Lane 1 — produits homologués</span><h2>Catalogue & stock</h2></div><span class="pill blue">Lecture SAP</span></div>
+    <div class="prod-grid" id="prodGrid"></div>
+  </section>
+
+  <!-- INTEGRATIONS -->
+  <section class="view" id="v-integ">
+    <div class="sec-h"><div><span class="eyebrow">Architecture SI</span><h2>Intégrations · Landing Zone Nutricrops</h2></div></div>
+    <div class="integ-grid" id="integGrid"></div>
+    <div class="card pad" style="margin-top:18px">
+      <div class="sec-h" style="margin-bottom:12px"><h3>Journal & audit trail</h3></div>
+      <div style="overflow-x:auto"><table class="audit-tbl" id="auditTbl"></table></div>
+    </div>
+  </section>
+</main>
+
+<footer>Prototype de démonstration — <b>OCP Nutricrops · D²nAI</b></footer>
+
+<div class="scrim" id="scrim"><div id="modalHost"></div></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+/* ================= DONNÉES ================= */
+const TODAY = new Date("2026-09-14");
+const PRODUCTS=[
+  {code:"00 40 00 10S",label:"NPK 0-40-0 +10S",family:"Starter phosphaté soufré",approved:["Ghana","Cameroun","Nigeria","Côte d'Ivoire","Kenya"]},
+  {code:"MAP 11-52 Special Low Cd",label:"MAP 11-52 Special Low Cd",family:"MAP faible cadmium",approved:["Poland","France","Germany","Ghana"]},
+  {code:"5 38 9S",label:"NPS 5-38-9S",family:"Starter NPS",approved:["Bresil","Argentina","Poland"]},
+  {code:"3 30 7S Low Cd",label:"NPK 3-30-7S Low Cd",family:"Starter faible cadmium",approved:["Cameroun","Ghana","Kenya"]},
+];
+function productByCode(c){return PRODUCTS.find(p=>p.code===c);}
+const STOCK={
+  "00 40 00 10S":{available:1200,unit:"kg",sapRef:"MAT-004010S"},
+  "MAP 11-52 Special Low Cd":{available:20,unit:"kg",sapRef:"MAT-MAP1152LC"},
+  "5 38 9S":{available:0,unit:"kg",sapRef:"MAT-53809S"},
+  "3 30 7S Low Cd":{available:400,unit:"kg",sapRef:"MAT-33007SLC"},
+};
+const COUNTRIES=["Ghana","Poland","Bresil","Cameroun","Kenya","Nigeria","Côte d'Ivoire","France","Argentina","Germany"];
+
+const DOC_KEYS=["coa","coc","hm","tds","sds"];
+const DOC_LABELS={coa:"COA",coc:"COC",hm:"HM",tds:"TDS",sds:"SDS"};
+
+const STAGES=[
+  {k:"submitted",lab:"Soumise",ic:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>',c:"#8a978f"},
+  {k:"review",lab:"Routage",ic:'<path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/>',c:"#2563EB"},
+  {k:"gate",lab:"Contrôle réglementaire",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',c:"#D97706"},
+  {k:"stock",lab:"Stock & mise en œuvre",ic:'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>',c:"#7C3AED"},
+  {k:"shipped",lab:"Expédiée",ic:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>',c:"#0891B2"},
+  {k:"delivered",lab:"Livrée",ic:'<path d="M20 6 9 17l-5-5"/>',c:"#2E7D32"},
+  {k:"feedback",lab:"Retour terrain",ic:'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>',c:"#1B5E20"},
+];
+function stageById(k){return STAGES.find(s=>s.k===k)||{k:"obsolete",lab:"Obsolète",c:"var(--bad)"};}
+function stageIdx(k){return STAGES.findIndex(s=>s.k===k);}
+
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+function fmtDate(iso){if(!iso)return "—";const m=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];const d=new Date(iso);return d.getDate()+" "+m[d.getMonth()]+" "+d.getFullYear();}
+
+function docCompleteness(r){
+  const relevant=DOC_KEYS.filter(k=>r.docs[k]!==undefined);
+  if(!relevant.length)return null;
+  const yes=relevant.filter(k=>r.docs[k]==="yes").length;
+  return Math.round(yes/DOC_KEYS.length*100);
+}
+
+// 9 demandes — 4 réelles (fichier client) + 5 synthétiques pour couvrir les 7 étapes + 1 cas obsolète
+let REQUESTS=[
+  {id:"r1",ref:"REQ-2025-0714",date:"2025-07-14",spoc:"Ibrahim Owusu",bu:"Customization",region:"Africa",country:"Ghana",productCode:"00 40 00 10S",qty:1000,priority:"High",reqType:"Agronomic testing",crop:"Maïs",soil:"Sol ferralitique acide",outcome:"Évaluer la réponse du maïs à un apport starter phosphaté-soufré en sol acide.",
+   rawStatus:"Shipped",stage:"delivered",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   shipDate:"2026-01-01",shipMethod:"Container",trackingRef:"MSCU-771042-GH",receiptConfirmed:true,receiptDate:"2026-02-18",receiptCondition:"Conforme",
+   feedback:null},
+
+  {id:"r2",ref:"REQ-2026-0303",date:"2026-03-03",spoc:"Katarzyna Nowak",bu:"Customization",region:"Europe",country:"Poland",productCode:"MAP 11-52 Special Low Cd",qty:50,priority:"Critical",reqType:"Agronomic testing",crop:"Blé d'hiver",soil:"Sol limoneux, pH 6.8",outcome:"Comparer la disponibilité du phosphore en sol froid de printemps.",
+   rawStatus:"Packaging",stage:"stock",riCheck:"Compliant",docs:{coa:"no",coc:"yes",hm:"no",tds:"yes",sds:"yes"},
+   shipDate:null,shipMethod:"DHL",trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r3",ref:"REQ-2026-0409",date:"2026-04-09",spoc:"Carla Silva",bu:"Customization",region:"LATAM",country:"Bresil",productCode:"5 38 9S",qty:150,priority:"Critical",reqType:"Agronomic testing",crop:"Soja",soil:"Sol argileux tropical",outcome:"Tester l'apport starter NPS sur soja en 1ère année.",
+   rawStatus:"Shipped",stage:"shipped",riCheck:"Compliant",docs:{coa:"no",coc:"na",hm:"no",tds:"yes",sds:"yes"},
+   shipDate:"2026-07-08",shipMethod:"Container",trackingRef:"MSCU-559981-BR",receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r4",ref:"REQ-2026-0616",date:"2026-06-16",spoc:"Ibrahim Owusu",bu:"Customization",region:"Africa",country:"Cameroun",productCode:"3 30 7S Low Cd",qty:5,priority:"Critical",reqType:"Registration",crop:"Cacao",soil:"Sol ferralitique",outcome:"Constituer le dossier d'homologation — analyses réglementaires.",
+   rawStatus:"Quality check validation",stage:"gate",riCheck:"Compliant",docs:{coa:"no",coc:"no",hm:"no",tds:"yes",sds:"yes"},
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r5",ref:"REQ-2026-0912",date:"2026-09-12",spoc:"Amara Otieno",bu:"Standard",region:"Africa",country:"Kenya",productCode:"00 40 00 10S",qty:200,priority:"Medium",reqType:"Agronomic testing",crop:"Café",soil:"Sol volcanique d'altitude",outcome:"Valider la réponse du caféier à un starter phosphaté en altitude.",
+   rawStatus:"Submitted",stage:"submitted",riCheck:null,docs:{},
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r6",ref:"REQ-2026-0905",date:"2026-09-05",spoc:"Fatou Diarra",bu:"Customization",region:"Africa",country:"Côte d'Ivoire",productCode:"00 40 00 10S",qty:300,priority:"Medium",reqType:"Agronomic testing",crop:"Banane plantain",soil:"Sol alluvial",outcome:"Évaluer la vigueur du plantain avec un apport starter en sol alluvial.",
+   rawStatus:"Routed",stage:"review",riCheck:null,docs:{},
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r7",ref:"REQ-2026-0908",date:"2026-09-08",spoc:"Chidi Okafor",bu:"Customization",region:"Africa",country:"Nigeria",productCode:"5 38 9S",qty:80,priority:"High",reqType:"Agronomic testing",crop:"Riz irrigué",soil:"Sol hydromorphe",outcome:"Tester le démarrage du riz irrigué avec un starter NPS.",
+   rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit « 5 38 9S » non homologué pour le Nigeria (hors périmètre Lane 1 pour ce pays).",
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r8",ref:"REQ-2026-0512",date:"2026-05-12",spoc:"Élodie Marchand",bu:"Customization",region:"Europe",country:"France",productCode:"MAP 11-52 Special Low Cd",qty:25,priority:"Medium",reqType:"Agronomic testing",crop:"Colza",soil:"Limon battant",outcome:"Comparer la disponibilité du phosphore en sol froid vs référence standard.",
+   rawStatus:"Closed",stage:"feedback",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   shipDate:"2026-06-02",shipMethod:"DHL",trackingRef:"DHL-4471002-FR",receiptConfirmed:true,receiptDate:"2026-06-09",receiptCondition:"Conforme",
+   feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"Levée plus rapide et meilleure vigueur initiale vs référence (+12% de biomasse à 30 jours).",satisfaction:5,opportunity:"Opportunité commerciale identifiée — intérêt confirmé pour un test élargi en 2027."}},
+
+  {id:"r9",ref:"REQ-2025-1102",date:"2025-11-02",spoc:"Amara Otieno",bu:"Standard",region:"Africa",country:"Kenya",productCode:"3 30 7S Low Cd",qty:10,priority:"Medium",reqType:"Agronomic testing",crop:"Thé",soil:"Sol volcanique",outcome:"Tester l'apport starter sur jeunes plants de théier.",
+   rawStatus:"Abandonné",stage:"obsolete",riCheck:"Compliant",docs:{coa:"no",coc:"no",hm:"na",tds:"yes",sds:"yes"},obsoleteReason:"87 jours sans mouvement en contrôle réglementaire, aucune relance — demande abandonnée par le terrain.",
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+];
+
+let AUDIT=[
+  {d:"2026-09-13 —",who:"Système",act:"Rappel automatique envoyé",det:"REQ-2026-0409 (Bresil) — confirmation de réception en retard de "+daysBetween("2026-07-08","2026-09-14")+" j depuis l'expédition"},
+  {d:"2026-06-09 09:12",who:"Élodie Marchand",act:"Feedback terrain complété",det:"REQ-2026-0512 (France) — satisfaction 5/5, opportunité commerciale identifiée"},
+  {d:"2026-01-01 —",who:"Coordinateur — Youssef Amrani",det:"Container MSCU-771042-GH confirmé",act:"Expédition confirmée — REQ-2025-0714 (Ghana)"},
+  {d:"2025-07-15 —",who:"Système",act:"Routage automatique",det:"REQ-2025-0714 assignée au coordinateur Qualité — SLA démarré"},
+];
+
+let ROLE="demandeur";
+const CURRENT_USER={demandeur:{nom:"Ibrahim Owusu",role:"Sales Agronomist"},coord:{nom:"Youssef Amrani",role:"Sample Coordinator"},direction:{nom:"Salma Bennani",role:"Portfolio Manager"}};
+const ROLES={
+  demandeur:{lab:"Demandeur",tabs:["dash","nouvelle","mesdemandes","feedback"],banner:"Vous naviguez en tant que <b>demandeur</b> — soumettez une demande et suivez son avancement jusqu'au retour terrain."},
+  coord:{lab:"Coordinateur",tabs:["dash","file","catalogue","feedback"],banner:"Vous agissez en <b>coordinateur</b> — traitez le contrôle réglementaire, le stock, la logistique et les réceptions."},
+  direction:{lab:"Direction",tabs:["dash","feedback","integ"],banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain."},
+};
+const TAB_META={
+  dash:["Tableau de bord",'<path d="M3 3v18h18M9 9h9M9 15h6"/>'],
+  nouvelle:["Nouvelle demande",'<path d="M12 5v14M5 12h14"/>'],
+  mesdemandes:["Mes demandes",'<path d="M20 6 9 17l-5-5"/>'],
+  file:["Demandes à traiter",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
+  feedback:["Retours terrain",'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>'],
+  catalogue:["Catalogue & stock",'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>'],
+  integ:["Intégrations SI",'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 7.5 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 12.6a1.65 1.65 0 0 0-1.51-1H1a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 2.6 6.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 1.6V1a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 22.4 9H23a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'],
+};
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+function toast(msg,ic,err){const t=document.createElement("div");t.className="toast"+(err?" err":"");t.innerHTML=`<span class="ti">${ic||"●"}</span><span>${msg}</span>`;$("#toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="all .35s";t.style.transform="translateY(12px)";setTimeout(()=>t.remove(),350);},err?4200:3000);}
+function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();}
+function priorityCls(p){return p==="Critical"?"bad":p==="High"?"warn":"blue";}
+function requestFlags(r){
+  const flags=[];
+  const dc=docCompleteness(r);
+  if(r.stage!=="submitted"&&r.stage!=="review"&&r.stage!=="obsolete"&&dc!==null&&dc<100)flags.push({t:"Documents incomplets ("+dc+"%)",c:"warn",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'});
+  if(r.gateBlocked)flags.push({t:"Bloqué — réglementaire",c:"bad",ic:'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>'});
+  if(r.stage==="shipped"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45)flags.push({t:"Réception en retard",c:"bad",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'});
+  if(r.stage==="delivered"&&!r.feedback)flags.push({t:"Feedback manquant",c:"warn",ic:'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>'});
+  if(r.stage==="obsolete")flags.push({t:"Obsolète",c:"bad",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>'});
+  return flags;
+}
+
+/* ================= ROLE / NAV ================= */
+function setRole(r){
+  ROLE=r; const R=ROLES[r]; const u=CURRENT_USER[r];
+  $("#meName").innerHTML=u.nom+"<span>"+u.role+"</span>"; $("#meAv").textContent=initials(u.nom);
+  $("#roleBanner").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>${R.banner}</span>`;
+  $("#tabs").innerHTML=R.tabs.map(t=>{
+    const badge=t==="file"?`<span class="n">${queueItems().length}</span>`:"";
+    return `<button data-v="${t}" onclick="go('${t}')">${`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${TAB_META[t][1]}</svg>`}${TAB_META[t][0]}${badge}</button>`;
+  }).join("");
+  go(R.tabs[0]);
+}
+function go(v){
+  document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
+  const el=$("#v-"+v); if(el)el.classList.add("active");
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
+  if(v==="dash")renderDash();
+  if(v==="nouvelle")renderNouvelle();
+  if(v==="mesdemandes")renderMyRequests();
+  if(v==="file")renderQueue();
+  if(v==="feedback")renderFeedbackView();
+  if(v==="catalogue")renderCatalogue();
+  if(v==="integ")renderInteg();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ================= DASHBOARD / KPIS ================= */
+function computeKpis(){
+  const withShip=REQUESTS.filter(r=>r.shipDate);
+  const avgLead=withShip.length?Math.round(withShip.reduce((s,r)=>s+daysBetween(r.date,r.shipDate),0)/withShip.length):0;
+  const eligible=REQUESTS.filter(r=>["shipped","delivered","feedback"].includes(r.stage));
+  const withFeedback=eligible.filter(r=>r.feedback);
+  const feedbackRate=eligible.length?Math.round(withFeedback.length/eligible.length*100):0;
+  const gateReached=REQUESTS.filter(r=>!["submitted","review"].includes(r.stage));
+  const docRates=gateReached.map(r=>docCompleteness(r)).filter(v=>v!==null);
+  const avgDocRate=docRates.length?Math.round(docRates.reduce((a,b)=>a+b,0)/docRates.length):0;
+  const obsolete=REQUESTS.filter(r=>r.stage==="obsolete").length;
+  const terminal=REQUESTS.filter(r=>["shipped","delivered","feedback","obsolete"].includes(r.stage)).length;
+  const obsRate=terminal?Math.round(obsolete/terminal*100):0;
+  return {avgLead,feedbackRate,avgDocRate,obsRate,withFeedback:withFeedback.length,eligible:eligible.length,obsolete,terminal};
+}
+function renderKpis(){
+  const k=computeKpis();
+  const cards=[
+    {l:"Délai moyen demande → expédition",v:k.avgLead+" j",tgt:"Objectif ≤ 70 j (-30% vs référence 2 sem.–plusieurs mois)",c:k.avgLead>70?"var(--bad)":"var(--green-800)"},
+    {l:"Feedback capturé",v:k.feedbackRate+"%",tgt:k.withFeedback+"/"+k.eligible+" échantillons livrés · objectif 100%",c:k.feedbackRate<100?"var(--warn)":"var(--green-800)"},
+    {l:"Complétude documentaire",v:k.avgDocRate+"%",tgt:"COA · COC · HM · TDS · SDS — moyenne sur les dossiers engagés",c:k.avgDocRate<80?"var(--warn)":"var(--green-800)"},
+    {l:"Taux d'obsolescence",v:k.obsRate+"%",tgt:k.obsolete+"/"+k.terminal+" — objectif -50% (historique non fiabilisé avant Crop Cart)",c:"var(--bad)"},
+  ];
+  $("#kpis").innerHTML=cards.map(c=>`<div class="card kpi"><div class="v" style="color:${c.c}">${c.v}</div><div class="l">${c.l}</div><div class="tgt">${c.tgt}</div></div>`).join("");
+  const flags=[];
+  if(k.feedbackRate<100)flags.push({t:"La perte de signal terrain persiste : "+(k.eligible-k.withFeedback)+" échantillon(s) livré(s) sans retour structuré, dont le cas Ghana (REQ-2025-0714).",c:"warn"});
+  const overdue=REQUESTS.filter(r=>r.stage==="shipped"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45);
+  if(overdue.length)flags.push({t:overdue.length+" expédition(s) en attente de confirmation de réception depuis plus de 45 jours (ex. "+overdue[0].ref+", Brésil).",c:"bad"});
+  const integrityGap=REQUESTS.filter(r=>!["submitted","review","obsolete"].includes(r.stage)&&docCompleteness(r)!==null&&docCompleteness(r)<100&&stageIdx(r.stage)>=stageIdx("stock"));
+  if(integrityGap.length)flags.push({t:integrityGap.length+" dossier(s) ont progressé en stock/logistique malgré une documentation réglementaire incomplète — le contrôle automatique Crop Cart aurait bloqué ce passage.",c:"bad"});
+  $("#dashFlags").innerHTML=flags.map(f=>`<div class="empty-flag ${f.c==='bad'?'bad':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div>${f.t}</div></div>`).join("");
+}
+function renderDash(){
+  renderKpis();
+  const regions=[...new Set(REQUESTS.map(r=>r.region))];
+  const fr=$("#fRegion"); if(fr.options.length<=1)fr.innerHTML=`<option value="">Toutes régions</option>`+regions.map(r=>`<option>${r}</option>`).join("");
+  renderKanban();
+}
+function renderKanban(){
+  const q=($("#dashQ").value||"").toLowerCase();
+  const region=$("#fRegion").value, prio=$("#fPrio").value;
+  let list=REQUESTS.filter(r=>!q||r.country.toLowerCase().includes(q)||r.productCode.toLowerCase().includes(q)||r.ref.toLowerCase().includes(q)||r.crop.toLowerCase().includes(q));
+  if(region)list=list.filter(r=>r.region===region);
+  if(prio)list=list.filter(r=>r.priority===prio);
+  const obsoleteList=list.filter(r=>r.stage==="obsolete");
+  $("#kanban").innerHTML=STAGES.map(st=>{
+    const items=list.filter(r=>r.stage===st.k);
+    return `<div class="kcol"><div class="kcol-h"><span class="dot" style="background:${st.c}"></span><span class="kn">${st.lab}</span><span class="kc">${items.length}</span></div>
+      <div class="kcol-b">${items.map(r=>{
+        const flags=requestFlags(r);
+        return `<div class="kcard" onclick="openRequest('${r.id}')"><div class="kref">${r.ref}</div><div class="kt">${r.country} · ${productByCode(r.productCode).label}</div><div class="kd">${r.qty} kg · ${r.priority}</div>
+          <div class="kflags">${flags.map(f=>`<span class="flag-dot" style="background:var(--${f.c==='bad'?'bad-bg':'warn-bg'});color:var(--${f.c==='bad'?'bad':'warn'})" title="${f.t}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">${f.ic}</svg></span>`).join("")}</div></div>`;
+      }).join("")||'<div style="font-size:12px;color:var(--muted);text-align:center;padding:14px">—</div>'}</div></div>`;
+  }).join("")+(obsoleteList.length?`<div class="kcol"><div class="kcol-h"><span class="dot" style="background:var(--bad)"></span><span class="kn">Obsolète</span><span class="kc">${obsoleteList.length}</span></div><div class="kcol-b">${obsoleteList.map(r=>`<div class="kcard" onclick="openRequest('${r.id}')" style="opacity:.75"><div class="kref">${r.ref}</div><div class="kt">${r.country} · ${productByCode(r.productCode).label}</div><div class="kd">${r.obsoleteReason}</div></div>`).join("")}</div></div>`:"");
+}
+
+/* ================= NOUVELLE DEMANDE ================= */
+let selReqType="Agronomic testing";
+function setReqType(btn,t){selReqType=t;document.querySelectorAll("#nf-type button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");}
+function onRegionChange(){ populateCountries(); checkEligibility(); }
+function populateCountries(){
+  $("#nf-country").innerHTML=COUNTRIES.map(c=>`<option>${c}</option>`).join("");
+  $("#nf-product").innerHTML=PRODUCTS.map(p=>`<option value="${p.code}">${p.label} (${p.code})</option>`).join("");
+}
+function checkEligibility(){
+  const country=$("#nf-country").value, code=$("#nf-product").value; const p=productByCode(code);
+  if(!p){$("#eligBox").innerHTML="";return;}
+  const ok=p.approved.includes(country);
+  $("#eligBox").innerHTML=`<div class="empty-flag ${ok?'':'bad'}" style="background:${ok?'var(--green-50)':''};border-color:${ok?'var(--green-100)':''};color:${ok?'var(--green-800)':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ok?'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>':'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>'}</svg><div>${ok?"<b>Produit homologué</b> pour "+country+" (Lane 1). La demande pourra avancer sans blocage réglementaire de pays.":"<b>Produit non homologué</b> pour "+country+". Vous pouvez soumettre, mais la demande sera bloquée automatiquement au contrôle réglementaire — gagnez du temps en choisissant un autre produit ou pays."}</div></div>`;
+}
+function renderNouvelle(){ populateCountries(); checkEligibility(); }
+function submitRequest(){
+  const spoc=$("#nf-spoc").value.trim(), crop=$("#nf-crop").value.trim(), outcome=$("#nf-outcome").value.trim();
+  if(!spoc||!crop||!outcome){toast("Merci de compléter les champs obligatoires",null,true);return;}
+  const country=$("#nf-country").value, code=$("#nf-product").value;
+  const id="r"+Date.now();
+  const ref="REQ-2026-"+String(Math.floor(1000+Math.random()*8999));
+  REQUESTS.unshift({id,ref,date:"2026-09-14",spoc,bu:$("#nf-bu").value,region:$("#nf-region").value,country,productCode:code,qty:+$("#nf-qty").value||1,priority:$("#nf-prio").value,reqType:selReqType,crop,soil:$("#nf-soil").value.trim()||"—",outcome,
+    rawStatus:"Submitted",stage:"submitted",riCheck:null,docs:{},shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,feedback:null});
+  AUDIT.unshift({d:"2026-09-14 —",who:spoc,act:"Nouvelle demande soumise",det:ref+" — "+country+" · "+productByCode(code).label});
+  toast("Demande soumise — routage automatique en cours","→");
+  go('mesdemandes');
+}
+
+/* ================= MES DEMANDES ================= */
+function renderMyRequests(){
+  const mine=REQUESTS.filter(r=>r.spoc===CURRENT_USER.demandeur.nom);
+  $("#myReqList").innerHTML=mine.map(r=>requestRow(r)).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">Aucune demande soumise pour l'instant.</div>`;
+}
+function requestRow(r){
+  const st=stageById(r.stage); const flags=requestFlags(r);
+  return `<div class="card pad" style="margin-bottom:12px;cursor:pointer" onclick="openRequest('${r.id}')">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+      <div><div style="font-family:var(--serif);font-weight:700;font-size:17px;color:var(--green-800)">${r.ref}</div><div style="font-size:13px;color:var(--muted);margin-top:2px">${r.country} · ${productByCode(r.productCode).label} · ${r.qty} kg</div></div>
+      <span class="pill ${r.stage==='obsolete'?'bad':(stageIdx(r.stage)>=stageIdx('feedback')?'ok':'blue')}">${st.lab}</span>
+    </div>
+    ${flags.length?`<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">${flags.map(f=>`<span class="pill ${f.c}">${f.t}</span>`).join("")}</div>`:""}
+  </div>`;
+}
+
+/* ================= FILE COORDINATEUR ================= */
+function queueItems(){
+  return REQUESTS.filter(r=>["review","gate","stock","shipped"].includes(r.stage)||(r.stage==="delivered"&&!r.feedback));
+}
+function renderQueue(){
+  const groups=[
+    {k:"review",lab:"À router",ic:'<path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14"/>'},
+    {k:"gate",lab:"Contrôle réglementaire à statuer",ic:'<path d="M9 11l3 3L22 4"/>'},
+    {k:"stock",lab:"Stock à confirmer",ic:'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>'},
+    {k:"shipped",lab:"Réception à relancer",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
+  ];
+  $("#queueBox").innerHTML=groups.map(g=>{
+    let items=REQUESTS.filter(r=>r.stage===g.k);
+    if(g.k==="shipped")items=items.filter(r=>!r.receiptConfirmed);
+    if(!items.length)return "";
+    return `<div class="queue-group"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">${g.ic}</svg>${g.lab} <span class="pill blue">${items.length}</span></h4>
+      ${items.map(r=>{
+        const age=daysBetween(r.date,"2026-09-14");
+        const slaCls=age>60?"bad":age>30?"warn":"ok";
+        return `<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${g.ic}</svg></div><div class="qm"><div class="qt">${r.ref} — ${r.country} · ${productByCode(r.productCode).label}</div><div class="qd">${r.spoc} · ${r.qty} kg · ${r.priority}</div></div><span class="sla ${slaCls}">${age} j</span></div>`;
+      }).join("")}
+    </div>`;
+  }).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">File vide — tout est à jour.</div>`;
+}
+
+/* ================= DOC CHECKLIST (state) ================= */
+function docToggleHtml(r,k){
+  const v=r.docs[k];
+  return `<div class="doc-item"><div class="dn">${DOC_LABELS[k]}</div><div class="doc-toggle">
+    <button class="yes ${v==='yes'?'on':''}" onclick="setDoc('${r.id}','${k}','yes')">Oui</button>
+    <button class="no ${v==='no'?'on':''}" onclick="setDoc('${r.id}','${k}','no')">Non</button>
+    <button class="na ${v==='na'?'on':''}" onclick="setDoc('${r.id}','${k}','na')">N/A</button>
+  </div></div>`;
+}
+function setDoc(id,k,v){const r=REQUESTS.find(x=>x.id===id);r.docs[k]=v;openRequest(id);}
+
+/* ================= DETAIL DE DEMANDE ================= */
+function pipelineHtml(r){
+  const idx=stageIdx(r.stage);
+  return `<div class="pipeline">${STAGES.map((s,i)=>`<div class="pstep ${i<idx?'done':i===idx?'cur':''}"><div class="pb"></div><div class="pd">${i<idx?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${s.ic}</svg>`}</div><div class="pl">${s.lab}</div></div>`).join("")}</div>`;
+}
+function actionPanel(r){
+  if(r.stage==="obsolete"){
+    return `<div class="empty-flag bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><div><b>Demande obsolète.</b> ${r.obsoleteReason}</div></div>
+    <button class="btn ghost sm" onclick="reopenRequest('${r.id}')">Relancer la demande</button>`;
+  }
+  if(r.stage==="review"){
+    return `<div class="card pad soft"><div style="font-size:13px;color:var(--green-800);margin-bottom:10px">Requête reçue, en attente d'assignation au contrôle réglementaire & qualité.</div><button class="btn" onclick="advanceToGate('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Assigner et lancer le contrôle réglementaire</button></div>`;
+  }
+  if(r.stage==="gate"){
+    const p=productByCode(r.productCode); const eligible=p.approved.includes(r.country);
+    const allDocs=DOC_KEYS.every(k=>r.docs[k]&&r.docs[k]!=="no");
+    const canApprove=eligible&&allDocs;
+    return `<div class="frow" style="margin-bottom:14px">
+        <div class="card pad" style="${eligible?'':'border-color:var(--bad)'}"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Éligibilité pays</div><div style="font-weight:700;color:${eligible?'var(--green-800)':'var(--bad)'}">${eligible?'✓ Homologué pour '+r.country:'✗ Non homologué pour '+r.country}</div></div>
+        <div class="card pad soft"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">RI Check</div><div style="font-weight:700;color:var(--green-800)">${r.riCheck||'À vérifier'}</div></div>
+      </div>
+      <div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:8px" class="caps">Documents réglementaires requis</div>
+      <div class="doc-grid" style="margin-bottom:14px">${DOC_KEYS.map(k=>docToggleHtml(r,k)).join("")}</div>
+      ${r.gateBlocked?`<div class="empty-flag bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg><div>${r.gateReason}</div></div>`:''}
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn bad" onclick="blockRequest('${r.id}')">⚠ Bloquer avec motif</button><button class="btn" ${canApprove?'':'disabled title="Éligibilité pays et documents requis"'} onclick="approveGate('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Approuver le contrôle</button></div>`;
+  }
+  if(r.stage==="stock"){
+    const stk=STOCK[r.productCode]; const ok=stk.available>=r.qty;
+    return `<div class="card pad" style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Lecture SAP (lecture seule) — ${stk.sapRef}</div>
+        <div class="stock-box"><div class="sv" style="color:${ok?'var(--green-800)':'var(--bad)'}">${stk.available} kg</div><div class="stock-gauge"><i style="width:${Math.min(stk.available/Math.max(r.qty,1)*100,100)}%;background:${ok?'var(--green-600)':'var(--bad)'}"></i></div><div style="font-size:12.5px;color:var(--muted);white-space:nowrap">besoin : ${r.qty} kg</div></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:9px">${ok?'Stock suffisant pour réserver intégralement cette demande.':'Stock insuffisant — estimation de production requise.'}</div>
+      </div>
+      ${ok?`<button class="btn" onclick="reserveStock('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Réserver le stock et passer à la logistique</button>`
+          :`<div class="field"><label>Délai de production estimé (semaines)</label><input type="number" id="prodWeeks" value="6" min="1"/></div><button class="btn amber" onclick="logProduction('${r.id}')">Enregistrer l'estimation et notifier le demandeur</button>`}`;
+  }
+  if(r.stage==="shipped"&&!r.receiptConfirmed){
+    return `<div class="card pad soft" style="margin-bottom:14px">
+        <div class="frow"><div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Méthode</div><div style="font-weight:700">${r.shipMethod}</div></div><div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Référence de suivi</div><div style="font-weight:700">${r.trackingRef||'—'}</div></div></div>
+        <div style="margin-top:9px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Expédiée le</div><div style="font-weight:700">${fmtDate(r.shipDate)} · ${daysBetween(r.shipDate,"2026-09-14")} j écoulés</div></div>
+      </div>
+      <div class="field"><label>Confirmation de réception</label><div class="seg"><button class="on" id="recYes" onclick="setRecOk(true)">Reçu conforme</button><button id="recNo" onclick="setRecOk(false)">Problème à la réception</button></div></div>
+      <button class="btn" onclick="confirmReceipt('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Enregistrer la confirmation</button>`;
+  }
+  if(r.stage==="delivered"&&!r.feedback){
+    return `<div class="empty-flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg><div><b>Échantillon livré, aucun retour terrain enregistré.</b> Sans Crop Cart, cette information aurait été perdue — c'est exactement le trou que le module feedback comble.</div></div>
+      <button class="btn amber block" onclick="closeModal();openFeedbackForm('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Compléter le feedback terrain</button>`;
+  }
+  if(r.feedback){
+    const f=r.feedback;
+    return `<div class="fb-card card"><div class="fh"><div class="fav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg></div><div><div style="font-weight:700">Retour terrain</div><div class="stars">${'★'.repeat(f.satisfaction)}${'☆'.repeat(5-f.satisfaction)}</div></div></div>
+      <div style="font-size:13px;margin-bottom:6px"><b>Échantillon utilisé :</b> ${f.used}</div>
+      <div style="font-size:13px;margin-bottom:6px"><b>Réponse agronomique :</b> ${f.cropResponse}</div>
+      <div style="font-size:13px;color:var(--green-800)"><b>Opportunité :</b> ${f.opportunity}</div></div>`;
+  }
+  return `<div style="color:var(--muted);font-size:13px;padding:10px 0">Aucune action requise — étape en cours de traitement.</div>`;
+}
+function openRequest(id){
+  const r=REQUESTS.find(x=>x.id===id); const p=productByCode(r.productCode);
+  const trail=[
+    {lab:"Soumise",who:r.spoc,d:r.date,done:true},
+    stageIdx(r.stage)>=stageIdx("review")?{lab:"Routée vers coordinateur",who:"Système",d:r.date,done:true}:null,
+    stageIdx(r.stage)>=stageIdx("gate")?{lab:"Contrôle réglementaire & qualité",who:CURRENT_USER.coord.nom,d:r.date,done:stageIdx(r.stage)>stageIdx("gate")}:null,
+    stageIdx(r.stage)>=stageIdx("stock")?{lab:"Vérification stock",who:CURRENT_USER.coord.nom,d:r.date,done:stageIdx(r.stage)>stageIdx("stock")}:null,
+    r.shipDate?{lab:"Expédiée — "+r.shipMethod+" ("+(r.trackingRef||'réf. en attente')+")",who:CURRENT_USER.coord.nom,d:r.shipDate,done:true}:null,
+    r.receiptConfirmed?{lab:"Réception confirmée — "+r.receiptCondition,who:r.spoc,d:r.receiptDate,done:true}:null,
+    r.feedback?{lab:"Retour terrain complété",who:r.spoc,d:r.receiptDate,done:true}:null,
+  ].filter(Boolean);
+  const dc=docCompleteness(r);
+  $("#modalHost").innerHTML=`<div class="modal wide">
+    <div class="m-head">
+      <div><h3>${r.ref}</h3><p>${r.country} · ${p.label} · ${r.qty} kg · ${r.spoc}</p></div>
+      <span class="pill ${r.stage==='obsolete'?'bad':'blue'}" style="margin-top:2px">${stageById(r.stage).lab}</span>
+      <button class="m-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="m-body">
+      ${pipelineHtml(r)}
+      <div class="frow" style="margin:16px 0">
+        <div class="card pad"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Contexte agronomique</div><div style="font-size:13px"><b>${r.crop}</b> · ${r.soil}<br><span style="color:var(--muted)">${r.outcome}</span></div></div>
+        <div class="card pad"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Statut source importé</div><div style="font-size:13px"><b>${r.rawStatus}</b>${dc!==null?` · complétude documentaire ${dc}%`:''}</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Action</div>
+      ${actionPanel(r)}
+      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px">Audit trail</div>
+      ${trail.map(n=>`<div class="audit"><div class="ad" style="background:${n.done?'var(--green-600)':'#fff'};border:${n.done?'none':'1.5px solid var(--line)'}"></div><div><div class="at">${n.lab} <span style="font-weight:400;color:var(--muted)">— ${n.who}</span></div><div class="atm">${fmtDate(n.d)}</div></div></div>`).join("")}
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal()">Fermer</button></div>
+  </div>`;
+  $("#scrim").classList.add("open");
+}
+function reopenRequest(id){const r=REQUESTS.find(x=>x.id===id);r.stage="review";toast("Demande relancée — nouveau SLA démarré","→");AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Relance manuelle",det:r.ref+" — sortie du statut obsolète"});closeModal();refreshAll();}
+function advanceToGate(id){const r=REQUESTS.find(x=>x.id===id);r.stage="gate";AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Routage effectué",det:r.ref+" assignée — contrôle réglementaire démarré"});toast("Assignée — contrôle réglementaire démarré","→");openRequest(id);refreshAll();}
+function approveGate(id){const r=REQUESTS.find(x=>x.id===id);r.stage="stock";r.gateBlocked=false;AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Contrôle réglementaire approuvé",det:r.ref});toast("Contrôle approuvé — passage au stock","●");openRequest(id);refreshAll();}
+function blockRequest(id){const r=REQUESTS.find(x=>x.id===id);const reason=prompt("Motif du blocage :","Documents réglementaires manquants");if(!reason)return;r.gateBlocked=true;r.gateReason=reason;AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Demande bloquée",det:r.ref+" — "+reason});toast("Demandeur notifié du blocage","⚠",true);openRequest(id);refreshAll();}
+function reserveStock(id){const r=REQUESTS.find(x=>x.id===id);STOCK[r.productCode].available-=r.qty;r.stage="shipped";r.shipDate="2026-09-14";r.shipMethod=r.shipMethod||"Container";r.trackingRef="TRK-"+Math.floor(100000+Math.random()*899999);AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Stock réservé et expédition enregistrée",det:r.ref+" — "+r.trackingRef});toast("Stock réservé — expédition enregistrée","●");openRequest(id);refreshAll();}
+function logProduction(id){const w=$("#prodWeeks")?$("#prodWeeks").value:6;const r=REQUESTS.find(x=>x.id===id);AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Estimation de production enregistrée",det:r.ref+" — délai estimé "+w+" semaines, demandeur notifié"});toast("Demandeur notifié du délai de production estimé");openRequest(id);}
+let recOk=true;
+function setRecOk(v){recOk=v;const y=$("#recYes"),n=$("#recNo");if(y){y.classList.toggle("on",v);n.classList.toggle("on",!v);}}
+function confirmReceipt(id){const r=REQUESTS.find(x=>x.id===id);r.receiptConfirmed=true;r.receiptDate="2026-09-14";r.receiptCondition=recOk?"Conforme":"Anomalie signalée";r.stage="delivered";AUDIT.unshift({d:"2026-09-14 —",who:r.spoc,act:"Réception confirmée",det:r.ref+" — "+r.receiptCondition});toast("Réception confirmée — formulaire de feedback débloqué","●");openRequest(id);refreshAll();}
+
+/* ================= FEEDBACK ================= */
+function renderFeedbackView(){
+  const eligible=REQUESTS.filter(r=>["shipped","delivered","feedback"].includes(r.stage));
+  const withFb=eligible.filter(r=>r.feedback).length;
+  $("#fbKpis").innerHTML=[
+    [eligible.length,"Échantillons livrés/expédiés suivis"],
+    [withFb,"Retours terrain complétés"],
+    [eligible.length-withFb,"En attente de retour"],
+  ].map(k=>`<div class="card kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
+  $("#feedbackList").innerHTML=eligible.map(r=>{
+    const p=productByCode(r.productCode);
+    if(r.feedback){
+      const f=r.feedback;
+      return `<div class="card fb-card"><div class="fh"><div class="fav" style="background:var(--green-100);color:var(--green-800)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 6 9 17l-5-5"/></svg></div><div style="flex:1"><div style="font-weight:700">${r.ref} — ${r.country}</div><div style="font-size:12px;color:var(--muted)">${p.label} · ${r.crop}</div></div><div class="stars">${'★'.repeat(f.satisfaction)}${'☆'.repeat(5-f.satisfaction)}</div></div>
+        <div style="font-size:13px;margin-bottom:5px"><b>Réponse agronomique :</b> ${f.cropResponse}</div>
+        <div style="font-size:13px;color:var(--green-800)"><b>Opportunité :</b> ${f.opportunity}</div></div>`;
+    }
+    return `<div class="card fb-card" style="border-color:var(--warn-bg)"><div class="fh"><div class="fav" style="background:var(--warn-bg);color:var(--warn)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></div><div style="flex:1"><div style="font-weight:700">${r.ref} — ${r.country}</div><div style="font-size:12px;color:var(--muted)">${p.label} · ${r.crop} · livré ${r.receiptConfirmed?fmtDate(r.receiptDate):'— réception non confirmée'}</div></div><span class="pill warn">Retour manquant</span></div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">${r.receiptConfirmed?"L'échantillon est arrivé mais aucune donnée d'usage, de réponse agronomique ni de satisfaction n'a été capturée.":"Expédition en cours — confirmation de réception encore requise."}</div>
+      ${r.receiptConfirmed?`<button class="btn amber sm" onclick="openFeedbackForm('${r.id}')">Compléter le feedback</button>`:`<button class="btn ghost sm" onclick="openRequest('${r.id}')">Voir la demande</button>`}</div>`;
+  }).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">Aucun échantillon livré pour l'instant.</div>`;
+}
+function openFeedbackForm(id){
+  const r=REQUESTS.find(x=>x.id===id); const p=productByCode(r.productCode);
+  $("#modalHost").innerHTML=`<div class="modal"><div class="m-head"><div><h3>Retour terrain</h3><p>${r.ref} — ${r.country} · ${p.label} · ${r.crop}</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="m-body">
+      <div class="empty-flag" style="margin-bottom:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><div>Contexte pré-rempli : réception confirmée le ${fmtDate(r.receiptDate)}, ${r.receiptCondition}. Objectif initial : « ${r.outcome} »</div></div>
+      <div class="field"><label>L'échantillon a-t-il été utilisé ?</label><select id="fb-used"><option>Oui, sur parcelle d'essai dédiée</option><option>Oui, en usage exploratoire</option><option>Non, pas encore utilisé</option></select></div>
+      <div class="field"><label>Réponse agronomique observée</label><textarea id="fb-resp" placeholder="Ex. Levée plus rapide, meilleure vigueur initiale, effet sur le rendement…"></textarea></div>
+      <div class="field"><label>Satisfaction du client</label><div class="seg" id="fb-sat">${[1,2,3,4,5].map(n=>`<button class="${n===4?'on':''}" onclick="setFbSat(${n},this)">${'★'.repeat(n)}</button>`).join("")}</div></div>
+      <div class="field"><label>Opportunité commerciale identifiée ?</label><textarea id="fb-opp" placeholder="Ex. Intérêt confirmé pour un déploiement élargi…"></textarea></div>
+    </div>
+    <div class="m-foot"><button class="btn ghost" onclick="closeModal()">Annuler</button><button class="btn" onclick="saveFeedback('${id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Enregistrer le retour terrain</button></div>
+  </div>`;
+  $("#scrim").classList.add("open");
+}
+let fbSat=4;
+function setFbSat(n,btn){fbSat=n;document.querySelectorAll("#fb-sat button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");}
+function saveFeedback(id){
+  const r=REQUESTS.find(x=>x.id===id);
+  const resp=$("#fb-resp").value.trim()||"Observation en cours de consolidation.";
+  r.feedback={used:$("#fb-used").value,cropResponse:resp,satisfaction:fbSat,opportunity:$("#fb-opp").value.trim()||"Aucune opportunité identifiée à ce stade."};
+  r.stage="feedback";
+  AUDIT.unshift({d:"2026-09-14 —",who:r.spoc,act:"Feedback terrain complété",det:r.ref+" — satisfaction "+fbSat+"/5"});
+  closeModal(); toast("Retour terrain enregistré — dashboard mis à jour","●"); refreshAll();
+}
+
+/* ================= CATALOGUE ================= */
+function renderCatalogue(){
+  $("#prodGrid").innerHTML=PRODUCTS.map(p=>{
+    const stk=STOCK[p.code]; const pct=Math.min(stk.available/1500*100,100);
+    return `<div class="card prod-card"><div class="pcode">${p.code}</div><div class="pfam">${p.family}</div>
+      <div class="stock-box" style="margin-top:12px"><div class="sv" style="font-size:20px">${stk.available} kg</div><div class="stock-gauge"><i style="width:${pct}%;background:${stk.available>0?'var(--green-600)':'var(--bad)'}"></i></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Réf. SAP ${stk.sapRef} · lecture seule</div>
+      <div style="margin-top:11px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Pays homologués (Lane 1)</div>${p.approved.map(c=>`<span class="country-chip">${c}</span>`).join("")}</div>
+    </div>`;
+  }).join("");
+}
+
+/* ================= INTEGRATIONS ================= */
+function renderInteg(){
+  const items=[
+    {t:"SAP",d:"Catalogue produits & stock — API lecture seule",c:"ok",ic:'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>'},
+    {t:"Azure Blob Storage",d:"Documents réglementaires (COA, COC, HM, TDS, SDS)",c:"ok",ic:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>'},
+    {t:"Entra ID SSO",d:"Authentification unique — production",c:"ok",ic:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'},
+    {t:"SharePoint",d:"Archivage documentaire long terme",c:"ok",ic:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'},
+    {t:"Azure Databricks · Unity Catalog",d:"Analytique avancée — Engine B, phase 2",c:"info",ic:'<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>'},
+    {t:"Notifications automatiques",d:"Rappels SLA, exceptions, feedback — email + alerte plateforme",c:"ok",ic:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'},
+  ];
+  $("#integGrid").innerHTML=items.map(i=>`<div class="card integ"><div class="ii" style="background:${i.c==='ok'?'var(--green-50)':'var(--amber-bg)'};color:${i.c==='ok'?'var(--green-700)':'var(--amber)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${i.ic}</svg></div><div><h4>${i.t}</h4><p>${i.d}</p><span class="pill ${i.c}" style="margin-top:8px">${i.c==='ok'?'Connecté':'Phase 2'}</span></div></div>`).join("");
+  $("#auditTbl").innerHTML=`<tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Détail</th></tr>`+AUDIT.slice(0,14).map(a=>`<tr><td style="white-space:nowrap;color:var(--muted)">${a.d}</td><td style="font-weight:600">${a.who}</td><td>${a.act}</td><td style="color:var(--muted)">${a.det}</td></tr>`).join("");
+}
+
+function refreshAll(){ const active=document.querySelector("#tabs button.active"); if(active)go(active.dataset.v); const b=document.querySelector('#tabs button[data-v="file"] .n'); if(b)b.textContent=queueItems().length; }
+
+/* ================= MODAL ================= */
+function closeModal(){$("#scrim").classList.remove("open");$("#modalHost").innerHTML="";}
+$("#scrim").addEventListener("click",e=>{if(e.target===$("#scrim"))closeModal();});
+
+/* ================= INIT ================= */
+setRole("demandeur");
+</script>
+</body>
+</html>
