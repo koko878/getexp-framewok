@@ -301,7 +301,7 @@
         </div>
         <div id="eligBox"></div>
         <div class="frow">
-          <div class="field"><label>Quantité (kg) <span class="req">*</span></label><input type="number" id="nf-qty" value="500" min="1"/></div>
+          <div class="field"><label>Quantité (kg) <span class="req">*</span></label><input type="number" id="nf-qty" value="500" min="1" oninput="checkEligibility()"/></div>
           <div class="field"><label>Priorité <span class="req">*</span></label><select id="nf-prio"><option>Medium</option><option>High</option><option>Critical</option></select></div>
         </div>
         <div class="field"><label>Type de demande <span class="req">*</span></label><div class="seg" id="nf-type"><button class="on" onclick="setReqType(this,'Agronomic testing')">Essai agronomique</button><button onclick="setReqType(this,'Registration')">Homologation / Registration</button></div></div>
@@ -369,11 +369,15 @@
 <script>
 /* ================= DONNÉES ================= */
 const TODAY = new Date("2026-09-14");
+// Moteur réglementaire — seuils configurés à titre ILLUSTRATIF (structure représentative du secteur
+// des fertilisants phosphatés : homologation par pays, teneur en cadmium, seuil quantité échantillon
+// avant bascule en régime commercial). À faire valider par l'équipe Regulatory Affairs OCP avant mise en
+// production — ce ne sont pas les chiffres officiels OCP, faute de référentiel transmis.
 const PRODUCTS=[
-  {code:"00 40 00 10S",label:"NPK 0-40-0 +10S",family:"Starter phosphaté soufré",approved:["Ghana","Cameroun","Nigeria","Côte d'Ivoire","Kenya"]},
-  {code:"MAP 11-52 Special Low Cd",label:"MAP 11-52 Special Low Cd",family:"MAP faible cadmium",approved:["Poland","France","Germany","Ghana"]},
-  {code:"5 38 9S",label:"NPS 5-38-9S",family:"Starter NPS",approved:["Bresil","Argentina","Poland"]},
-  {code:"3 30 7S Low Cd",label:"NPK 3-30-7S Low Cd",family:"Starter faible cadmium",approved:["Cameroun","Ghana","Kenya"]},
+  {code:"00 40 00 10S",label:"NPK 0-40-0 +10S",family:"Starter phosphaté soufré",approved:["Ghana","Cameroun","Nigeria","Côte d'Ivoire","Kenya"],cdContent:45},
+  {code:"MAP 11-52 Special Low Cd",label:"MAP 11-52 Special Low Cd",family:"MAP faible cadmium",approved:["Poland","France","Germany","Ghana"],cdContent:12},
+  {code:"5 38 9S",label:"NPS 5-38-9S",family:"Starter NPS",approved:["Bresil","Argentina","Poland","Germany"],cdContent:48},
+  {code:"3 30 7S Low Cd",label:"NPK 3-30-7S Low Cd",family:"Starter faible cadmium",approved:["Cameroun","Ghana","Kenya"],cdContent:14},
 ];
 function productByCode(c){return PRODUCTS.find(p=>p.code===c);}
 const STOCK={
@@ -383,6 +387,27 @@ const STOCK={
   "3 30 7S Low Cd":{available:400,unit:"kg",sapRef:"MAT-33007SLC"},
 };
 const COUNTRIES=["Ghana","Poland","Bresil","Cameroun","Kenya","Nigeria","Côte d'Ivoire","France","Argentina","Germany"];
+
+// Plafond cadmium en mg Cd / kg P₂O₅ — null = aucun plafond réglementaire en vigueur dans ce marché.
+// L'UE resserre progressivement ce seuil (Règlement (UE) 2019/1009) ; l'Afrique/LATAM n'a pas
+// aujourd'hui de plafond harmonisé dans ce référentiel de démonstration.
+const CD_LIMITS={Ghana:null,Cameroun:null,Nigeria:null,"Côte d'Ivoire":null,Kenya:null,Poland:60,France:60,Germany:20,Bresil:60,Argentina:null};
+// Au-delà de ce tonnage, la demande sort du régime "échantillon" et doit suivre le circuit
+// d'homologation commerciale complet plutôt que le circuit Crop Cart Lane 1.
+const SAMPLE_THRESHOLD_KG={default:1500,Poland:150,France:150,Germany:150,Bresil:300,Argentina:300};
+function sampleThreshold(country){return SAMPLE_THRESHOLD_KG[country]||SAMPLE_THRESHOLD_KG.default;}
+// Marchés où une licence d'importation est requise en plus des documents standards — informatif,
+// ne bloque pas le contrôle Crop Cart mais s'affiche pour rappel au coordinateur.
+const IMPORT_LICENSE_COUNTRIES=["Poland","France","Germany","Bresil","Argentina"];
+function regChecks(r){
+  const p=productByCode(r.productCode);
+  const registered=p.approved.includes(r.country);
+  const cdLimit=CD_LIMITS[r.country];
+  const cdOk=cdLimit==null||p.cdContent<=cdLimit;
+  const threshold=sampleThreshold(r.country);
+  const qtyOk=r.qty<=threshold;
+  return {registered,cdLimit,cdOk,cdContent:p.cdContent,threshold,qtyOk,licenseRequired:IMPORT_LICENSE_COUNTRIES.includes(r.country),allOk:registered&&cdOk&&qtyOk};
+}
 
 const DOC_KEYS=["coa","coc","hm","tds","sds"];
 const DOC_LABELS={coa:"COA",coc:"COC",hm:"HM",tds:"TDS",sds:"SDS"};
@@ -453,6 +478,11 @@ let REQUESTS=[
 
   {id:"r9",ref:"REQ-2025-1102",date:"2025-11-02",spoc:"Amara Otieno",bu:"Standard",region:"Africa",country:"Kenya",productCode:"3 30 7S Low Cd",qty:10,priority:"Medium",reqType:"Agronomic testing",crop:"Thé",soil:"Sol volcanique",outcome:"Tester l'apport starter sur jeunes plants de théier.",
    rawStatus:"Abandonné",stage:"obsolete",riCheck:"Compliant",docs:{coa:"no",coc:"no",hm:"na",tds:"yes",sds:"yes"},obsoleteReason:"87 jours sans mouvement en contrôle réglementaire, aucune relance — demande abandonnée par le terrain.",
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r10",ref:"REQ-2026-0910",date:"2026-09-10",spoc:"Klaus Richter",bu:"Customization",region:"Europe",country:"Germany",productCode:"5 38 9S",qty:60,priority:"High",reqType:"Agronomic testing",crop:"Orge de printemps",soil:"Sol limono-sableux",outcome:"Tester le démarrage de l'orge de printemps avec un starter NPS standard.",
+   rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Teneur en cadmium du produit (48 mg/kg P₂O₅) supérieure au plafond réglementaire allemand (20 mg/kg P₂O₅). Homologué pour l'Allemagne, mais non conforme en l'état — proposer la variante Low Cd.",
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 ];
@@ -552,6 +582,8 @@ function renderKpis(){
   if(overdue.length)flags.push({t:overdue.length+" expédition(s) en attente de confirmation de réception depuis plus de 45 jours (ex. "+overdue[0].ref+", Brésil).",c:"bad"});
   const integrityGap=REQUESTS.filter(r=>!["submitted","review","obsolete"].includes(r.stage)&&docCompleteness(r)!==null&&docCompleteness(r)<100&&stageIdx(r.stage)>=stageIdx("stock"));
   if(integrityGap.length)flags.push({t:integrityGap.length+" dossier(s) ont progressé en stock/logistique malgré une documentation réglementaire incomplète — le contrôle automatique Crop Cart aurait bloqué ce passage.",c:"bad"});
+  const cdBlocked=REQUESTS.filter(r=>r.stage==="gate"&&(regChecks(r).cdOk===false));
+  if(cdBlocked.length)flags.push({t:cdBlocked.length+" demande(s) bloquée(s) sur la teneur en cadmium ("+cdBlocked.map(r=>r.country).join(", ")+") — l'UE resserre ce seuil : les variantes Low Cd du catalogue sécurisent l'accès à ces marchés.",c:"warn"});
   $("#dashFlags").innerHTML=flags.map(f=>`<div class="empty-flag ${f.c==='bad'?'bad':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div>${f.t}</div></div>`).join("");
 }
 function renderDash(){
@@ -589,8 +621,17 @@ function populateCountries(){
 function checkEligibility(){
   const country=$("#nf-country").value, code=$("#nf-product").value; const p=productByCode(code);
   if(!p){$("#eligBox").innerHTML="";return;}
-  const ok=p.approved.includes(country);
-  $("#eligBox").innerHTML=`<div class="empty-flag ${ok?'':'bad'}" style="background:${ok?'var(--green-50)':''};border-color:${ok?'var(--green-100)':''};color:${ok?'var(--green-800)':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ok?'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>':'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>'}</svg><div>${ok?"<b>Produit homologué</b> pour "+country+" (Lane 1). La demande pourra avancer sans blocage réglementaire de pays.":"<b>Produit non homologué</b> pour "+country+". Vous pouvez soumettre, mais la demande sera bloquée automatiquement au contrôle réglementaire — gagnez du temps en choisissant un autre produit ou pays."}</div></div>`;
+  const qty=+($("#nf-qty")?$("#nf-qty").value:0)||0;
+  const rc=regChecks({country,productCode:code,qty});
+  const rows=[
+    {ok:rc.registered,lab:rc.registered?"Produit homologué pour "+country+" (Lane 1)":"Produit non homologué pour "+country},
+    {ok:rc.cdOk,lab:rc.cdLimit==null?"Aucun plafond cadmium en vigueur dans ce marché":(rc.cdOk?"Cadmium conforme : "+rc.cdContent+" mg/kg ≤ plafond "+rc.cdLimit+" mg/kg (P₂O₅)":"Cadmium non conforme : "+rc.cdContent+" mg/kg > plafond "+rc.cdLimit+" mg/kg (P₂O₅) — envisager une variante Low Cd")},
+    {ok:rc.qtyOk,lab:rc.qtyOk?"Quantité dans le seuil échantillon ("+qty+" ≤ "+rc.threshold+" kg)":"Quantité au-delà du seuil échantillon ("+qty+" > "+rc.threshold+" kg) — bascule en circuit d'homologation commerciale requise"},
+  ];
+  const allOk=rows.every(r=>r.ok);
+  $("#eligBox").innerHTML=rows.map(r=>`<div class="empty-flag ${r.ok?'':'bad'}" style="background:${r.ok?'var(--green-50)':''};border-color:${r.ok?'var(--green-100)':''};color:${r.ok?'var(--green-800)':''};margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${r.ok?'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>':'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>'}</svg><div>${r.lab}</div></div>`).join("")+
+    (rc.licenseRequired?`<div class="empty-flag" style="background:var(--amber-bg);border-color:#fde5b0;color:#7c4a06;margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div>Licence d'importation requise pour ${country} — à anticiper en parallèle du dossier réglementaire.</div></div>`:'')+
+    `<div style="font-size:11px;color:var(--muted);margin-top:2px">${allOk?"La demande pourra avancer sans blocage réglementaire.":"Vous pouvez soumettre, mais la demande sera bloquée automatiquement au contrôle réglementaire — gagnez du temps en ajustant le produit, le pays ou la quantité."}</div>`;
 }
 function renderNouvelle(){ populateCountries(); checkEligibility(); }
 function submitRequest(){
@@ -672,17 +713,20 @@ function actionPanel(r){
     return `<div class="card pad soft"><div style="font-size:13px;color:var(--green-800);margin-bottom:10px">Requête reçue, en attente d'assignation au contrôle réglementaire & qualité.</div><button class="btn" onclick="advanceToGate('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Assigner et lancer le contrôle réglementaire</button></div>`;
   }
   if(r.stage==="gate"){
-    const p=productByCode(r.productCode); const eligible=p.approved.includes(r.country);
+    const rc=regChecks(r);
     const allDocs=DOC_KEYS.every(k=>r.docs[k]&&r.docs[k]!=="no");
-    const canApprove=eligible&&allDocs;
+    const canApprove=rc.allOk&&allDocs;
     return `<div class="frow" style="margin-bottom:14px">
-        <div class="card pad" style="${eligible?'':'border-color:var(--bad)'}"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Éligibilité pays</div><div style="font-weight:700;color:${eligible?'var(--green-800)':'var(--bad)'}">${eligible?'✓ Homologué pour '+r.country:'✗ Non homologué pour '+r.country}</div></div>
-        <div class="card pad soft"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">RI Check</div><div style="font-weight:700;color:var(--green-800)">${r.riCheck||'À vérifier'}</div></div>
+        <div class="card pad" style="${rc.registered?'':'border-color:var(--bad)'}"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Homologation pays</div><div style="font-weight:700;color:${rc.registered?'var(--green-800)':'var(--bad)'}">${rc.registered?'✓ Homologué pour '+r.country:'✗ Non homologué pour '+r.country}</div></div>
+        <div class="card pad" style="${rc.cdOk?'':'border-color:var(--bad)'}"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Cadmium (mg/kg P₂O₅)</div><div style="font-weight:700;color:${rc.cdOk?'var(--green-800)':'var(--bad)'}">${rc.cdContent} ${rc.cdLimit==null?'· aucun plafond':(rc.cdOk?'≤ '+rc.cdLimit+' ✓':'> '+rc.cdLimit+' ✗')}</div></div>
+        <div class="card pad" style="${rc.qtyOk?'':'border-color:var(--bad)'}"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Seuil échantillon</div><div style="font-weight:700;color:${rc.qtyOk?'var(--green-800)':'var(--bad)'}">${r.qty} / ${rc.threshold} kg ${rc.qtyOk?'✓':'✗'}</div></div>
       </div>
+      ${rc.licenseRequired?`<div class="empty-flag" style="background:var(--amber-bg);border-color:#fde5b0;color:#7c4a06;margin-bottom:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div>Licence d'importation requise pour ${r.country} — à confirmer en parallèle (hors périmètre des 5 documents standards).</div></div>`:''}
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">RI Check</div><div style="font-weight:700;color:var(--green-800);margin-bottom:14px">${r.riCheck||'À vérifier'}</div>
       <div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:8px" class="caps">Documents réglementaires requis</div>
       <div class="doc-grid" style="margin-bottom:14px">${DOC_KEYS.map(k=>docToggleHtml(r,k)).join("")}</div>
       ${r.gateBlocked?`<div class="empty-flag bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg><div>${r.gateReason}</div></div>`:''}
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn bad" onclick="blockRequest('${r.id}')">⚠ Bloquer avec motif</button><button class="btn" ${canApprove?'':'disabled title="Éligibilité pays et documents requis"'} onclick="approveGate('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Approuver le contrôle</button></div>`;
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn bad" onclick="blockRequest('${r.id}')">⚠ Bloquer avec motif</button><button class="btn" ${canApprove?'':'disabled title="Homologation, cadmium, quantité et documents requis"'} onclick="approveGate('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Approuver le contrôle</button></div>`;
   }
   if(r.stage==="stock"){
     const stk=STOCK[r.productCode]; const ok=stk.available>=r.qty;
@@ -812,9 +856,13 @@ function renderCatalogue(){
     return `<div class="card prod-card"><div class="pcode">${p.code}</div><div class="pfam">${p.family}</div>
       <div class="stock-box" style="margin-top:12px"><div class="sv" style="font-size:20px">${stk.available} kg</div><div class="stock-gauge"><i style="width:${pct}%;background:${stk.available>0?'var(--green-600)':'var(--bad)'}"></i></div></div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px">Réf. SAP ${stk.sapRef} · lecture seule</div>
-      <div style="margin-top:11px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Pays homologués (Lane 1)</div>${p.approved.map(c=>`<span class="country-chip">${c}</span>`).join("")}</div>
+      <div style="margin-top:11px;display:flex;gap:16px">
+        <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Cadmium</div><div style="font-weight:700;font-family:var(--serif);font-size:16px;color:var(--green-800)">${p.cdContent} mg/kg</div></div>
+        <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Seuil échantillon</div><div style="font-weight:700;font-family:var(--serif);font-size:16px">≤ ${SAMPLE_THRESHOLD_KG.default} kg</div></div>
+      </div>
+      <div style="margin-top:11px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Pays homologués (Lane 1)</div>${p.approved.map(c=>{const lim=CD_LIMITS[c];const ok=lim==null||p.cdContent<=lim;return `<span class="country-chip" style="${ok?'':'background:var(--warn-bg);color:var(--warn)'}">${c}${ok?'':' ⚠ Cd'}</span>`;}).join("")}</div>
     </div>`;
-  }).join("");
+  }).join("")+`<div class="card pad" style="grid-column:1/-1;background:var(--amber-bg);border-color:#fde5b0"><div style="font-size:12.5px;color:#7c4a06"><b>Seuils illustratifs.</b> Cadmium et seuils de quantité échantillon sont configurés à titre représentatif du secteur (fertilisants phosphatés) — à valider avec l'équipe Regulatory Affairs OCP avant mise en production, faute de référentiel officiel transmis pour ce prototype.</div></div>`;
 }
 
 /* ================= INTEGRATIONS ================= */
