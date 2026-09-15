@@ -240,6 +240,55 @@
 
   footer{text-align:center;padding:22px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:20px}
   footer b{color:var(--green-800);font-weight:600}
+
+  /* ===== GLOBE ===== */
+  .globe-wrap{display:flex;justify-content:center}
+  #globeSvg{width:100%;max-width:400px;height:auto}
+  .globe-pin{cursor:pointer}
+  .globe-pin circle.ring{opacity:0;transition:opacity .15s}
+  .globe-pin:hover circle.ring{opacity:.35}
+  .globe-pin text{font-size:9px;font-weight:700;fill:var(--ink);pointer-events:none}
+  .presence-legend-item{display:flex;align-items:center;gap:6px}
+
+  /* ===== THREADS ===== */
+  .thread{padding:18px;margin-bottom:16px}
+  .thread-h{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+  .thread-ic{width:38px;height:38px;border-radius:10px;flex:0 0 38px;display:flex;align-items:center;justify-content:center}
+  .thread-ic svg{width:19px;height:19px}
+  .thread h4{font-size:15px;font-weight:700;line-height:1.35}
+  .thread .tlinks{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+  .tpost{display:flex;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .tpost .pav{width:30px;height:30px;border-radius:50%;background:var(--green-100);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex:0 0 30px}
+  .tpost .pn{font-weight:700;font-size:13px}.tpost .pr{font-size:11px;color:var(--muted)}
+  .tpost .pt{font-size:13.5px;margin-top:4px;line-height:1.5}
+  .reply-box{display:flex;gap:8px;margin-top:12px}
+  .reply-box input{flex:1;padding:9px 13px;border:1px solid var(--line);border-radius:20px;background:#fff}
+  .reply-box button{width:38px;height:38px;border-radius:50%;background:var(--green-800);color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 38px}
+  .reply-box button svg{width:16px;height:16px}
+
+  /* ===== REGLEMENTAIRE ===== */
+  .reg-card{padding:15px 17px;margin-bottom:10px;display:flex;gap:13px;align-items:flex-start}
+  .reg-card .ri{width:36px;height:36px;border-radius:10px;flex:0 0 36px;display:flex;align-items:center;justify-content:center}
+  .reg-card .ri svg{width:18px;height:18px}
+  .reg-card h4{font-size:13.5px;font-weight:700}
+  .reg-card p{font-size:12.5px;color:var(--muted);margin-top:3px}
+
+  /* ===== LOGISTIQUE ===== */
+  .wh-row{padding:13px 0;border-bottom:1px solid var(--line)}
+  .wh-row:last-child{border-bottom:none}
+  .wh-row .whn{font-weight:700;font-size:13.5px;margin-bottom:8px}
+  .wh-item{display:flex;align-items:center;gap:10px;font-size:12.5px;padding:4px 0}
+  .wh-item .win{width:150px;flex:0 0 150px;color:var(--muted)}
+  .wh-item .wb{flex:1;height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+  .wh-item .wb i{display:block;height:100%;border-radius:4px}
+  .wh-item .wv{width:56px;text-align:right;font-weight:700}
+  .mode-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .mode-row:last-child{border-bottom:none}
+  .mode-row .mi{width:34px;height:34px;border-radius:9px;background:var(--green-50);color:var(--green-700);display:flex;align-items:center;justify-content:center;flex:0 0 34px}
+  .mode-row .mi svg{width:17px;height:17px}
+  .co2-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+  .co2-row:last-child{border-bottom:none}
+  .co2-row .cv{margin-left:auto;font-weight:700;color:var(--green-800);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -350,6 +399,74 @@
     <div class="prod-grid" id="prodGrid"></div>
   </section>
 
+  <!-- CARTE MONDIALE -->
+  <section class="view" id="v-globe">
+    <div class="sec-h"><div><span class="eyebrow">Vision mondiale</span><h2>Opérations Crop Cart — carte interactive</h2><div class="sub-muted">Cliquer un point pour le détail du marché · survoler pour un retour terrain</div></div></div>
+    <div class="grid2">
+      <div class="card pad" style="text-align:center">
+        <div class="globe-wrap"><svg id="globeSvg" viewBox="0 0 400 400"></svg></div>
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:8px">
+          <button class="btn ghost sm" onclick="rotateGlobe(-30)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Tourner</button>
+          <button class="btn ghost sm" onclick="rotateGlobe(30)">Tourner<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        </div>
+        <div style="display:flex;justify-content:center;gap:14px;margin-top:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)">
+          <span style="display:flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:50%;background:var(--green-700);display:inline-block"></i>Filiale confirmée</span>
+          <span style="display:flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:50%;background:var(--blue);display:inline-block"></i>Marché confirmé</span>
+          <span style="display:flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:50%;background:var(--amber);display:inline-block"></i>Présence non confirmée</span>
+          <span style="display:flex;align-items:center;gap:5px"><i style="width:9px;height:9px;border-radius:50%;background:var(--ink);display:inline-block"></i>Hub d'expédition (Maroc)</span>
+        </div>
+      </div>
+      <div id="globeSide"><div class="card pad" style="text-align:center;color:var(--muted)">Sélectionnez un pays sur la carte pour voir ses demandes et retours terrain.</div></div>
+    </div>
+  </section>
+
+  <!-- INTELLIGENCE TERRAIN -->
+  <section class="view" id="v-intelligence">
+    <div class="sec-h"><div><span class="eyebrow">Apprentissage organisationnel</span><h2>Intelligence terrain — essais & discussions</h2></div></div>
+    <div id="threadList"></div>
+  </section>
+
+  <!-- INTELLIGENCE REGLEMENTAIRE -->
+  <section class="view" id="v-reglementaire">
+    <div class="sec-h"><div><span class="eyebrow">Conformité & veille</span><h2>Intelligence réglementaire</h2></div></div>
+    <div class="sec-h" style="margin-top:6px"><h3 style="font-size:15px">Expéditions bloquées</h3></div>
+    <div id="regBlocked" style="margin-bottom:20px"></div>
+    <div class="sec-h"><h3 style="font-size:15px">Dérogations en cours</h3></div>
+    <div id="regExemptions" style="margin-bottom:20px"></div>
+    <div class="sec-h"><h3 style="font-size:15px">Évolutions réglementaires anticipées</h3></div>
+    <div id="regPolicy" style="margin-bottom:20px"></div>
+    <div class="card pad">
+      <div class="sec-h" style="margin-bottom:10px"><h3>Journal d'homologation produit × pays</h3><span class="hint">historique complet</span></div>
+      <div style="overflow-x:auto"><table class="audit-tbl" id="clearanceTbl"></table></div>
+    </div>
+  </section>
+
+  <!-- LOGISTIQUE & CO2 -->
+  <section class="view" id="v-logistique">
+    <div class="sec-h"><div><span class="eyebrow">Étape 5 — Fulfillment orchestration</span><h2>Logistique, stockage & impact CO₂</h2></div></div>
+    <div class="kpis" id="logKpis"></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Stock par entrepôt</h3><span class="hint">seuil d'alerte 50 kg</span></div>
+        <div id="warehouseBox"></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Répartition par mode de transport</h3><span class="hint">volume & coût fret</span></div>
+        <div id="modeBox"></div>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Tendance coût fret vs indice carburant</h3><span class="hint">6 derniers mois — illustratif</span></div>
+        <div style="height:190px"><svg id="freightChart" viewBox="0 0 500 190" preserveAspectRatio="none"></svg></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Impact CO₂ par expédition</h3><span class="hint">vs scénario par défaut (fret aérien)</span></div>
+        <div id="co2List"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- INTEGRATIONS -->
   <section class="view" id="v-integ">
     <div class="sec-h"><div><span class="eyebrow">Architecture SI</span><h2>Intégrations · Landing Zone Nutricrops</h2></div></div>
@@ -374,10 +491,11 @@ const TODAY = new Date("2026-09-14");
 // avant bascule en régime commercial). À faire valider par l'équipe Regulatory Affairs OCP avant mise en
 // production — ce ne sont pas les chiffres officiels OCP, faute de référentiel transmis.
 const PRODUCTS=[
-  {code:"00 40 00 10S",label:"NPK 0-40-0 +10S",family:"Starter phosphaté soufré",approved:["Ghana","Cameroun","Nigeria","Côte d'Ivoire","Kenya"],cdContent:45},
+  {code:"00 40 00 10S",label:"NPK 0-40-0 +10S",family:"Starter phosphaté soufré",approved:["Ghana","Cameroun","Nigeria","Côte d'Ivoire","Kenya","Ethiopia","Bresil"],cdContent:45},
   {code:"MAP 11-52 Special Low Cd",label:"MAP 11-52 Special Low Cd",family:"MAP faible cadmium",approved:["Poland","France","Germany","Ghana"],cdContent:12},
   {code:"5 38 9S",label:"NPS 5-38-9S",family:"Starter NPS",approved:["Bresil","Argentina","Poland","Germany"],cdContent:48},
-  {code:"3 30 7S Low Cd",label:"NPK 3-30-7S Low Cd",family:"Starter faible cadmium",approved:["Cameroun","Ghana","Kenya"],cdContent:14},
+  {code:"3 30 7S Low Cd",label:"NPK 3-30-7S Low Cd",family:"Starter faible cadmium",approved:["Cameroun","Ghana","Kenya","Ethiopia"],cdContent:14},
+  {code:"TSP 0-46-0",label:"TSP 0-46-0 (Triple Super Phosphate)",family:"Phosphate concentré",approved:["Indonesia","Ghana","Kenya"],cdContent:32},
 ];
 function productByCode(c){return PRODUCTS.find(p=>p.code===c);}
 const STOCK={
@@ -385,8 +503,32 @@ const STOCK={
   "MAP 11-52 Special Low Cd":{available:20,unit:"kg",sapRef:"MAT-MAP1152LC"},
   "5 38 9S":{available:0,unit:"kg",sapRef:"MAT-53809S"},
   "3 30 7S Low Cd":{available:400,unit:"kg",sapRef:"MAT-33007SLC"},
+  "TSP 0-46-0":{available:850,unit:"kg",sapRef:"MAT-TSP0460"},
 };
-const COUNTRIES=["Ghana","Poland","Bresil","Cameroun","Kenya","Nigeria","Côte d'Ivoire","France","Argentina","Germany"];
+const COUNTRIES=["Ghana","Poland","Bresil","Cameroun","Kenya","Nigeria","Côte d'Ivoire","France","Argentina","Germany","Ethiopia","South Africa","Indonesia","Vietnam"];
+
+// Présence marché — vérifiée par recherche web avant peuplement (voir échange du 15/09/2026), pas d'invention.
+// "subsidiary" = filiale/représentation OCP Africa ou OCP Nutricrops confirmée en source ouverte.
+// "confirmed_trade" = relation commerciale directe confirmée (ex. exports LATAM) sans filiale dédiée identifiée.
+// "unconfirmed" = présence plausible (OCP dessert 80+ pays) mais NON confirmée en source ouverte pour ce prototype — à valider.
+const PRESENCE_INFO={
+  Ghana:{type:"subsidiary",label:"Filiale OCP Africa"},
+  Cameroun:{type:"subsidiary",label:"Filiale OCP Africa"},
+  Kenya:{type:"subsidiary",label:"Filiale OCP Africa"},
+  Nigeria:{type:"subsidiary",label:"Filiale OCP Africa"},
+  "Côte d'Ivoire":{type:"subsidiary",label:"Filiale OCP Africa"},
+  Ethiopia:{type:"subsidiary",label:"Filiale OCP Africa"},
+  France:{type:"subsidiary",label:"Filiale OCP Nutricrops (nouvelle, 2026)"},
+  Bresil:{type:"confirmed_trade",label:"Marché LATAM — exports directs confirmés"},
+  Poland:{type:"unconfirmed",label:"Marché export Europe — présence non confirmée en source ouverte"},
+  Germany:{type:"unconfirmed",label:"Marché export Europe — présence non confirmée en source ouverte"},
+  Argentina:{type:"unconfirmed",label:"Marché export LATAM — présence non confirmée en source ouverte"},
+  "South Africa":{type:"unconfirmed",label:"Marché potentiel — présence non confirmée en source ouverte"},
+  Indonesia:{type:"unconfirmed",label:"Marché export Asie — présence non confirmée en source ouverte"},
+  Vietnam:{type:"unconfirmed",label:"Marché export Asie — présence non confirmée en source ouverte"},
+};
+const PRESENCE_STYLE={subsidiary:{c:"var(--green-800)",bg:"var(--green-100)"},confirmed_trade:{c:"var(--blue)",bg:"var(--blue-bg)"},unconfirmed:{c:"var(--warn)",bg:"var(--warn-bg)"}};
+function presenceBadge(country){const p=PRESENCE_INFO[country];if(!p)return "";const s=PRESENCE_STYLE[p.type];return `<span class="pill" style="color:${s.c};background:${s.bg}">${p.label}</span>`;}
 
 // Plafond cadmium en mg Cd / kg P₂O₅ — null = aucun plafond réglementaire en vigueur dans ce marché.
 // L'UE resserre progressivement ce seuil (Règlement (UE) 2019/1009) ; l'Afrique/LATAM n'a pas
@@ -485,7 +627,153 @@ let REQUESTS=[
    rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Teneur en cadmium du produit (48 mg/kg P₂O₅) supérieure au plafond réglementaire allemand (20 mg/kg P₂O₅). Homologué pour l'Allemagne, mais non conforme en l'état — proposer la variante Low Cd.",
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
+
+  // Élargissement international (15-20 opérations) — pays vérifiés avant peuplement, cf. PRESENCE_INFO. Maroc exclu.
+  {id:"r11",ref:"REQ-2026-0210",date:"2026-02-10",spoc:"Bekele Girma",bu:"Customization",region:"Africa",country:"Ethiopia",productCode:"00 40 00 10S",qty:400,priority:"High",reqType:"Agronomic testing",crop:"Teff",soil:"Sol volcanique d'altitude",outcome:"Évaluer la réponse du teff à un starter phosphaté-soufré en altitude.",transportMode:"Camion",distanceKm:5200,
+   rawStatus:"Shipped",stage:"shipped",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   shipDate:"2026-04-02",shipMethod:"Camion",trackingRef:"RD-ETH-40021",receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r12",ref:"REQ-2025-1120",date:"2025-11-20",spoc:"Bekele Girma",bu:"Customization",region:"Africa",country:"Ethiopia",productCode:"3 30 7S Low Cd",qty:60,priority:"Medium",reqType:"Agronomic testing",crop:"Teff",soil:"Sol volcanique",outcome:"Comparer la formulation Low Cd sur teff en sol volcanique.",transportMode:"Camion",distanceKm:5200,
+   rawStatus:"Closed",stage:"feedback",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   shipDate:"2025-12-15",shipMethod:"Camion",trackingRef:"RD-ETH-39880",receiptConfirmed:true,receiptDate:"2026-01-10",receiptCondition:"Conforme",
+   feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"+9% de biomasse en sol volcanique vs référence locale, tallage plus homogène.",satisfaction:4,opportunity:"Approche jugée réplicable sur les sols volcaniques comparables du Kenya."}},
+
+  {id:"r13",ref:"REQ-2026-0820",date:"2026-08-20",spoc:"Lindiwe Nkosi",bu:"Standard",region:"Africa",country:"South Africa",productCode:"MAP 11-52 Special Low Cd",qty:40,priority:"Medium",reqType:"Registration",crop:"Maïs",soil:"Sol sablo-limoneux",outcome:"Constituer un dossier d'entrée sur un marché non encore homologué.",
+   rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit non homologué pour l'Afrique du Sud — marché sans filiale confirmée. Une demande de dérogation d'entrée est en cours (cf. Intelligence réglementaire).",
+   pendingExemption:{filedDate:"2026-08-25",expectedDate:"2026-09-29",authority:"Department of Agriculture — Fertilizers, Farm Feeds Act"},
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r14",ref:"REQ-2025-0918",date:"2025-09-18",spoc:"Sari Wulandari",bu:"Customization",region:"Asia",country:"Indonesia",productCode:"TSP 0-46-0",qty:120,priority:"High",reqType:"Agronomic testing",crop:"Riz",soil:"Sol volcanique irrigué",outcome:"Évaluer l'apport de phosphore concentré sur riz irrigué en sol volcanique.",transportMode:"DHL",distanceKm:11800,
+   rawStatus:"Closed",stage:"feedback",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   shipDate:"2025-10-05",shipMethod:"DHL",trackingRef:"DHL-8820134-ID",receiptConfirmed:true,receiptDate:"2025-10-14",receiptCondition:"Conforme",
+   feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"+12% de rendement riz vs référence TSP standard, meilleure disponibilité P en sol volcanique.",satisfaction:5,opportunity:"Résultat jugé réplicable — approche à tester au Vietnam et aux Philippines."}},
+
+  {id:"r15",ref:"REQ-2026-0901",date:"2026-09-01",spoc:"Pham Thi Lan",bu:"Customization",region:"Asia",country:"Vietnam",productCode:"TSP 0-46-0",qty:100,priority:"High",reqType:"Registration",crop:"Riz",soil:"Sol alluvial du delta",outcome:"Répliquer l'essai TSP riz mené en Indonésie sur le delta du Mékong.",
+   rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit TSP 0-46-0 non encore homologué pour le Vietnam — dossier d'enregistrement à engager avant expédition.",
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r16",ref:"REQ-2026-0822",date:"2026-08-22",spoc:"Carla Silva",bu:"Customization",region:"LATAM",country:"Bresil",productCode:"00 40 00 10S",qty:600,priority:"Critical",reqType:"Agronomic testing",crop:"Maïs",soil:"Sol argileux tropical",outcome:"Étendre les essais starter phosphaté-soufré au maïs après le succès sur soja.",
+   rawStatus:"Production check",stage:"stock",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   supplyNote:"Pénurie de soufre signalée sur la ligne de formulation 00-40-00-10S — alerte procurement en cours (cf. Intelligence terrain).",
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r17",ref:"REQ-2026-0715",date:"2026-07-15",spoc:"Martín Fernández",bu:"Customization",region:"LATAM",country:"Argentina",productCode:"5 38 9S",qty:90,priority:"Medium",reqType:"Agronomic testing",crop:"Blé",soil:"Sol limoneux pampéen",outcome:"Tester le starter NPS sur blé d'hiver dans la pampa humide.",transportMode:"Container",distanceKm:10600,
+   rawStatus:"Shipped",stage:"shipped",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   shipDate:"2026-08-10",shipMethod:"Container",trackingRef:"MSCU-660214-AR",receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r18",ref:"REQ-2026-0913",date:"2026-09-13",spoc:"Élodie Marchand",bu:"Customization",region:"Europe",country:"France",productCode:"MAP 11-52 Special Low Cd",qty:35,priority:"Critical",reqType:"Agronomic testing",crop:"Colza",soil:"Limon profond",outcome:"Premier échantillon depuis l'ouverture de la filiale OCP Nutricrops France — vitrine de lancement.",
+   rawStatus:"Submitted",stage:"submitted",riCheck:null,docs:{},
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r19",ref:"REQ-2026-0730",date:"2026-07-30",spoc:"Chidi Okafor",bu:"Customization",region:"Africa",country:"Nigeria",productCode:"00 40 00 10S",qty:250,priority:"Medium",reqType:"Agronomic testing",crop:"Sorgho",soil:"Sol ferrugineux tropical",outcome:"Valider l'apport starter sur sorgho en zone soudano-sahélienne.",transportMode:"Camion",distanceKm:4300,
+   rawStatus:"Shipped",stage:"shipped",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   shipDate:"2026-08-20",shipMethod:"Camion",trackingRef:"RD-NGA-55210",receiptConfirmed:false,
+   feedback:null},
+
+  {id:"r20",ref:"REQ-2026-0110",date:"2026-01-10",spoc:"Katarzyna Nowak",bu:"Customization",region:"Europe",country:"Poland",productCode:"5 38 9S",qty:40,priority:"Medium",reqType:"Agronomic testing",crop:"Blé de printemps",soil:"Sol froid, pH 6.5",outcome:"Tester le starter NPS sur blé de printemps en sol froid.",transportMode:"DHL",distanceKm:2900,
+   rawStatus:"Closed",stage:"feedback",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   shipDate:"2026-02-05",shipMethod:"DHL",trackingRef:"DHL-4402210-PL",receiptConfirmed:true,receiptDate:"2026-02-12",receiptCondition:"Conforme",
+   feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"Résultat en dessous des attentes : +2% de biomasse seulement en sol froid (objectif +8%) — absorption ralentie par les températures basses.",satisfaction:2,opportunity:"Aucune à ce stade — recommander une reformulation ou un décalage de la fenêtre d'application avant nouvel essai."}},
 ];
+
+// ================= INTELLIGENCE TERRAIN — fils de discussion (positifs & négatifs) =================
+let TRIAL_THREADS=[
+  {id:"t1",title:"TSP +12% rendement riz en Indonésie → répliquer l'approche au Vietnam & Philippines",sentiment:"positive",linkedRequests:["r14","r15"],
+   posts:[
+     {by:"Sari Wulandari",role:"Sales Agronomist — Indonésie",date:"2025-10-20",text:"Résultat net : +12% de rendement riz vs TSP standard sur sol volcanique irrigué. Le phosphore concentré se libère mieux dans ces conditions. Je recommande de tester la même approche sur delta alluvial."},
+     {by:"Pham Thi Lan",role:"Country Manager — Vietnam",date:"2025-11-02",text:"Très intéressant — le delta du Mékong a un profil de sol comparable. J'ai initié une demande TSP pour le Vietnam (REQ-2026-0901), en attente d'homologation produit."},
+     {by:"Innovation Manager",role:"R&D Scientist",date:"2025-11-05",text:"Ajout au backlog R&D : documenter le mécanisme de libération du phosphore en sol volcanique irrigué pour accélérer les futurs dossiers d'homologation en Asie du Sud-Est."},
+   ]},
+  {id:"t2",title:"Pénurie de soufre signalée pour la formulation 00-40-00-10S au Brésil → alerte procurement",sentiment:"negative",linkedRequests:["r16"],
+   posts:[
+     {by:"Youssef Amrani",role:"Sample Coordinator",date:"2026-09-12",text:"La ligne de formulation soufrée du 00-40-00-10S signale une tension d'approvisionnement en soufre. Demande Brésil REQ-2026-0822 (600 kg) en attente de confirmation stock."},
+     {by:"Production/Pilot Engineer",role:"Manufacturing",date:"2026-09-13",text:"Confirmé — stock soufre à 60% du seuil de sécurité. Délai de réapprovisionnement estimé 3 semaines. Prioriser les demandes Critical en attendant."},
+     {by:"Portfolio Manager",role:"Direction",date:"2026-09-13",text:"Alerte transmise à l'équipe Achats. À surveiller : ce type de tension doit remonter automatiquement dès le contrôle stock, pas après coup."},
+   ]},
+  {id:"t3",title:"+9% biomasse teff en sol volcanique Éthiopie → approche réplicable au Kenya",sentiment:"positive",linkedRequests:["r12"],
+   posts:[
+     {by:"Bekele Girma",role:"Sales Agronomist — Éthiopie",date:"2026-01-12",text:"La formulation Low Cd donne +9% de biomasse sur teff en sol volcanique, tallage plus homogène que la référence locale."},
+     {by:"Field Trial Coordinator",role:"R&D",date:"2026-01-15",text:"Les sols volcaniques d'altitude du Kenya (région du mont Kenya) présentent un profil comparable — je propose d'ouvrir un essai miroir (cf. REQ-2026-0912, café, en cours de soumission)."},
+   ]},
+  {id:"t4",title:"Réponse NPS en dessous des attentes en sol froid polonais → revoir la fenêtre d'application",sentiment:"negative",linkedRequests:["r20"],
+   posts:[
+     {by:"Katarzyna Nowak",role:"Agronomist — Pologne",date:"2026-02-14",text:"+2% de biomasse seulement sur blé de printemps, largement sous l'objectif de +8%. L'absorption semble ralentie par les températures basses au semis."},
+     {by:"R&D Scientist",role:"Innovation",date:"2026-02-18",text:"Cohérent avec la littérature sur la disponibilité du P en sol froid. Deux pistes : décaler la fenêtre d'application de 2-3 semaines, ou tester un starter avec activateur racinaire. À valider sur un nouvel essai 2027."},
+   ]},
+];
+function threadById(id){return TRIAL_THREADS.find(t=>t.id===id);}
+function addThreadReply(id){
+  const el=document.getElementById("reply-"+id); if(!el)return;
+  const text=el.value.trim(); if(!text)return;
+  threadById(id).posts.push({by:CURRENT_USER[ROLE].nom,role:CURRENT_USER[ROLE].role,date:"2026-09-15",text});
+  toast("Réponse publiée dans le fil","●");
+  renderIntelligence();
+}
+
+// ================= INTELLIGENCE RÉGLEMENTAIRE =================
+const POLICY_WATCH=[
+  {t:"UE — resserrement progressif du seuil cadmium (Règlement (UE) 2019/1009)",d:"Trajectoire de durcissement du plafond Cd pour les engrais CE (actuellement configuré à 60 mg/kg P₂O₅ dans ce prototype pour Pologne/France). Impact direct sur la gamme standard — la gamme Low Cd sécurise l'accès EU à moyen terme.",horizon:"Surveillance continue"},
+  {t:"Éthiopie — projet d'harmonisation des seuils d'homologation OCP Africa",d:"Discussions en cours pour aligner les procédures d'homologation entre pays OCP Africa (Côte d'Ivoire, Ghana, Cameroun, Kenya, Nigeria, Éthiopie) et réduire les délais de dossier.",horizon:"12-18 mois"},
+  {t:"Asie du Sud-Est — simplification des procédures d'enregistrement engrais",d:"Cadres nationaux (Indonésie, Vietnam, Thaïlande) alignés progressivement sur les référentiels FAO — fenêtre favorable pour accélérer les dossiers TSP en cours (Vietnam).",horizon:"6-12 mois"},
+];
+const CLEARANCE_LOG=(()=>{
+  const rows=[];
+  PRODUCTS.forEach(p=>p.approved.forEach(c=>{
+    const seed=(p.code+c).split("").reduce((s,ch)=>s+ch.charCodeAt(0),0);
+    const year=2024+(seed%3), month=1+(seed%12);
+    rows.push({product:p.code,country:c,date:year+"-"+String(month).padStart(2,"0")+"-"+String(1+(seed%27)).padStart(2,"0"),status:"Homologué"});
+  }));
+  rows.push({product:"TSP 0-46-0",country:"Vietnam",date:null,status:"En cours d'instruction"});
+  rows.push({product:"MAP 11-52 Special Low Cd",country:"South Africa",date:null,status:"Dérogation demandée"});
+  return rows.sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999")).reverse();
+})();
+
+// ================= LOGISTIQUE, ENTREPÔTS & CO2 =================
+const WAREHOUSES=[
+  {loc:"Jorf Lasfar (Maroc) — hub central",items:{"00 40 00 10S":1200,"MAP 11-52 Special Low Cd":20,"5 38 9S":0,"3 30 7S Low Cd":400,"TSP 0-46-0":850}},
+  {loc:"Rotterdam (Pays-Bas) — hub Europe",items:{"MAP 11-52 Special Low Cd":60,"5 38 9S":45,"TSP 0-46-0":0}},
+  {loc:"Abidjan (Côte d'Ivoire) — hub Afrique de l'Ouest",items:{"00 40 00 10S":300,"3 30 7S Low Cd":90}},
+];
+const LOW_STOCK_THRESHOLD=50;
+const TRANSPORT_LABEL={Container:"Fret maritime",DHL:"Fret aérien",Camion:"Fret routier"};
+const CO2_G_PER_TKM={Container:12,DHL:550,Camion:90}; // g CO2 / tonne.km — ordres de grandeur sectoriels illustratifs
+const FREIGHT_COST_PER_TKM={Container:0.02,DHL:0.35,Camion:0.09}; // USD / tonne.km — illustratif
+function shipmentImpact(r){
+  if(!r.shipMethod||!r.distanceKm)return null;
+  const tonnes=r.qty/1000;
+  const actualCo2=CO2_G_PER_TKM[r.shipMethod]*tonnes*r.distanceKm/1000; // kg CO2
+  const baselineCo2=CO2_G_PER_TKM.DHL*tonnes*r.distanceKm/1000; // scénario par défaut : fret aérien
+  const cost=FREIGHT_COST_PER_TKM[r.shipMethod]*tonnes*r.distanceKm;
+  return {actualCo2:Math.round(actualCo2),baselineCo2:Math.round(baselineCo2),co2Avoided:Math.max(0,Math.round(baselineCo2-actualCo2)),cost:Math.round(cost)};
+}
+const FREIGHT_TREND=[ // coût fret moyen (USD/tonne) et indice prix carburant, 6 derniers mois — illustratif
+  {m:"Avr",freight:410,fuel:96},{m:"Mai",freight:425,fuel:99},{m:"Juin",freight:450,fuel:104},
+  {m:"Juil",freight:470,fuel:108},{m:"Août",freight:460,fuel:106},{m:"Sept",freight:485,fuel:111},
+];
+
+// ================= GLOBE — coordonnées approximatives (démonstration) =================
+const LATLON={
+  Ghana:[5.6,-0.2],Poland:[52.2,21.0],Bresil:[-23.5,-46.6],Cameroun:[3.9,11.5],Kenya:[-1.3,36.8],
+  Nigeria:[9.1,7.5],"Côte d'Ivoire":[5.3,-4.0],France:[48.9,2.3],Argentina:[-34.6,-58.4],Germany:[52.5,13.4],
+  Ethiopia:[9.0,38.7],"South Africa":[-25.7,28.2],Indonesia:[-6.2,106.8],Vietnam:[21.0,105.8],
+};
+const HUB_LATLON=[33.1,-8.6]; // Jorf Lasfar — origine des expéditions, pas un marché (Maroc exclu du périmètre demandes)
+const TESTIMONIALS={
+  Ghana:[{s:"pos",q:"Le maïs a mieux démarré que toutes nos parcelles témoins — premier essai concluant depuis longtemps.",who:"Agronome partenaire, région Volta"}],
+  Poland:[{s:"neg",q:"Le froid de printemps a limité la réponse — nous attendions mieux sur cette formulation.",who:"Coopérative agricole, Basse-Silésie"}],
+  Bresil:[{s:"pos",q:"Sur soja, la vigueur initiale est nettement visible dès la levée.",who:"Ingénieur agronome, État de São Paulo"},{s:"neg",q:"Le retard de livraison a repoussé notre fenêtre de semis de deux semaines.",who:"Coordinateur logistique local"}],
+  Ethiopia:[{s:"pos",q:"Le tallage du teff est plus homogène qu'avec nos apports habituels en altitude.",who:"Coopérative agricole, région d'Oromia"}],
+  Indonesia:[{s:"pos",q:"+12% de rendement sur riz irrigué — nous voulons étendre l'essai à d'autres parcelles.",who:"Agronome partenaire, Java Ouest"}],
+  Nigeria:[{s:"neg",q:"Le dossier réglementaire a pris plus de temps que prévu, ce qui a retardé notre saison d'essai.",who:"Partenaire commercial, État de Kano"}],
+  "South Africa":[{s:"neg",q:"Nous attendons toujours l'homologation du produit — le marché est prêt, la procédure ralentit.",who:"Distributeur régional"}],
+  France:[{s:"pos",q:"Premier contact très positif avec la nouvelle filiale — réactivité appréciée sur ce premier échantillon.",who:"Coopérative agricole, Hauts-de-France"}],
+};
 
 let AUDIT=[
   {d:"2026-09-13 —",who:"Système",act:"Rappel automatique envoyé",det:"REQ-2026-0409 (Bresil) — confirmation de réception en retard de "+daysBetween("2026-07-08","2026-09-14")+" j depuis l'expédition"},
@@ -498,16 +786,20 @@ let ROLE="demandeur";
 const CURRENT_USER={demandeur:{nom:"Ibrahim Owusu",role:"Sales Agronomist"},coord:{nom:"Youssef Amrani",role:"Sample Coordinator"},direction:{nom:"Salma Bennani",role:"Portfolio Manager"}};
 const ROLES={
   demandeur:{lab:"Demandeur",tabs:["dash","nouvelle","mesdemandes","feedback"],banner:"Vous naviguez en tant que <b>demandeur</b> — soumettez une demande et suivez son avancement jusqu'au retour terrain."},
-  coord:{lab:"Coordinateur",tabs:["dash","file","catalogue","feedback"],banner:"Vous agissez en <b>coordinateur</b> — traitez le contrôle réglementaire, le stock, la logistique et les réceptions."},
-  direction:{lab:"Direction",tabs:["dash","feedback","integ"],banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain."},
+  coord:{lab:"Coordinateur",tabs:["dash","file","catalogue","feedback","reglementaire","logistique"],banner:"Vous agissez en <b>coordinateur</b> — traitez le contrôle réglementaire, le stock, la logistique et les réceptions."},
+  direction:{lab:"Direction",tabs:["globe","dash","intelligence","reglementaire","logistique","integ"],banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain, à l'échelle mondiale."},
 };
 const TAB_META={
   dash:["Tableau de bord",'<path d="M3 3v18h18M9 9h9M9 15h6"/>'],
+  globe:["Carte mondiale",'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>'],
   nouvelle:["Nouvelle demande",'<path d="M12 5v14M5 12h14"/>'],
   mesdemandes:["Mes demandes",'<path d="M20 6 9 17l-5-5"/>'],
   file:["Demandes à traiter",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
   feedback:["Retours terrain",'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>'],
   catalogue:["Catalogue & stock",'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>'],
+  intelligence:["Intelligence terrain",'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'],
+  reglementaire:["Intelligence réglementaire",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
+  logistique:["Logistique & CO₂",'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>'],
   integ:["Intégrations SI",'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 7.5 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 12.6a1.65 1.65 0 0 0-1.51-1H1a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 2.6 6.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 1.6V1a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 22.4 9H23a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'],
 };
 
@@ -543,11 +835,15 @@ function go(v){
   const el=$("#v-"+v); if(el)el.classList.add("active");
   document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.v===v));
   if(v==="dash")renderDash();
+  if(v==="globe")renderGlobe();
   if(v==="nouvelle")renderNouvelle();
   if(v==="mesdemandes")renderMyRequests();
   if(v==="file")renderQueue();
   if(v==="feedback")renderFeedbackView();
   if(v==="catalogue")renderCatalogue();
+  if(v==="intelligence")renderIntelligence();
+  if(v==="reglementaire")renderReglementaire();
+  if(v==="logistique")renderLogistique();
   if(v==="integ")renderInteg();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -588,6 +884,7 @@ function renderKpis(){
 }
 function renderDash(){
   renderKpis();
+  $("#reqCount").textContent=REQUESTS.length;
   const regions=[...new Set(REQUESTS.map(r=>r.region))];
   const fr=$("#fRegion"); if(fr.options.length<=1)fr.innerHTML=`<option value="">Toutes régions</option>`+regions.map(r=>`<option>${r}</option>`).join("");
   renderKanban();
@@ -877,6 +1174,128 @@ function renderInteg(){
   ];
   $("#integGrid").innerHTML=items.map(i=>`<div class="card integ"><div class="ii" style="background:${i.c==='ok'?'var(--green-50)':'var(--amber-bg)'};color:${i.c==='ok'?'var(--green-700)':'var(--amber)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${i.ic}</svg></div><div><h4>${i.t}</h4><p>${i.d}</p><span class="pill ${i.c}" style="margin-top:8px">${i.c==='ok'?'Connecté':'Phase 2'}</span></div></div>`).join("");
   $("#auditTbl").innerHTML=`<tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Détail</th></tr>`+AUDIT.slice(0,14).map(a=>`<tr><td style="white-space:nowrap;color:var(--muted)">${a.d}</td><td style="font-weight:600">${a.who}</td><td>${a.act}</td><td style="color:var(--muted)">${a.det}</td></tr>`).join("");
+}
+
+/* ================= CARTE MONDIALE (globe SVG en projection orthographique) ================= */
+let globeLon0=10;
+function projectPt(lat,lon,R){
+  const latR=lat*Math.PI/180, lonR=(lon-globeLon0)*Math.PI/180;
+  const x=R*Math.cos(latR)*Math.sin(lonR);
+  const y=-R*Math.sin(latR);
+  const visible=Math.cos(latR)*Math.cos(lonR)>-0.1;
+  return {x:200+x,y:200+y,visible};
+}
+function meridianPath(lon,R){
+  let d="";
+  for(let lat=-90;lat<=90;lat+=6){
+    const p=projectPt(lat,lon,R);
+    d+=(d?"L":"M")+p.x.toFixed(1)+","+p.y.toFixed(1)+" ";
+  }
+  return d;
+}
+function rotateGlobe(delta){globeLon0=(globeLon0+delta+360)%360;renderGlobe();}
+function renderGlobe(){
+  const R=170,cx=200,cy=200;
+  let svg=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--green-50)" stroke="var(--green-300)" stroke-width="1.5"/>`;
+  // parallèles (chords)
+  [-60,-30,0,30,60].forEach(lat=>{
+    const y=cy-R*Math.sin(lat*Math.PI/180);
+    const halfW=R*Math.cos(lat*Math.PI/180);
+    svg+=`<line x1="${(cx-halfW).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(cx+halfW).toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--green-100)" stroke-width="1"/>`;
+  });
+  // méridiens
+  for(let off=-60;off<=60;off+=30){ svg+=`<path d="${meridianPath(globeLon0+off,R)}" fill="none" stroke="var(--green-100)" stroke-width="1"/>`; }
+  svg+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--green-700)" stroke-width="2"/>`;
+  // hub Maroc
+  const hub=projectPt(HUB_LATLON[0],HUB_LATLON[1],R);
+  if(hub.visible)svg+=`<g class="globe-pin"><circle cx="${hub.x.toFixed(1)}" cy="${hub.y.toFixed(1)}" r="7" fill="var(--ink)" stroke="#fff" stroke-width="2"/><text x="${hub.x.toFixed(1)}" y="${(hub.y-11).toFixed(1)}" text-anchor="middle">Hub</text></g>`;
+  // pays
+  Object.entries(LATLON).forEach(([country,[lat,lon]])=>{
+    const p=projectPt(lat,lon,R); if(!p.visible)return;
+    const pres=PRESENCE_INFO[country]; const style=PRESENCE_STYLE[pres.type];
+    const n=REQUESTS.filter(r=>r.country===country).length;
+    const rad=6+Math.min(n,6);
+    svg+=`<g class="globe-pin" onclick="openGlobeCountry('${country}')"><circle class="ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad+7}" fill="${style.c}"/><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad}" fill="${style.c}" stroke="#fff" stroke-width="2"/><text x="${p.x.toFixed(1)}" y="${(p.y-rad-4).toFixed(1)}" text-anchor="middle">${country}</text></g>`;
+  });
+  $("#globeSvg").innerHTML=svg;
+}
+function openGlobeCountry(country){
+  const list=REQUESTS.filter(r=>r.country===country);
+  const testi=TESTIMONIALS[country]||[];
+  const pres=PRESENCE_INFO[country];
+  $("#globeSide").innerHTML=`<div class="card pad">
+    <div class="sec-h" style="margin-bottom:10px"><div><h3 style="font-size:16px">${country}</h3>${presenceBadge(country)}</div><span class="pill blue">${list.length} demande(s)</span></div>
+    ${testi.map(t=>`<div class="empty-flag ${t.s==='neg'?'bad':''}" style="background:${t.s==='neg'?'':'var(--green-50)'};border-color:${t.s==='neg'?'':'var(--green-100)'};color:${t.s==='neg'?'':'var(--green-800)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>« ${t.q} »<div style="font-size:11px;margin-top:3px;opacity:.8">— ${t.who}</div></div></div>`).join("")}
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:12px 0 8px">Demandes liées</div>
+    ${list.map(r=>`<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div><div class="qm"><div class="qt">${r.ref} — ${productByCode(r.productCode).label}</div><div class="qd">${r.crop} · ${r.qty} kg</div></div><span class="pill ${stageIdx(r.stage)>=stageIdx('feedback')?'ok':'blue'}">${stageById(r.stage).lab}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:10px 0">Aucune demande enregistrée pour ce marché.</div>'}
+  </div>`;
+}
+
+/* ================= INTELLIGENCE TERRAIN ================= */
+function renderIntelligence(){
+  $("#threadList").innerHTML=TRIAL_THREADS.map(t=>{
+    const pos=t.sentiment==="positive";
+    return `<div class="card thread">
+      <div class="thread-h">
+        <div class="thread-ic" style="background:${pos?'var(--green-50)':'var(--bad-bg)'};color:${pos?'var(--green-700)':'var(--bad)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${pos?'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>':'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'}</svg></div>
+        <div style="flex:1"><h4>${t.title}</h4><div class="tlinks">${t.linkedRequests.map(id=>{const r=REQUESTS.find(x=>x.id===id);return r?`<button class="pill blue" onclick="closeModal();openRequest('${id}')" style="cursor:pointer">${r.ref} — ${r.country}</button>`:'';}).join("")}</div></div>
+      </div>
+      ${t.posts.map(p=>`<div class="tpost"><div class="pav">${initials(p.by)}</div><div style="flex:1"><span class="pn">${p.by}</span> <span class="pr">${p.role} · ${fmtDate(p.date)}</span><div class="pt">${p.text}</div></div></div>`).join("")}
+      <div class="reply-box"><input id="reply-${t.id}" placeholder="Ajouter une observation…" onkeydown="if(event.key==='Enter')addThreadReply('${t.id}')"/><button onclick="addThreadReply('${t.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+    </div>`;
+  }).join("");
+}
+
+/* ================= INTELLIGENCE REGLEMENTAIRE ================= */
+function renderReglementaire(){
+  const blocked=REQUESTS.filter(r=>r.gateBlocked);
+  $("#regBlocked").innerHTML=blocked.map(r=>`<div class="card reg-card" onclick="closeModal();openRequest('${r.id}')" style="cursor:pointer"><div class="ri" style="background:var(--bad-bg);color:var(--bad)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg></div><div><h4>${r.ref} — ${r.country} · ${productByCode(r.productCode).label}</h4><p>${r.gateReason}</p></div></div>`).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">Aucune expédition bloquée actuellement.</div>`;
+
+  const pending=REQUESTS.filter(r=>r.pendingExemption);
+  $("#regExemptions").innerHTML=pending.map(r=>`<div class="card reg-card"><div class="ri" style="background:var(--amber-bg);color:var(--amber)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><h4>${r.ref} — ${r.country} · ${productByCode(r.productCode).label}</h4><p>Dérogation déposée le ${fmtDate(r.pendingExemption.filedDate)} auprès de ${r.pendingExemption.authority} — décision attendue le ${fmtDate(r.pendingExemption.expectedDate)}.</p></div></div>`).join("")||`<div class="card pad" style="text-align:center;color:var(--muted)">Aucune dérogation en cours.</div>`;
+
+  $("#regPolicy").innerHTML=POLICY_WATCH.map(p=>`<div class="card reg-card"><div class="ri" style="background:var(--blue-bg);color:var(--blue)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zM12 8v4l3 2"/></svg></div><div><h4>${p.t} <span class="pill info" style="margin-left:6px">${p.horizon}</span></h4><p>${p.d}</p></div></div>`).join("");
+
+  $("#clearanceTbl").innerHTML=`<tr><th>Produit</th><th>Pays</th><th>Date</th><th>Statut</th></tr>`+CLEARANCE_LOG.map(c=>`<tr><td style="font-weight:600">${c.product}</td><td>${c.country}</td><td style="color:var(--muted)">${c.date?fmtDate(c.date):'—'}</td><td><span class="pill ${c.status==='Homologué'?'ok':(c.status==='Dérogation demandée'?'info':'warn')}">${c.status}</span></td></tr>`).join("");
+}
+
+/* ================= LOGISTIQUE, STOCK & CO2 ================= */
+function renderLogistique(){
+  const shipped=REQUESTS.filter(r=>r.shipMethod&&r.distanceKm);
+  const impacts=shipped.map(r=>({r,imp:shipmentImpact(r)})).filter(x=>x.imp);
+  const totalCo2Avoided=impacts.reduce((s,x)=>s+x.imp.co2Avoided,0);
+  const totalCost=impacts.reduce((s,x)=>s+x.imp.cost,0);
+  const lowStock=WAREHOUSES.flatMap(w=>Object.entries(w.items).filter(([,v])=>v>0&&v<LOW_STOCK_THRESHOLD).map(([p])=>w.loc+" — "+p));
+  $("#logKpis").innerHTML=[
+    [totalCo2Avoided+" kg",  "CO₂ évité (vs scénario fret aérien)"],
+    ["$"+totalCost.toLocaleString("fr-FR"), "Coût fret cumulé (expéditions tracées)"],
+    [lowStock.length, "Alertes stock bas (< "+LOW_STOCK_THRESHOLD+" kg)"],
+    [shipped.length, "Expéditions avec empreinte calculée"],
+  ].map(k=>`<div class="card kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
+
+  $("#warehouseBox").innerHTML=WAREHOUSES.map(w=>`<div class="wh-row"><div class="whn">${w.loc}</div>${Object.entries(w.items).map(([p,v])=>{const low=v>0&&v<LOW_STOCK_THRESHOLD;const out=v===0;return `<div class="wh-item"><span class="win">${p}</span><span class="wb"><i style="width:${Math.min(v/1500*100,100)}%;background:${out?'var(--bad)':low?'var(--warn)':'var(--green-600)'}"></i></span><span class="wv" style="color:${out?'var(--bad)':low?'var(--warn)':'var(--ink)'}">${v} kg</span></div>`;}).join("")}</div>`).join("");
+
+  const modeAgg={};
+  shipped.forEach(r=>{ modeAgg[r.shipMethod]=modeAgg[r.shipMethod]||{n:0,qty:0,cost:0}; modeAgg[r.shipMethod].n++; modeAgg[r.shipMethod].qty+=r.qty; const imp=shipmentImpact(r); if(imp)modeAgg[r.shipMethod].cost+=imp.cost; });
+  const modeIcons={Container:'<path d="M2 20h20M4 20V9l5 3V9l5 3V6l5 3v11"/>',DHL:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>',Camion:'<path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 9h8"/><circle cx="8" cy="17" r="1.5"/><circle cx="16" cy="17" r="1.5"/>'};
+  $("#modeBox").innerHTML=Object.entries(modeAgg).map(([m,a])=>`<div class="mode-row"><div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${modeIcons[m]||modeIcons.Container}</svg></div><div style="flex:1"><div style="font-weight:700;font-size:13.5px">${TRANSPORT_LABEL[m]||m}</div><div style="font-size:11.5px;color:var(--muted)">${a.n} expédition(s) · ${a.qty.toLocaleString("fr-FR")} kg</div></div><div style="font-weight:700;font-family:var(--serif);font-size:16px">$${a.cost.toLocaleString("fr-FR")}</div></div>`).join("")||`<div style="color:var(--muted);font-size:13px;padding:10px 0">Aucune expédition avec distance renseignée.</div>`;
+
+  const w=500,h=190,pad=24;
+  const fVals=FREIGHT_TREND.map(d=>d.freight), fuVals=FREIGHT_TREND.map(d=>d.fuel);
+  const fMin=Math.min(...fVals)-20,fMax=Math.max(...fVals)+20;
+  const step=(w-2*pad)/(FREIGHT_TREND.length-1);
+  const fPts=FREIGHT_TREND.map((d,i)=>[pad+i*step,h-pad-(d.freight-fMin)/(fMax-fMin)*(h-2*pad)]);
+  const fuMin=Math.min(...fuVals)-5,fuMax=Math.max(...fuVals)+5;
+  const fuPts=FREIGHT_TREND.map((d,i)=>[pad+i*step,h-pad-(d.fuel-fuMin)/(fuMax-fuMin)*(h-2*pad)]);
+  const path=pts=>pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+  $("#freightChart").innerHTML=`
+    <path d="${path(fPts)}" fill="none" stroke="var(--green-700)" stroke-width="2.5"/>
+    <path d="${path(fuPts)}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="4 3"/>
+    ${FREIGHT_TREND.map((d,i)=>`<text x="${fPts[i][0].toFixed(1)}" y="${h-4}" text-anchor="middle" font-size="10" fill="var(--muted)">${d.m}</text>`).join("")}
+    <text x="${pad}" y="14" font-size="10" fill="var(--green-700)" font-weight="700">— Coût fret ($/t)</text>
+    <text x="${pad+150}" y="14" font-size="10" fill="var(--amber)" font-weight="700">┄ Indice carburant</text>`;
+
+  $("#co2List").innerHTML=impacts.map(({r,imp})=>`<div class="co2-row"><span>${r.ref} — ${r.country} (${TRANSPORT_LABEL[r.shipMethod]})</span><span class="cv">−${imp.co2Avoided} kg CO₂</span></div>`).join("")||`<div style="color:var(--muted);font-size:13px;padding:10px 0">Aucune donnée d'impact disponible.</div>`;
 }
 
 function refreshAll(){ const active=document.querySelector("#tabs button.active"); if(active)go(active.dataset.v); const b=document.querySelector('#tabs button[data-v="file"] .n'); if(b)b.textContent=queueItems().length; }
