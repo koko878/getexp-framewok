@@ -232,6 +232,27 @@
   .m-body{padding:20px 22px;max-height:74vh;overflow-y:auto}
   .m-foot{padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px;background:#fbfdfb;flex-wrap:wrap}
 
+  /* ===== RAPPORT ===== */
+  .report-tabs{display:flex;gap:6px;padding:14px 22px 0}
+  .report-tabs button{padding:8px 14px;border-radius:8px 8px 0 0;font-size:12.5px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent}
+  .report-tabs button.on{color:var(--green-800);border-bottom-color:var(--green-800);background:var(--green-50)}
+  .report-modal .m-body{padding-top:8px}
+  #scriptText{border:1px solid var(--line);border-radius:10px;padding:14px;font-family:inherit;font-size:13px;line-height:1.6;color:var(--ink);resize:vertical}
+  #printArea{display:none}
+  @media print{
+    body *{visibility:hidden}
+    #printArea,#printArea *{visibility:visible}
+    #printArea{display:block;position:absolute;left:0;top:0;width:100%;padding:28px;color:#111}
+    .pr-head{border-bottom:2px solid #1B5E20;padding-bottom:10px;margin-bottom:16px}
+    .pr-head h1{font-family:Georgia,serif;font-size:22px;color:#103d17}
+    .pr-head div{font-size:11px;color:#555;margin-top:2px}
+    .pr-kpi,.pr-actions{width:100%;border-collapse:collapse;margin:14px 0 20px}
+    .pr-kpi th,.pr-kpi td,.pr-actions th,.pr-actions td{border:1px solid #ccc;padding:7px 9px;text-align:left;font-size:11.5px}
+    .pr-kpi th,.pr-actions th{background:#EAF4EC;text-transform:uppercase;font-size:10px;letter-spacing:.04em}
+    .pr-actions h2,.pr-kpi-title{font-size:14px;margin:0 0 8px;color:#103d17}
+    .pr-foot{margin-top:24px;font-size:9.5px;color:#777;border-top:1px solid #ddd;padding-top:8px}
+  }
+
   .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:120;display:flex;flex-direction:column;gap:10px;width:calc(100% - 32px);max-width:400px}
   .toast{display:flex;align-items:center;gap:11px;background:var(--green-900);color:#fff;padding:13px 17px;border-radius:12px;box-shadow:var(--sh-lg);font-size:14px;font-weight:500;animation:tin .3s ease}
   .toast.err{background:var(--bad)}
@@ -289,6 +310,40 @@
   .co2-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12.5px}
   .co2-row:last-child{border-bottom:none}
   .co2-row .cv{margin-left:auto;font-weight:700;color:var(--green-800);white-space:nowrap}
+
+  /* ===== HERO DASHBOARD ===== */
+  .dash-hero{position:relative;border-radius:18px;overflow:hidden;padding:26px 24px;margin-bottom:18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;min-height:120px}
+  .dash-hero-art{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .dash-hero-txt{position:relative;z-index:1;color:#fff}
+  .dash-hero-txt .eyebrow{color:var(--green-300)}
+  .dash-hero-txt h2{color:#fff;font-size:22px}
+  .dash-hero-txt .sub-muted{color:rgba(255,255,255,.82)}
+  .dash-hero .btn{position:relative;z-index:1;background:#fff;color:var(--green-800)}
+  .dash-hero .btn:hover{background:var(--green-50)}
+
+  /* ===== DECISION SUPPORT ===== */
+  .decision-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  @media (max-width:760px){.decision-grid{grid-template-columns:1fr}}
+  .decision-card{padding:18px}
+  .dc-head{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+  .dc-head svg{width:18px;height:18px;color:var(--green-700)}
+  .dc-head h3{font-size:15px;font-weight:700}
+  .dc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+  .dc-row:first-of-type{border-top:none}
+  .dc-dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px}
+  .dc-row.bad .dc-dot{background:var(--bad)}
+  .dc-row.warn .dc-dot{background:var(--warn)}
+  .dc-row.ok .dc-dot{background:var(--green-600)}
+  .dc-txt{flex:1;font-size:13px;line-height:1.4}
+  .pa-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+  .pa-row:first-of-type{border-top:none}
+  .pa-row:hover .pa-t{color:var(--green-800)}
+  .pa-urg{width:5px;align-self:stretch;border-radius:3px;flex:0 0 5px;min-height:32px}
+  .pa-urg.bad{background:var(--bad)}.pa-urg.warn{background:var(--warn)}.pa-urg.blue{background:var(--blue)}
+  .pa-m{flex:1;min-width:0}
+  .pa-t{font-size:13px;font-weight:700}
+  .pa-d{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .pill.dir{color:#fff;background:var(--ink)}
 </style>
 </head>
 <body>
@@ -322,9 +377,31 @@
 
   <!-- DASHBOARD -->
   <section class="view active" id="v-dash">
-    <div class="sec-h"><div><h2>Pilotage des demandes d'échantillons</h2><div class="sub-muted">Lane 1 · produits homologués · <span id="reqCount">9</span> demandes suivies</div></div><span class="pill ok">Temps réel</span></div>
+    <div class="dash-hero">
+      <svg class="dash-hero-art" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <defs><linearGradient id="heroG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B5E20"/><stop offset="1" stop-color="#0d2f13"/></linearGradient></defs>
+        <rect width="800" height="200" fill="url(#heroG)"/>
+        <circle cx="705" cy="42" r="30" fill="#66BB6A" opacity=".3"/>
+        <circle cx="705" cy="42" r="30" fill="none" stroke="#EAF4EC" stroke-width="1" opacity=".2"/>
+        <path d="M0 150 Q100 112 200 140 T400 128 T600 148 T800 126 V200 H0 Z" fill="#2E7D32" opacity=".5"/>
+        <path d="M0 172 Q120 142 240 166 T480 160 T720 174 T800 164 V200 H0 Z" fill="#388E3C" opacity=".65"/>
+        <g stroke="#EAF4EC" stroke-width="1.5" opacity=".18">
+          <path d="M30 200 L100 158"/><path d="M75 200 L145 158"/><path d="M120 200 L190 158"/><path d="M165 200 L235 158"/><path d="M210 200 L280 158"/>
+          <path d="M430 200 L500 160"/><path d="M475 200 L545 160"/><path d="M520 200 L590 160"/><path d="M565 200 L635 160"/>
+        </g>
+      </svg>
+      <div class="dash-hero-txt">
+        <span class="eyebrow">Crop Cart · OCP Nutricrops</span>
+        <h2 style="font-family:var(--serif);font-weight:700">Pilotage des demandes d'échantillons</h2>
+        <div class="sub-muted">Lane 1 · produits homologués · <span id="reqCount">9</span> demandes suivies</div>
+      </div>
+      <button class="btn" onclick="openReportModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Générer rapport</button>
+    </div>
+    <div class="decision-grid">
+      <div class="card decision-card" id="decisionPanel"></div>
+      <div class="card decision-card" id="priorityActions"></div>
+    </div>
     <div class="kpis" id="kpis"></div>
-    <div id="dashFlags" style="margin-top:16px"></div>
     <div class="sec-h" style="margin-top:22px"><div><h3 style="font-size:16px">Pipeline opérationnel</h3><span class="hint">cliquer une carte pour le détail complet</span></div></div>
     <div class="filters">
       <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg><input id="dashQ" placeholder="Rechercher pays, produit, référence…" oninput="renderKanban()"/></div>
@@ -789,18 +866,34 @@ const ROLES={
   coord:{lab:"Coordinateur",tabs:["dash","file","catalogue","feedback","reglementaire","logistique"],banner:"Vous agissez en <b>coordinateur</b> — traitez le contrôle réglementaire, le stock, la logistique et les réceptions."},
   direction:{lab:"Direction",tabs:["globe","dash","intelligence","reglementaire","logistique","integ"],banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain, à l'échelle mondiale."},
 };
+/* Icônes agri-métier dessinées à la main (remplacent les glyphes génériques) */
+const ICONS={
+  wheat:'<path d="M12 22V9"/><path d="M12 6c-1.8 0-3 1-3.4 2.4C9.8 9.2 10.8 10 12 10s2.2-.8 3.4-1.6C15 7 13.8 6 12 6z"/><path d="M12 3c-1.8 0-3 .8-3.4 2C9.8 5.6 10.8 6.3 12 6.3s2.2-.7 3.4-1.3C15 3.8 13.8 3 12 3z"/><path d="M9 12.5c-1.6.3-2.6 1.3-2.8 2.7.9.6 2 .5 3.1 0 .5-.7.4-1.8-.3-2.7z"/><path d="M15 12.5c1.6.3 2.6 1.3 2.8 2.7-.9.6-2 .5-3.1 0-.5-.7-.4-1.8.3-2.7z"/><path d="M9 17c-1.6.3-2.6 1.3-2.8 2.7.9.6 2 .5 3.1 0 .5-.7.4-1.8-.3-2.7z"/><path d="M15 17c1.6.3 2.6 1.3 2.8 2.7-.9.6-2 .5-3.1 0-.5-.7-.4-1.8.3-2.7z"/>',
+  seedling:'<path d="M12 22v-7.5"/><path d="M12 14.5c0-3.5-2.5-6-6.5-6.2-.2 3.9 2.4 6.2 6.5 6.2z"/><path d="M12 12.2c0-4.2 3-7.2 7.5-7.4.3 4.7-2.9 7.4-7.5 7.4z"/><path d="M5 22h14"/>',
+  leaf:'<path d="M20 4C10 4 4 10 4 18v2h2c8 0 14-6 14-14V4z"/><path d="M6 20C10 15 13 11 18 6"/>',
+  flask:'<path d="M9 2h6"/><path d="M10 2v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 8.2V2"/><path d="M7.5 15h9"/>',
+  microscope:'<path d="M6 22h12"/><path d="M9 22v-3.2a3 3 0 0 1 6 0V22"/><circle cx="12" cy="10" r="4"/><path d="M12 6V3"/><path d="M9.5 3h5"/><path d="M16 12.5 19 15"/>',
+  ship:'<path d="M3 19l1.6-6h14.8L21 19"/><path d="M6 13V8h5V5h2v3h5v5"/><path d="M2.5 19c1.4 1.6 3 1.6 4.5 0 1.5 1.6 3 1.6 4.5 0 1.5 1.6 3 1.6 4.5 0 1.5 1.6 3 1.6 4.5 0"/>',
+  silo:'<path d="M9 22V9a3 3 0 0 1 6 0v13"/><path d="M9 9c0-3 6-3 6 0"/><path d="M6 22h12"/><path d="M9 14h6"/><path d="M9 18h6"/>',
+  clipboard:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  bars:'<path d="M3 3v18h18M9 9h9M9 15h6"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  star:'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 7.5 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 12.6a1.65 1.65 0 0 0-1.51-1H1a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 2.6 6.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 1.6V1a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 22.4 9H23a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  globeLeaf:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/><path d="M9 15c3-1 4.5-2.5 5.5-5.5-3 .3-4.7 2-5.5 5.5z"/>',
+};
 const TAB_META={
-  dash:["Tableau de bord",'<path d="M3 3v18h18M9 9h9M9 15h6"/>'],
-  globe:["Carte mondiale",'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>'],
-  nouvelle:["Nouvelle demande",'<path d="M12 5v14M5 12h14"/>'],
-  mesdemandes:["Mes demandes",'<path d="M20 6 9 17l-5-5"/>'],
-  file:["Demandes à traiter",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
-  feedback:["Retours terrain",'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>'],
-  catalogue:["Catalogue & stock",'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>'],
-  intelligence:["Intelligence terrain",'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'],
-  reglementaire:["Intelligence réglementaire",'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'],
-  logistique:["Logistique & CO₂",'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>'],
-  integ:["Intégrations SI",'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 7.5 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 12.6a1.65 1.65 0 0 0-1.51-1H1a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 2.6 6.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 1.6V1a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 22.4 9H23a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'],
+  dash:["Tableau de bord",ICONS.wheat],
+  globe:["Carte mondiale",ICONS.globeLeaf],
+  nouvelle:["Nouvelle demande",ICONS.seedling],
+  mesdemandes:["Mes demandes",ICONS.clipboard],
+  file:["Demandes à traiter",ICONS.clipboard],
+  feedback:["Retours terrain",ICONS.star],
+  catalogue:["Catalogue & stock",ICONS.silo],
+  intelligence:["Intelligence terrain",ICONS.microscope],
+  reglementaire:["Intelligence réglementaire",ICONS.flask],
+  logistique:["Logistique & CO₂",ICONS.ship],
+  integ:["Intégrations SI",ICONS.gear],
 };
 
 /* ================= HELPERS ================= */
@@ -872,18 +965,35 @@ function renderKpis(){
     {l:"Taux d'obsolescence",v:k.obsRate+"%",tgt:k.obsolete+"/"+k.terminal+" — objectif -50% (historique non fiabilisé avant Crop Cart)",c:"var(--bad)"},
   ];
   $("#kpis").innerHTML=cards.map(c=>`<div class="card kpi"><div class="v" style="color:${c.c}">${c.v}</div><div class="l">${c.l}</div><div class="tgt">${c.tgt}</div></div>`).join("");
-  const flags=[];
-  if(k.feedbackRate<100)flags.push({t:"La perte de signal terrain persiste : "+(k.eligible-k.withFeedback)+" échantillon(s) livré(s) sans retour structuré, dont le cas Ghana (REQ-2025-0714).",c:"warn"});
-  const overdue=REQUESTS.filter(r=>r.stage==="shipped"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45);
-  if(overdue.length)flags.push({t:overdue.length+" expédition(s) en attente de confirmation de réception depuis plus de 45 jours (ex. "+overdue[0].ref+", Brésil).",c:"bad"});
-  const integrityGap=REQUESTS.filter(r=>!["submitted","review","obsolete"].includes(r.stage)&&docCompleteness(r)!==null&&docCompleteness(r)<100&&stageIdx(r.stage)>=stageIdx("stock"));
-  if(integrityGap.length)flags.push({t:integrityGap.length+" dossier(s) ont progressé en stock/logistique malgré une documentation réglementaire incomplète — le contrôle automatique Crop Cart aurait bloqué ce passage.",c:"bad"});
+}
+function renderDecisionSupport(){
+  const k=computeKpis();
+  const recs=[];
   const cdBlocked=REQUESTS.filter(r=>r.stage==="gate"&&(regChecks(r).cdOk===false));
-  if(cdBlocked.length)flags.push({t:cdBlocked.length+" demande(s) bloquée(s) sur la teneur en cadmium ("+cdBlocked.map(r=>r.country).join(", ")+") — l'UE resserre ce seuil : les variantes Low Cd du catalogue sécurisent l'accès à ces marchés.",c:"warn"});
-  $("#dashFlags").innerHTML=flags.map(f=>`<div class="empty-flag ${f.c==='bad'?'bad':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div>${f.t}</div></div>`).join("");
+  const overdue=REQUESTS.filter(r=>r.stage==="shipped"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45);
+  const integrityGap=REQUESTS.filter(r=>!["submitted","review","obsolete"].includes(r.stage)&&docCompleteness(r)!==null&&docCompleteness(r)<100&&stageIdx(r.stage)>=stageIdx("stock"));
+  const missingFeedback=REQUESTS.filter(r=>r.stage==="delivered"&&!r.feedback);
+  if(cdBlocked.length)recs.push({t:cdBlocked.length+" demande(s) bloquée(s) sur la teneur en cadmium ("+cdBlocked.map(r=>r.country).join(", ")+") — statuer sur une variante Low Cd avant relance.",c:"bad"});
+  if(overdue.length)recs.push({t:overdue.length+" expédition(s) sans confirmation de réception depuis plus de 45 jours (ex. "+overdue[0].ref+", "+overdue[0].country+") — relancer le client/transitaire.",c:"bad"});
+  if(integrityGap.length)recs.push({t:integrityGap.length+" dossier(s) ont progressé en stock/logistique malgré une documentation incomplète — compléter avant la prochaine étape.",c:"warn"});
+  if(missingFeedback.length)recs.push({t:missingFeedback.length+" retour(s) terrain manquant(s) après livraison — solliciter le demandeur (dont "+missingFeedback[0].ref+").",c:"warn"});
+  if(k.obsRate>15)recs.push({t:"Taux d'obsolescence élevé ("+k.obsRate+"%) — revoir le tri amont des demandes non qualifiées.",c:"warn"});
+  $("#decisionPanel").innerHTML=`<div class="dc-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg><h3>Synthèse décisionnelle</h3></div>
+    <p class="sub-muted" style="margin-bottom:2px">Ce qui appelle une décision maintenant — le reste est sous contrôle, sans réunion nécessaire.</p>
+    ${recs.length?recs.map(r=>`<div class="dc-row ${r.c}"><span class="dc-dot"></span><div class="dc-txt">${r.t}</div></div>`).join(""):
+    `<div class="dc-row ok"><span class="dc-dot"></span><div class="dc-txt">Aucune action bloquante identifiée — portefeuille sous contrôle.</div></div>`}`;
+}
+function renderPriorityActions(){
+  const items=priorityActionItems(6);
+  $("#priorityActions").innerHTML=`<div class="dc-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICONS.clipboard}</svg><h3>Actions prioritaires</h3></div>
+    ${items.length?items.map(it=>`<div class="pa-row" onclick="openRequest('${it.r.id}')"><span class="pa-urg ${it.urg}"></span><div class="pa-m"><div class="pa-t">${it.r.ref} — ${it.r.country}</div><div class="pa-d">${productByCode(it.r.productCode).label} · ${it.r.qty} kg</div></div><span class="pill ${it.owner.startsWith('Direction')?'dir':it.owner.startsWith('Demandeur')?'ok':'blue'}">${it.owner}</span></div>`).join(""):
+    '<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Aucune action en attente.</div>'}
+    <button class="btn ghost sm" style="margin-top:12px;width:100%" onclick="openReportModal()">Voir le rapport complet</button>`;
 }
 function renderDash(){
   renderKpis();
+  renderDecisionSupport();
+  renderPriorityActions();
   $("#reqCount").textContent=REQUESTS.length;
   const regions=[...new Set(REQUESTS.map(r=>r.region))];
   const fr=$("#fRegion"); if(fr.options.length<=1)fr.innerHTML=`<option value="">Toutes régions</option>`+regions.map(r=>`<option>${r}</option>`).join("");
@@ -1177,6 +1287,14 @@ function renderInteg(){
 }
 
 /* ================= CARTE MONDIALE (globe SVG en projection orthographique) ================= */
+/* Silhouettes continentales simplifiées (polygones lat/lon, faible résolution — rendu stylisé, pas cartographique) */
+const CONTINENTS={
+  "Afrique":[[37,9],[33,10],[31,32],[22,37],[12,43],[4,42],[-1,41],[-12,40],[-17,35],[-25,33],[-34,19],[-29,17],[-18,12],[-9,13],[-4,9],[5,-4],[10,-13],[15,-17],[21,-17],[28,-11],[33,-6],[36,3]],
+  "Europe":[[71,25],[60,30],[59,60],[45,48],[41,29],[36,23],[38,15],[41,9],[44,-2],[48,-5],[52,3],[54,8],[58,10],[60,5],[65,12],[70,25]],
+  "Asie":[[77,105],[70,150],[60,170],[55,160],[45,140],[35,130],[25,122],[10,105],[1,104],[6,95],[8,80],[20,72],[25,67],[30,50],[35,36],[41,29],[45,48],[50,60],[55,70],[60,60],[65,60],[70,70]],
+  "Amérique du Nord":[[71,-156],[70,-130],[60,-95],[62,-80],[55,-60],[47,-53],[40,-74],[30,-81],[25,-97],[18,-97],[16,-93],[20,-105],[23,-110],[32,-117],[40,-124],[49,-125],[55,-133],[60,-140]],
+  "Amérique du Sud":[[12,-72],[10,-62],[5,-52],[-5,-35],[-15,-39],[-23,-43],[-34,-58],[-38,-62],[-42,-65],[-52,-69],[-55,-68],[-50,-73],[-38,-73],[-20,-70],[-5,-81],[2,-79],[8,-77]],
+};
 let globeLon0=10;
 function projectPt(lat,lon,R){
   const latR=lat*Math.PI/180, lonR=(lon-globeLon0)*Math.PI/180;
@@ -1194,6 +1312,20 @@ function meridianPath(lon,R){
   return d;
 }
 function rotateGlobe(delta){globeLon0=(globeLon0+delta+360)%360;renderGlobe();}
+function continentPath(coords,R){
+  const pts=coords.map(([lat,lon])=>projectPt(lat,lon,R));
+  const visN=pts.filter(p=>p.visible).length;
+  if(visN<coords.length*0.55)return null;
+  const cx=pts.reduce((s,p)=>s+p.x,0)/pts.length, cy=pts.reduce((s,p)=>s+p.y,0)/pts.length;
+  const d=pts.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+","+p.y.toFixed(1)).join(" ")+" Z";
+  return {d,cx,cy,pts};
+}
+function reliefPath(cp,scale){
+  return cp.pts.map((p,i)=>{
+    const x=cp.cx+(p.x-cp.cx)*scale, y=cp.cy+(p.y-cp.cy)*scale;
+    return (i?"L":"M")+x.toFixed(1)+","+y.toFixed(1);
+  }).join(" ")+" Z";
+}
 function renderGlobe(){
   const R=170,cx=200,cy=200;
   let svg=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--green-50)" stroke="var(--green-300)" stroke-width="1.5"/>`;
@@ -1205,17 +1337,25 @@ function renderGlobe(){
   });
   // méridiens
   for(let off=-60;off<=60;off+=30){ svg+=`<path d="${meridianPath(globeLon0+off,R)}" fill="none" stroke="var(--green-100)" stroke-width="1"/>`; }
+  // silhouettes continentales + relief topographique (contours concentriques stylisés)
+  Object.values(CONTINENTS).forEach(coords=>{
+    const cp=continentPath(coords,R); if(!cp)return;
+    svg+=`<path d="${cp.d}" fill="var(--green-100)" opacity=".65" stroke="var(--green-700)" stroke-width=".75"/>`;
+    svg+=`<path d="${reliefPath(cp,.88)}" fill="none" stroke="var(--green-700)" stroke-width=".5" opacity=".4"/>`;
+    svg+=`<path d="${reliefPath(cp,.72)}" fill="none" stroke="var(--green-700)" stroke-width=".5" opacity=".28"/>`;
+    svg+=`<path d="${reliefPath(cp,.54)}" fill="none" stroke="var(--green-700)" stroke-width=".5" opacity=".18"/>`;
+  });
   svg+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--green-700)" stroke-width="2"/>`;
   // hub Maroc
   const hub=projectPt(HUB_LATLON[0],HUB_LATLON[1],R);
-  if(hub.visible)svg+=`<g class="globe-pin"><circle cx="${hub.x.toFixed(1)}" cy="${hub.y.toFixed(1)}" r="7" fill="var(--ink)" stroke="#fff" stroke-width="2"/><text x="${hub.x.toFixed(1)}" y="${(hub.y-11).toFixed(1)}" text-anchor="middle">Hub</text></g>`;
-  // pays
+  if(hub.visible)svg+=`<g class="globe-pin"><circle cx="${hub.x.toFixed(1)}" cy="${hub.y.toFixed(1)}" r="9" fill="var(--ink)" stroke="#fff" stroke-width="2"/><svg x="${(hub.x-5).toFixed(1)}" y="${(hub.y-5).toFixed(1)}" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6">${ICONS.silo}</svg><text x="${hub.x.toFixed(1)}" y="${(hub.y-13).toFixed(1)}" text-anchor="middle">Hub</text></g>`;
+  // pays — pastille agri-produit au lieu d'un simple point
   Object.entries(LATLON).forEach(([country,[lat,lon]])=>{
     const p=projectPt(lat,lon,R); if(!p.visible)return;
     const pres=PRESENCE_INFO[country]; const style=PRESENCE_STYLE[pres.type];
     const n=REQUESTS.filter(r=>r.country===country).length;
-    const rad=6+Math.min(n,6);
-    svg+=`<g class="globe-pin" onclick="openGlobeCountry('${country}')"><circle class="ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad+7}" fill="${style.c}"/><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad}" fill="${style.c}" stroke="#fff" stroke-width="2"/><text x="${p.x.toFixed(1)}" y="${(p.y-rad-4).toFixed(1)}" text-anchor="middle">${country}</text></g>`;
+    const rad=7+Math.min(n,6);
+    svg+=`<g class="globe-pin" onclick="openGlobeCountry('${country}')"><circle class="ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad+7}" fill="${style.c}"/><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad}" fill="${style.c}" stroke="#fff" stroke-width="2"/><svg x="${(p.x-rad*0.62).toFixed(1)}" y="${(p.y-rad*0.62).toFixed(1)}" width="${(rad*1.24).toFixed(1)}" height="${(rad*1.24).toFixed(1)}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8">${ICONS.leaf}</svg><text x="${p.x.toFixed(1)}" y="${(p.y-rad-4).toFixed(1)}" text-anchor="middle">${country}</text></g>`;
   });
   $("#globeSvg").innerHTML=svg;
 }
@@ -1229,6 +1369,94 @@ function openGlobeCountry(country){
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:12px 0 8px">Demandes liées</div>
     ${list.map(r=>`<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div><div class="qm"><div class="qt">${r.ref} — ${productByCode(r.productCode).label}</div><div class="qd">${r.crop} · ${r.qty} kg</div></div><span class="pill ${stageIdx(r.stage)>=stageIdx('feedback')?'ok':'blue'}">${stageById(r.stage).lab}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:10px 0">Aucune demande enregistrée pour ce marché.</div>'}
   </div>`;
+}
+
+/* ================= GÉNÉRATEUR DE RAPPORT ================= */
+function ownerFor(r){
+  if(r.gateBlocked)return "Direction";
+  if(r.stage==="shipped"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45)return "Direction";
+  if(r.stage==="delivered"&&!r.feedback)return "Demandeur";
+  return "Coordinateur (Crop Cart)";
+}
+function urgencyFor(r){
+  if(r.gateBlocked)return "bad";
+  const age=daysBetween(r.date,"2026-09-14");
+  if(r.priority==="Critical"||age>60)return "bad";
+  if(r.priority==="High"||age>30)return "warn";
+  return "blue";
+}
+function urgencyLabel(u){return u==="bad"?"Urgent":u==="warn"?"À surveiller":"Normal";}
+function priorityActionItems(limit){
+  const list=queueItems().map(r=>({r,owner:ownerFor(r),urg:urgencyFor(r)}));
+  const order={bad:0,warn:1,blue:2};
+  list.sort((a,b)=>order[a.urg]-order[b.urg]||daysBetween(b.r.date,a.r.date));
+  return limit?list.slice(0,limit):list;
+}
+function reportNarrationScript(){
+  const k=computeKpis();
+  const items=priorityActionItems(5);
+  const lines=[];
+  lines.push("Synthèse Crop Cart — "+fmtDate("2026-09-14")+".");
+  lines.push("Délai moyen entre la demande et l'expédition : "+k.avgLead+" jours. Taux de feedback terrain capturé : "+k.feedbackRate+" pour cent. Complétude documentaire moyenne : "+k.avgDocRate+" pour cent. Taux d'obsolescence des demandes : "+k.obsRate+" pour cent.");
+  if(items.length){
+    lines.push("Voici les actions prioritaires à traiter :");
+    items.forEach(it=>lines.push("- "+it.r.ref+", "+it.r.country+", produit "+productByCode(it.r.productCode).label+" — à traiter par "+it.owner+", niveau d'urgence : "+urgencyLabel(it.urg).toLowerCase()+"."));
+  } else {
+    lines.push("Aucune action bloquante n'est identifiée sur le portefeuille actif.");
+  }
+  lines.push("Fin de synthèse.");
+  return lines.join("\n\n");
+}
+function buildPrintArea(k,items,genDate){
+  let host=document.getElementById("printArea");
+  if(!host){host=document.createElement("div");host.id="printArea";document.body.appendChild(host);}
+  host.innerHTML=`<div class="pr-head"><h1>Crop Cart — Rapport de pilotage</h1><div>OCP Nutricrops · Agri-Input Sample Orchestration Platform</div><div>Généré le ${genDate} — ${CURRENT_USER[ROLE].nom}, ${ROLES[ROLE].lab}</div></div>
+    <div class="pr-kpi-title">Indicateurs clés</div>
+    <table class="pr-kpi"><tr><th>Délai moyen</th><th>Feedback capturé</th><th>Complétude doc.</th><th>Obsolescence</th></tr><tr><td>${k.avgLead} j</td><td>${k.feedbackRate}%</td><td>${k.avgDocRate}%</td><td>${k.obsRate}%</td></tr></table>
+    <div class="pr-actions"><h2>Actions prioritaires (${items.length})</h2><table class="pr-actions"><tr><th>Réf.</th><th>Pays</th><th>Produit</th><th>Propriétaire</th><th>Urgence</th></tr>
+    ${items.map(it=>`<tr><td>${it.r.ref}</td><td>${it.r.country}</td><td>${productByCode(it.r.productCode).label}</td><td>${it.owner}</td><td>${urgencyLabel(it.urg)}</td></tr>`).join("")||'<tr><td colspan="5">Aucune action en attente.</td></tr>'}
+    </table></div>
+    <div class="pr-foot">OCP Nutricrops · Crop Cart — document généré automatiquement à partir des données de la plateforme, à usage interne.</div>`;
+}
+function printReport(){window.print();}
+function copyScript(){
+  const el=$("#scriptText"); const txt=el?el.value:"";
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast("Script copié dans le presse-papiers","✓")).catch(()=>toast("Copie impossible — sélectionnez le texte manuellement",null,true));
+  } else if(el){
+    el.select(); toast("Sélectionnez puis copiez le texte (Ctrl/Cmd+C)",null,true);
+  }
+}
+function setReportTab(btn,tab){
+  document.querySelectorAll(".report-tabs button").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  $("#rt-pdf").style.display=tab==="pdf"?"":"none";
+  $("#rt-script").style.display=tab==="script"?"":"none";
+}
+function openReportModal(){
+  const k=computeKpis(); const items=priorityActionItems(8); const genDate=fmtDate("2026-09-14");
+  $("#modalHost").innerHTML=`<div class="modal wide report-modal">
+    <div class="m-head"><div><h3>Rapport de pilotage</h3><p>Généré le ${genDate} · ${CURRENT_USER[ROLE].nom} (${ROLES[ROLE].lab})</p></div><button class="m-x" onclick="closeModal()">✕</button></div>
+    <div class="report-tabs"><button class="on" onclick="setReportTab(this,'pdf')">Rapport PDF</button><button onclick="setReportTab(this,'script')">Script narration audio / vidéo</button></div>
+    <div class="m-body">
+      <div id="rt-pdf">
+        <div class="kpis">${[
+          {l:"Délai moyen",v:k.avgLead+" j"},{l:"Feedback capturé",v:k.feedbackRate+"%"},
+          {l:"Complétude doc.",v:k.avgDocRate+"%"},{l:"Obsolescence",v:k.obsRate+"%"},
+        ].map(c=>`<div class="card kpi" style="padding:12px"><div class="v" style="font-size:20px">${c.v}</div><div class="l">${c.l}</div></div>`).join("")}</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:14px 0 8px">Actions prioritaires — ${items.length}</div>
+        ${items.map(it=>`<div class="queue-row" onclick="closeModal();openRequest('${it.r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${ICONS.clipboard}</svg></div><div class="qm"><div class="qt">${it.r.ref} — ${it.r.country}</div><div class="qd">${productByCode(it.r.productCode).label} · à traiter par <b>${it.owner}</b></div></div><span class="pill ${it.urg==='bad'?'bad':it.urg==='warn'?'warn':'blue'}">${urgencyLabel(it.urg)}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted)">Aucune action en attente.</div>'}
+        <button class="btn" style="margin-top:16px" onclick="printReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimer / Enregistrer en PDF</button>
+      </div>
+      <div id="rt-script" style="display:none">
+        <p class="sub-muted" style="margin:10px 0 12px">Script texte prêt à être lu pour une narration audio ou vidéo courte (message vocal, voix off). <b>Le rendu du fichier audio/vidéo final n'est pas généré ici</b> : cela nécessite un service de synthèse vocale ou de montage vidéo côté serveur, hors périmètre d'un prototype 100% statique et sans appel réseau. Copiez ce script dans l'outil de narration de votre choix (Teams, Stream, etc.).</p>
+        <textarea id="scriptText" readonly style="width:100%;min-height:220px">${reportNarrationScript()}</textarea>
+        <button class="btn ghost" style="margin-top:10px" onclick="copyScript()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le script</button>
+      </div>
+    </div>
+  </div>`;
+  $("#scrim").classList.add("open");
+  buildPrintArea(k,items,genDate);
 }
 
 /* ================= INTELLIGENCE TERRAIN ================= */
