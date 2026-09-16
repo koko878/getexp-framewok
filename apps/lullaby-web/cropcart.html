@@ -21,10 +21,20 @@
     --sh-2:0 10px 34px rgba(16,35,26,.10); --sh-lg:0 24px 60px rgba(16,35,26,.22);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:var(--sans);color:var(--ink);background:#f4f8f5;line-height:1.55;-webkit-font-smoothing:antialiased}
+  body{font-family:var(--sans);color:var(--ink);background:transparent;line-height:1.55;-webkit-font-smoothing:antialiased}
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
   input,select,textarea{font-family:inherit;font-size:14.5px;color:var(--ink)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  /* ===== SCÈNE AGRICOLE ANIMÉE (fond de page) ===== */
+  .bg-scene{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+  .bg-scene svg{width:100%;height:100%;display:block}
+  .bg-sun{animation:sunPulse 12s ease-in-out infinite}
+  .bg-cloud{animation:cloudDrift linear infinite}
+  .bg-rows{animation:rowSway 16s ease-in-out infinite;transform-origin:center bottom}
+  @keyframes sunPulse{0%,100%{opacity:.14}50%{opacity:.24}}
+  @keyframes cloudDrift{0%{transform:translateX(-4%)}50%{transform:translateX(4%)}100%{transform:translateX(-4%)}}
+  @keyframes rowSway{0%,100%{transform:skewX(0deg)}50%{transform:skewX(.6deg)}}
   .serif{font-family:var(--serif)}
   .caps{text-transform:uppercase;letter-spacing:.08em}
   .hidden{display:none!important}
@@ -344,9 +354,59 @@
   .pa-t{font-size:13px;font-weight:700}
   .pa-d{font-size:11.5px;color:var(--muted);margin-top:1px}
   .pill.dir{color:#fff;background:var(--ink)}
+
+  /* ===== CLASSEMENTS ===== */
+  .rank-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+  .rank-row:first-of-type{border-top:none}
+  .rank-badge{width:26px;height:26px;border-radius:50%;background:var(--green-50);color:var(--green-800);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 26px}
+  .rank-row:nth-child(1) .rank-badge,.rank-row:nth-child(2) .rank-badge,.rank-row:nth-child(3) .rank-badge{background:var(--green-800);color:#fff}
+  .rank-m{flex:1;min-width:0}
+  .rank-t{font-size:13.5px;font-weight:700}
+  .rank-d{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .rank-score{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--green-800);white-space:nowrap}
+  .achv-card{padding:15px 17px;margin-bottom:10px;display:flex;gap:13px;align-items:flex-start}
+  .achv-card .ai{width:36px;height:36px;border-radius:10px;flex:0 0 36px;display:flex;align-items:center;justify-content:center;background:var(--green-50);color:var(--green-700)}
+  .achv-card .ai svg{width:18px;height:18px}
+  .achv-card h4{font-size:13.5px;font-weight:700}
+  .achv-card p{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+  .achv-card .opp{font-size:12px;color:var(--green-800);margin-top:6px;font-weight:600}
+
+  /* ===== PASSEPORT FORMULE ===== */
+  .passport-stamp{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+  .passport-stamp .ps-country{font-weight:700;font-size:13px;flex:1}
+  .passport-stamp .ps-valid{font-size:11px;color:var(--muted)}
+  .flag-card{padding:13px 15px;border-radius:10px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;background:var(--bad-bg);border:1px solid #f6c9c9}
+  .flag-card.warn{background:var(--warn-bg);border-color:#f5dfa3}
+  .flag-card h5{font-size:12.5px;font-weight:700;color:var(--bad)}
+  .flag-card.warn h5{color:var(--warn)}
+  .flag-card p{font-size:12px;color:var(--ink);margin-top:2px;line-height:1.45}
 </style>
 </head>
 <body>
+<div class="bg-scene" aria-hidden="true">
+  <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice">
+    <defs>
+      <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#EAF4EC"/><stop offset="1" stop-color="#DCEEE0"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="800" fill="url(#skyG)"/>
+    <circle class="bg-sun" cx="1000" cy="140" r="90" fill="#66BB6A" opacity=".16"/>
+    <g class="bg-cloud" style="animation-duration:70s">
+      <ellipse cx="220" cy="120" rx="70" ry="22" fill="#fff" opacity=".5"/><ellipse cx="270" cy="108" rx="46" ry="18" fill="#fff" opacity=".5"/>
+    </g>
+    <g class="bg-cloud" style="animation-duration:95s;animation-delay:-20s">
+      <ellipse cx="750" cy="220" rx="60" ry="18" fill="#fff" opacity=".4"/><ellipse cx="790" cy="210" rx="38" ry="14" fill="#fff" opacity=".4"/>
+    </g>
+    <path d="M0 560 Q150 500 300 540 T600 520 T900 550 T1200 520 V800 H0 Z" fill="#D6EADB" opacity=".7"/>
+    <path d="M0 610 Q180 560 360 590 T720 580 T1080 600 T1200 585 V800 H0 Z" fill="#C3E1CB" opacity=".8"/>
+    <g class="bg-rows" fill="none" stroke="#8FC79A" stroke-width="3" opacity=".35">
+      <path d="M40 800 L110 640"/><path d="M110 800 L180 640"/><path d="M180 800 L250 640"/><path d="M250 800 L320 640"/><path d="M320 800 L390 640"/>
+      <path d="M460 800 L530 650"/><path d="M530 800 L600 650"/><path d="M600 800 L670 650"/><path d="M670 800 L740 650"/>
+      <path d="M840 800 L910 645"/><path d="M910 800 L980 645"/><path d="M980 800 L1050 645"/><path d="M1050 800 L1120 645"/>
+    </g>
+  </svg>
+</div>
 <header>
   <div class="hd">
     <div class="wm" onclick="go('dash')">
@@ -478,7 +538,7 @@
 
   <!-- CARTE MONDIALE -->
   <section class="view" id="v-globe">
-    <div class="sec-h"><div><span class="eyebrow">Vision mondiale</span><h2>Opérations Crop Cart — carte interactive</h2><div class="sub-muted">Cliquer un point pour le détail du marché · survoler pour un retour terrain</div></div></div>
+    <div class="sec-h"><div><span class="eyebrow">Vision mondiale</span><h2>Opérations Crop Cart — carte interactive</h2><div class="sub-muted">Cliquer un point pour le détail du marché · l'icône sur chaque marché indique la culture la plus performante (retour terrain le mieux noté)</div></div></div>
     <div class="grid2">
       <div class="card pad" style="text-align:center">
         <div class="globe-wrap"><svg id="globeSvg" viewBox="0 0 400 400"></svg></div>
@@ -495,6 +555,33 @@
       </div>
       <div id="globeSide"><div class="card pad" style="text-align:center;color:var(--muted)">Sélectionnez un pays sur la carte pour voir ses demandes et retours terrain.</div></div>
     </div>
+  </section>
+
+  <!-- CLASSEMENTS -->
+  <section class="view" id="v-classements">
+    <div class="sec-h"><div><span class="eyebrow">Performance & reconnaissance</span><h2>Classements — top 10 par marché</h2><div class="sub-muted">Calculé à partir des retours terrain structurés (satisfaction, opportunités commerciales)</div></div></div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:6px"><h3 style="font-size:15px">Top pays — satisfaction moyenne</h3></div>
+        <div id="rankCountries"></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:6px"><h3 style="font-size:15px">Top formules</h3></div>
+        <div id="rankFormulas"></div>
+      </div>
+    </div>
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-h" style="margin-bottom:6px"><h3 style="font-size:15px">Porteurs de compte les plus actifs</h3><span class="hint">volume, satisfaction moyenne, opportunités identifiées</span></div>
+      <div style="overflow-x:auto"><table class="audit-tbl" id="rankAccounts"></table></div>
+    </div>
+    <div class="sec-h" style="margin-top:22px"><div><h3 style="font-size:16px">Réalisations clés</h3><span class="hint">résultats terrain les mieux notés, avec piste de réplication</span></div></div>
+    <div id="achievementList"></div>
+  </section>
+
+  <!-- BIBLIOTHÈQUE DE FORMULES -->
+  <section class="view" id="v-formules">
+    <div class="sec-h"><div><span class="eyebrow">Portefeuille produits</span><h2>Bibliothèque de formules — passeports produit</h2><div class="sub-muted">Spécifications complètes, homologations par pays, signaux d'alerte et causes racines</div></div></div>
+    <div id="formuleGrid" class="prod-grid"></div>
   </section>
 
   <!-- INTELLIGENCE TERRAIN -->
@@ -568,12 +655,30 @@ const TODAY = new Date("2026-09-14");
 // avant bascule en régime commercial). À faire valider par l'équipe Regulatory Affairs OCP avant mise en
 // production — ce ne sont pas les chiffres officiels OCP, faute de référentiel transmis.
 const PRODUCTS=[
-  {code:"00 40 00 10S",label:"NPK 0-40-0 +10S",family:"Starter phosphaté soufré",approved:["Ghana","Cameroun","Nigeria","Côte d'Ivoire","Kenya","Ethiopia","Bresil"],cdContent:45},
-  {code:"MAP 11-52 Special Low Cd",label:"MAP 11-52 Special Low Cd",family:"MAP faible cadmium",approved:["Poland","France","Germany","Ghana"],cdContent:12},
-  {code:"5 38 9S",label:"NPS 5-38-9S",family:"Starter NPS",approved:["Bresil","Argentina","Poland","Germany"],cdContent:48},
-  {code:"3 30 7S Low Cd",label:"NPK 3-30-7S Low Cd",family:"Starter faible cadmium",approved:["Cameroun","Ghana","Kenya","Ethiopia"],cdContent:14},
-  {code:"TSP 0-46-0",label:"TSP 0-46-0 (Triple Super Phosphate)",family:"Phosphate concentré",approved:["Indonesia","Ghana","Kenya"],cdContent:32},
+  {code:"00 40 00 10S",label:"NPK 0-40-0 +10S",family:"Starter phosphaté soufré",approved:["Ghana","Cameroun","Nigeria","Côte d'Ivoire","Kenya","Ethiopia","Bresil"],cdContent:45,form:"Granulé",moisture:1.8,particleSize:"2–4 mm",packaging:"Sac 50 kg / big bag 1t",shelfLife:"24 mois (stockage sec)",approvedSince:{Ghana:"2022-03",Cameroun:"2022-09",Nigeria:"2023-01",Kenya:"2023-06",Ethiopia:"2024-02","Côte d'Ivoire":"2023-11",Bresil:"2024-05"}},
+  {code:"MAP 11-52 Special Low Cd",label:"MAP 11-52 Special Low Cd",family:"MAP faible cadmium",approved:["Poland","France","Germany","Ghana"],cdContent:12,form:"Granulé",moisture:1.2,particleSize:"2–4 mm",packaging:"Big bag 500 kg / 1t",shelfLife:"36 mois (stockage sec)",approvedSince:{Poland:"2021-04",France:"2021-04",Germany:"2022-08",Ghana:"2023-10"}},
+  {code:"5 38 9S",label:"NPS 5-38-9S",family:"Starter NPS",approved:["Bresil","Argentina","Poland","Germany"],cdContent:48,form:"Granulé",moisture:2.1,particleSize:"2–5 mm",packaging:"Big bag 1t",shelfLife:"24 mois (stockage sec)",approvedSince:{Bresil:"2022-11",Argentina:"2023-03",Poland:"2023-09",Germany:"2024-01"}},
+  {code:"3 30 7S Low Cd",label:"NPK 3-30-7S Low Cd",family:"Starter faible cadmium",approved:["Cameroun","Ghana","Kenya","Ethiopia"],cdContent:14,form:"Granulé",moisture:1.5,particleSize:"2–4 mm",packaging:"Sac 50 kg",shelfLife:"24 mois (stockage sec)",approvedSince:{Cameroun:"2023-02",Ghana:"2023-02",Kenya:"2023-07",Ethiopia:"2024-04"}},
+  {code:"TSP 0-46-0",label:"TSP 0-46-0 (Triple Super Phosphate)",family:"Phosphate concentré",approved:["Indonesia","Ghana","Kenya"],cdContent:32,form:"Granulé",moisture:2.6,particleSize:"2–4 mm",packaging:"Sac 50 kg / big bag 1t",shelfLife:"18 mois (climat humide)",approvedSince:{Indonesia:"2024-06",Ghana:"2022-12",Kenya:"2023-08"}},
 ];
+const APPROVAL_VALIDITY_YEARS=5; // durée de validité type d'une homologation produit×pays — illustratif
+// Plafond d'humidité (%) au-delà duquel le risque de prise en masse (caking) est jugé significatif en
+// climat chaud/humide — seuil interne illustratif, à aligner avec le référentiel Qualité OCP en production.
+const MOISTURE_LIMITS={Ghana:2.0,Cameroun:2.0,Nigeria:2.0,"Côte d'Ivoire":2.0,Kenya:2.2,Ethiopia:2.2,Indonesia:1.8,Vietnam:1.8,Bresil:2.4,Argentina:2.4,Poland:null,France:null,Germany:null};
+function productFlags(p){
+  const flags=[];
+  p.approved.forEach(country=>{
+    const cdLim=CD_LIMITS[country];
+    if(cdLim!=null&&p.cdContent>cdLim)flags.push({country,c:"bad",title:"Cadmium au-delà du plafond",cause:"Teneur mesurée "+p.cdContent+" mg/kg (P₂O₅) vs plafond "+cdLim+" mg/kg en vigueur dans ce marché — cause racine : origine du minerai phosphaté, non ajustable sans reformulation Low Cd."});
+    const mLim=MOISTURE_LIMITS[country];
+    if(mLim!=null&&p.moisture>mLim)flags.push({country,c:"warn",title:"Risque de prise en masse (caking)",cause:"Humidité mesurée "+p.moisture+"% vs seuil climat chaud/humide "+mLim+"% — cause racine : exposition à l'humidité ambiante en transit/stockage ; recommandé : conditionnement barrière + délai de stockage réduit."});
+  });
+  return flags;
+}
+function approvalEnd(dateStr){
+  const [y,m]=dateStr.split("-").map(Number);
+  return String(y+APPROVAL_VALIDITY_YEARS).padStart(4,"0")+"-"+String(m).padStart(2,"0");
+}
 function productByCode(c){return PRODUCTS.find(p=>p.code===c);}
 const STOCK={
   "00 40 00 10S":{available:1200,unit:"kg",sapRef:"MAT-004010S"},
@@ -862,9 +967,9 @@ let AUDIT=[
 let ROLE="demandeur";
 const CURRENT_USER={demandeur:{nom:"Ibrahim Owusu",role:"Sales Agronomist"},coord:{nom:"Youssef Amrani",role:"Sample Coordinator"},direction:{nom:"Salma Bennani",role:"Portfolio Manager"}};
 const ROLES={
-  demandeur:{lab:"Demandeur",tabs:["dash","nouvelle","mesdemandes","feedback"],banner:"Vous naviguez en tant que <b>demandeur</b> — soumettez une demande et suivez son avancement jusqu'au retour terrain."},
-  coord:{lab:"Coordinateur",tabs:["dash","file","catalogue","feedback","reglementaire","logistique"],banner:"Vous agissez en <b>coordinateur</b> — traitez le contrôle réglementaire, le stock, la logistique et les réceptions."},
-  direction:{lab:"Direction",tabs:["globe","dash","intelligence","reglementaire","logistique","integ"],banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain, à l'échelle mondiale."},
+  demandeur:{lab:"Demandeur",tabs:["dash","nouvelle","mesdemandes","feedback","formules"],banner:"Vous naviguez en tant que <b>demandeur</b> — soumettez une demande et suivez son avancement jusqu'au retour terrain."},
+  coord:{lab:"Coordinateur",tabs:["dash","file","catalogue","feedback","reglementaire","logistique","formules"],banner:"Vous agissez en <b>coordinateur</b> — traitez le contrôle réglementaire, le stock, la logistique et les réceptions."},
+  direction:{lab:"Direction",tabs:["globe","dash","classements","intelligence","reglementaire","logistique","formules","integ"],banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain, à l'échelle mondiale."},
 };
 /* Icônes agri-métier dessinées à la main (remplacent les glyphes génériques) */
 const ICONS={
@@ -881,7 +986,31 @@ const ICONS={
   star:'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>',
   gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 7.5 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 3 12.6a1.65 1.65 0 0 0-1.51-1H1a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 2.6 6.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 1.6V1a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 22.4 9H23a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
   globeLeaf:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/><path d="M9 15c3-1 4.5-2.5 5.5-5.5-3 .3-4.7 2-5.5 5.5z"/>',
+  trophy:'<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/>',
+  passport:'<rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="9" r="3"/><path d="M8 17c0-2 1.8-3 4-3s4 1 4 3"/><path d="M8 6h.01M16 6h.01"/>',
 };
+/* Icônes cultures — pour surligner sur la carte la culture la plus performante par marché */
+const CROP_ICONS={
+  "Maïs":'<path d="M12 21c-3-2-5-6-5-11 0-3 2-6 5-8 3 2 5 5 5 8 0 5-2 9-5 11z"/><path d="M8 8.5c1 .8 2 1.3 4 1.3s3-.5 4-1.3"/><path d="M8 12c1 .8 2 1.3 4 1.3s3-.5 4-1.3"/><path d="M9 16c1 .6 2 1 3 1s2-.4 3-1"/>',
+  "Blé":ICONS.wheat,"Blé d'hiver":ICONS.wheat,"Blé de printemps":ICONS.wheat,"Orge de printemps":ICONS.wheat,
+  "Riz":'<path d="M12 3c3 4 3 9 0 13"/><path d="M12 6.2c1.3 0 2.3.6 2.3 1.5s-1 1.5-2.3 1.5"/><path d="M12 9.4c1.3 0 2.3.6 2.3 1.5s-1 1.5-2.3 1.5"/><path d="M9 19c1-2 2-3 3-3s2 1 3 3"/>',
+  "Riz irrigué":'<path d="M12 3c3 4 3 9 0 13"/><path d="M12 6.2c1.3 0 2.3.6 2.3 1.5s-1 1.5-2.3 1.5"/><path d="M12 9.4c1.3 0 2.3.6 2.3 1.5s-1 1.5-2.3 1.5"/><path d="M9 19c1-2 2-3 3-3s2 1 3 3"/>',
+  "Soja":'<path d="M7 14c0-5 3-9 8-10-1 1-1 2 0 3-3 1-5 4-5 8 0 3-1 5-3 5s-3-2-3-6z"/><circle cx="9.5" cy="12.3" r="1"/><circle cx="10.7" cy="8.8" r="1"/>',
+  "Cacao":'<path d="M12 3c4 2 6 7 4 12s-6 6-9 3 1-6 2-10c1-2 2-4 3-5z"/><path d="M12 5v14"/><path d="M9 8.2c1 .5 2 .9 3 .9s2-.4 3-.9"/><path d="M8.3 12c1.3.6 2.3 1 3.7 1s2.4-.4 3.7-1"/><path d="M8.3 15.8c1.2.6 2.2 1 3.7 1s2.5-.4 3.7-1"/>',
+  "Café":'<path d="M4 9h12v5a6 6 0 0 1-6 6 6 6 0 0 1-6-6z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><ellipse cx="10" cy="6.3" rx="3" ry="1.6"/><path d="M10 5v2.6"/>',
+  "Colza":'<path d="M12 22v-9"/><circle cx="12" cy="7" r="2"/><circle cx="9" cy="9" r="2"/><circle cx="15" cy="9" r="2"/><circle cx="9" cy="5" r="2"/><circle cx="15" cy="5" r="2"/>',
+  "Banane plantain":'<path d="M6 18c5 2 11-1 13-7"/><path d="M6 18c-1-3 0-8 4-12"/><path d="M17.5 10.5c1 .3 1.8 1 2.2 2"/>',
+  "Thé":ICONS.leaf,
+  "Sorgho":'<path d="M12 21V9"/><path d="M12 9c0-4 2-6 5-7-1 3-1 5-5 7z"/><path d="M12 13c0-3-2-5-5-6 1 3 2 4 5 6z"/>',
+  "Teff":'<path d="M12 21V9"/><path d="M12 9c0-4 2-6 5-7-1 3-1 5-5 7z"/><path d="M12 13c0-3-2-5-5-6 1 3 2 4 5 6z"/>',
+};
+function cropIcon(crop){return (crop&&CROP_ICONS[crop])||ICONS.leaf;}
+function bestCropByCountry(country){
+  const withFb=REQUESTS.filter(r=>r.country===country&&r.feedback);
+  if(!withFb.length)return null;
+  const best=withFb.reduce((a,b)=>b.feedback.satisfaction>a.feedback.satisfaction?b:a);
+  return {crop:best.crop,satisfaction:best.feedback.satisfaction,ref:best.ref,product:productByCode(best.productCode).label};
+}
 const TAB_META={
   dash:["Tableau de bord",ICONS.wheat],
   globe:["Carte mondiale",ICONS.globeLeaf],
@@ -893,6 +1022,8 @@ const TAB_META={
   intelligence:["Intelligence terrain",ICONS.microscope],
   reglementaire:["Intelligence réglementaire",ICONS.flask],
   logistique:["Logistique & CO₂",ICONS.ship],
+  classements:["Classements",ICONS.trophy],
+  formules:["Bibliothèque formules",ICONS.passport],
   integ:["Intégrations SI",ICONS.gear],
 };
 
@@ -937,6 +1068,8 @@ function go(v){
   if(v==="intelligence")renderIntelligence();
   if(v==="reglementaire")renderReglementaire();
   if(v==="logistique")renderLogistique();
+  if(v==="classements")renderRankings();
+  if(v==="formules")renderFormulesLib();
   if(v==="integ")renderInteg();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -1272,6 +1405,35 @@ function renderCatalogue(){
   }).join("")+`<div class="card pad" style="grid-column:1/-1;background:var(--amber-bg);border-color:#fde5b0"><div style="font-size:12.5px;color:#7c4a06"><b>Seuils illustratifs.</b> Cadmium et seuils de quantité échantillon sont configurés à titre représentatif du secteur (fertilisants phosphatés) — à valider avec l'équipe Regulatory Affairs OCP avant mise en production, faute de référentiel officiel transmis pour ce prototype.</div></div>`;
 }
 
+/* ================= BIBLIOTHÈQUE DE FORMULES (passeports produit) ================= */
+function fmtMonthYear(ym){
+  const months=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+  const [y,m]=ym.split("-").map(Number);
+  return months[m-1]+" "+y;
+}
+function renderFormulesLib(){
+  $("#formuleGrid").innerHTML=PRODUCTS.map(p=>{
+    const flags=productFlags(p);
+    return `<div class="card prod-card">
+      <div class="pcode">${p.code}</div><div class="pfam">${p.family}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;font-size:12px">
+        <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Forme</div>${p.form}</div>
+        <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Granulométrie</div>${p.particleSize}</div>
+        <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Humidité</div>${p.moisture}%</div>
+        <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Cadmium</div>${p.cdContent} mg/kg</div>
+        <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Conditionnement</div>${p.packaging}</div>
+        <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Durée de vie</div>${p.shelfLife}</div>
+      </div>
+      <div style="margin-top:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Homologations par pays</div>
+      ${p.approved.map(c=>{const since=p.approvedSince[c]; return `<div class="passport-stamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--green-700);flex:0 0 16px">${ICONS.check}</svg><span class="ps-country">${c}</span><span class="ps-valid">${since?"depuis "+fmtMonthYear(since)+" · valide jusqu'à "+fmtMonthYear(approvalEnd(since)):"—"}</span></div>`;}).join("")}
+      </div>
+      ${flags.length?`<div style="margin-top:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Signaux d'alerte par pays</div>
+      ${flags.map(f=>`<div class="flag-card ${f.c==='warn'?'warn':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex:0 0 16px"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div><h5>${f.country} — ${f.title}</h5><p>${f.cause}</p></div></div>`).join("")}
+      </div>`:""}
+    </div>`;
+  }).join("")+`<div class="card pad" style="grid-column:1/-1;background:var(--amber-bg);border-color:#fde5b0"><div style="font-size:12.5px;color:#7c4a06"><b>Passeports illustratifs.</b> Dates d'homologation, durée de validité et seuils d'humidité sont configurés à titre représentatif — à connecter au référentiel Regulatory Affairs / Quality OCP officiel avant mise en production.</div></div>`;
+}
+
 /* ================= INTEGRATIONS ================= */
 function renderInteg(){
   const items=[
@@ -1355,7 +1517,8 @@ function renderGlobe(){
     const pres=PRESENCE_INFO[country]; const style=PRESENCE_STYLE[pres.type];
     const n=REQUESTS.filter(r=>r.country===country).length;
     const rad=7+Math.min(n,6);
-    svg+=`<g class="globe-pin" onclick="openGlobeCountry('${country}')"><circle class="ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad+7}" fill="${style.c}"/><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad}" fill="${style.c}" stroke="#fff" stroke-width="2"/><svg x="${(p.x-rad*0.62).toFixed(1)}" y="${(p.y-rad*0.62).toFixed(1)}" width="${(rad*1.24).toFixed(1)}" height="${(rad*1.24).toFixed(1)}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8">${ICONS.leaf}</svg><text x="${p.x.toFixed(1)}" y="${(p.y-rad-4).toFixed(1)}" text-anchor="middle">${country}</text></g>`;
+    const best=bestCropByCountry(country);
+    svg+=`<g class="globe-pin" onclick="openGlobeCountry('${country}')"><circle class="ring" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad+7}" fill="${style.c}"/><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${rad}" fill="${style.c}" stroke="#fff" stroke-width="2"/><svg x="${(p.x-rad*0.62).toFixed(1)}" y="${(p.y-rad*0.62).toFixed(1)}" width="${(rad*1.24).toFixed(1)}" height="${(rad*1.24).toFixed(1)}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8">${cropIcon(best&&best.crop)}</svg><text x="${p.x.toFixed(1)}" y="${(p.y-rad-4).toFixed(1)}" text-anchor="middle">${country}${best?" · "+best.crop:""}</text></g>`;
   });
   $("#globeSvg").innerHTML=svg;
 }
@@ -1363,12 +1526,61 @@ function openGlobeCountry(country){
   const list=REQUESTS.filter(r=>r.country===country);
   const testi=TESTIMONIALS[country]||[];
   const pres=PRESENCE_INFO[country];
+  const best=bestCropByCountry(country);
   $("#globeSide").innerHTML=`<div class="card pad">
     <div class="sec-h" style="margin-bottom:10px"><div><h3 style="font-size:16px">${country}</h3>${presenceBadge(country)}</div><span class="pill blue">${list.length} demande(s)</span></div>
+    ${best?`<div class="empty-flag" style="background:var(--green-50);border-color:var(--green-100);color:var(--green-800)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${cropIcon(best.crop)}</svg><div>Culture la plus performante : <b>${best.crop}</b> (${best.product}) — satisfaction ${best.satisfaction}/5, réf. ${best.ref}</div></div>`:""}
     ${testi.map(t=>`<div class="empty-flag ${t.s==='neg'?'bad':''}" style="background:${t.s==='neg'?'':'var(--green-50)'};border-color:${t.s==='neg'?'':'var(--green-100)'};color:${t.s==='neg'?'':'var(--green-800)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>« ${t.q} »<div style="font-size:11px;margin-top:3px;opacity:.8">— ${t.who}</div></div></div>`).join("")}
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:12px 0 8px">Demandes liées</div>
     ${list.map(r=>`<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div><div class="qm"><div class="qt">${r.ref} — ${productByCode(r.productCode).label}</div><div class="qd">${r.crop} · ${r.qty} kg</div></div><span class="pill ${stageIdx(r.stage)>=stageIdx('feedback')?'ok':'blue'}">${stageById(r.stage).lab}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:10px 0">Aucune demande enregistrée pour ce marché.</div>'}
   </div>`;
+}
+
+/* ================= CLASSEMENTS ================= */
+function countryRankings(){
+  const byCountry={};
+  REQUESTS.forEach(r=>{
+    if(!r.feedback)return;
+    byCountry[r.country]=byCountry[r.country]||{country:r.country,scores:[]};
+    byCountry[r.country].scores.push(r.feedback.satisfaction);
+  });
+  return Object.values(byCountry).map(c=>({country:c.country,n:c.scores.length,avg:+(c.scores.reduce((a,b)=>a+b,0)/c.scores.length).toFixed(1)}))
+    .sort((a,b)=>b.avg-a.avg||b.n-a.n).slice(0,10);
+}
+function formulaRankings(){
+  const byProd={};
+  REQUESTS.forEach(r=>{
+    if(!r.feedback)return;
+    byProd[r.productCode]=byProd[r.productCode]||{code:r.productCode,scores:[],countries:new Set()};
+    byProd[r.productCode].scores.push(r.feedback.satisfaction);
+    byProd[r.productCode].countries.add(r.country);
+  });
+  return Object.values(byProd).map(p=>({code:p.code,label:productByCode(p.code).label,n:p.scores.length,avg:+(p.scores.reduce((a,b)=>a+b,0)/p.scores.length).toFixed(1),countries:[...p.countries]}))
+    .sort((a,b)=>b.avg-a.avg||b.n-a.n);
+}
+function isCommercialOpportunity(fb){return fb&&fb.opportunity&&!/^aucune/i.test(fb.opportunity.trim());}
+function accountRankings(){
+  const bySpoc={};
+  REQUESTS.forEach(r=>{
+    bySpoc[r.spoc]=bySpoc[r.spoc]||{spoc:r.spoc,n:0,scores:[],opportunities:0,countries:new Set()};
+    const a=bySpoc[r.spoc]; a.n++; a.countries.add(r.country);
+    if(r.feedback){a.scores.push(r.feedback.satisfaction); if(isCommercialOpportunity(r.feedback))a.opportunities++;}
+  });
+  return Object.values(bySpoc).map(s=>({spoc:s.spoc,n:s.n,opportunities:s.opportunities,countries:[...s.countries],avg:s.scores.length?+(s.scores.reduce((a,b)=>a+b,0)/s.scores.length).toFixed(1):null}))
+    .sort((a,b)=>b.opportunities-a.opportunities||(b.avg||0)-(a.avg||0)||b.n-a.n).slice(0,10);
+}
+function keyAchievements(){
+  return REQUESTS.filter(r=>r.feedback&&r.feedback.satisfaction>=4&&isCommercialOpportunity(r.feedback))
+    .map(r=>({ref:r.ref,country:r.country,crop:r.crop,product:productByCode(r.productCode).label,text:r.feedback.cropResponse,opportunity:r.feedback.opportunity,satisfaction:r.feedback.satisfaction}))
+    .sort((a,b)=>b.satisfaction-a.satisfaction);
+}
+function renderRankings(){
+  const countries=countryRankings(), formulas=formulaRankings(), accounts=accountRankings(), achievements=keyAchievements();
+  $("#rankCountries").innerHTML=countries.map((c,i)=>`<div class="rank-row" onclick="go('globe');setTimeout(()=>openGlobeCountry('${c.country}'),0)" style="cursor:pointer"><span class="rank-badge">${i+1}</span><div class="rank-m"><div class="rank-t">${c.country}</div><div class="rank-d">${c.n} retour(s) terrain noté(s)</div></div><span class="rank-score">${c.avg}/5</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Pas encore de retours notés.</div>';
+  $("#rankFormulas").innerHTML=formulas.map((f,i)=>`<div class="rank-row"><span class="rank-badge">${i+1}</span><div class="rank-m"><div class="rank-t">${f.label}</div><div class="rank-d">${f.n} retour(s) · ${f.countries.length} marché(s) : ${f.countries.join(", ")}</div></div><span class="rank-score">${f.avg}/5</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Pas encore de retours notés.</div>';
+  $("#rankAccounts").innerHTML=`<tr><th>Porteur de compte</th><th>Demandes</th><th>Marchés</th><th>Satisfaction moy.</th><th>Opportunités identifiées</th></tr>`+
+    accounts.map(a=>`<tr><td style="font-weight:600">${a.spoc}</td><td>${a.n}</td><td>${a.countries.join(", ")}</td><td>${a.avg!=null?a.avg+"/5":"—"}</td><td>${a.opportunities?`<span class="pill ok">${a.opportunities}</span>`:"—"}</td></tr>`).join("");
+  $("#achievementList").innerHTML=achievements.map(a=>`<div class="card achv-card"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${cropIcon(a.crop)}</svg></div><div><h4>${a.country} — ${a.product} sur ${a.crop} <span class="pill ok" style="margin-left:6px">${a.satisfaction}/5</span></h4><p>${a.text}</p><div class="opp">→ ${a.opportunity} (${a.ref})</div></div></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Aucune réalisation commerciale identifiée pour le moment.</div>';
 }
 
 /* ================= GÉNÉRATEUR DE RAPPORT ================= */
