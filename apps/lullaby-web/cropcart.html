@@ -229,6 +229,31 @@
   table.audit-tbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;padding:9px 10px;border-bottom:1px solid var(--line)}
   table.audit-tbl td{padding:11px 10px;border-bottom:1px solid var(--line)}
   table.audit-tbl tr:last-child td{border:none}
+  table.rbac-tbl th:not(:first-child),table.rbac-tbl td:not(:first-child){text-align:center}
+  table.rbac-tbl input[type=checkbox]{width:17px;height:17px;accent-color:var(--green-700);cursor:pointer}
+  table.rbac-tbl tr:hover td{background:var(--green-50)}
+
+  /* ===== ASSISTANT DOCUMENTAIRE (CHAT) ===== */
+  .chat-fab{position:fixed;right:18px;bottom:18px;width:54px;height:54px;border-radius:50%;background:var(--green-800);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-lg);z-index:60;transition:transform .15s}
+  .chat-fab:hover{transform:scale(1.06);background:var(--green-900)}
+  .chat-fab svg{width:24px;height:24px}
+  .chat-panel{position:fixed;right:18px;bottom:84px;width:min(360px,calc(100vw - 32px));max-height:min(520px,70vh);background:#fff;border-radius:16px;box-shadow:var(--sh-lg);display:flex;flex-direction:column;overflow:hidden;z-index:60;opacity:0;transform:translateY(12px) scale(.97);pointer-events:none;transition:opacity .18s,transform .18s}
+  .chat-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .chat-head{background:linear-gradient(120deg,var(--green-900),var(--green-700));color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+  .chat-av{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex:0 0 30px}
+  .chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--green-50)}
+  .chat-bubble{max-width:86%;padding:9px 12px;border-radius:12px;font-size:12.8px;line-height:1.5}
+  .chat-bubble.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:3px}
+  .chat-bubble.user{background:var(--green-800);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+  .chat-bubble .cb-link{display:inline-block;margin-top:6px;font-size:11.5px;font-weight:700;color:var(--green-800);background:var(--green-100);padding:4px 9px;border-radius:20px;cursor:pointer}
+  .chat-input-row{display:flex;align-items:center;gap:6px;padding:10px;border-top:1px solid var(--line);background:#fff}
+  .chat-input-row input{flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:20px;font-size:12.8px;background:var(--green-50)}
+  .chat-attach{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);flex:0 0 34px;cursor:pointer}
+  .chat-attach:hover{background:var(--green-50);color:var(--green-800)}
+  .chat-attach svg{width:17px;height:17px}
+  .chat-send{width:34px;height:34px;border-radius:50%;background:var(--green-800);color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 34px}
+  .chat-send svg{width:15px;height:15px}
+  @media (max-width:480px){.chat-panel{right:12px;bottom:78px}.chat-fab{right:12px;bottom:12px}}
 
   .scrim{position:fixed;inset:0;background:rgba(16,35,26,.55);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
   .scrim.open{display:flex}
@@ -424,6 +449,8 @@
           <option value="demandeur">Vue : Demandeur (Agronome)</option>
           <option value="coord">Vue : Coordinateur</option>
           <option value="direction">Vue : Direction / Board</option>
+          <option value="operateur">Vue : Opérateur industriel</option>
+          <option value="admin">Vue : Administrateur plateforme</option>
         </select>
       </div>
       <div class="me"><div class="mn" id="meName">Ibrahim Owusu<span id="meRole">Sales Agronomist</span></div><div class="av" id="meAv">IO</div></div>
@@ -631,6 +658,54 @@
     </div>
   </section>
 
+  <!-- OPÉRATIONS INDUSTRIELLES (JORF & SAFI) -->
+  <section class="view" id="v-indus">
+    <div class="sec-h"><div><span class="eyebrow">Vue industrielle consolidée</span><h2>Opérations industrielles — Jorf Lasfar & Safi</h2><div class="sub-muted">Planning de production et chargement navire sur un seul écran — pricing, fret et incoterms illustratifs</div></div></div>
+    <div id="indusSites"></div>
+    <div class="card pad" style="margin-top:18px">
+      <div class="sec-h" style="margin-bottom:10px"><h3>Chargements navire à venir</h3><span class="hint">tous sites</span></div>
+      <div style="overflow-x:auto"><table class="audit-tbl" id="vesselTbl"></table></div>
+    </div>
+    <div class="card pad" style="margin-top:16px;background:var(--amber-bg);border-color:#fde5b0"><div style="font-size:12.5px;color:#7c4a06"><b>Données illustratives.</b> Plannings, prix, fret et clients assignés sont représentatifs pour la démonstration — à connecter aux systèmes de planification industrielle et de trading réels en production.</div></div>
+  </section>
+
+  <!-- LIGNE PILOTE (ADMIN) -->
+  <section class="view" id="v-pilote">
+    <div class="sec-h"><div><span class="eyebrow">Accès restreint — Administrateur</span><h2>Ligne pilote — capacité & maintenance</h2><div class="sub-muted">Ligne conceptuelle d'essai pour la production de petits lots d'échantillons Lane 1</div></div></div>
+    <div class="kpis" id="piloteKpis"></div>
+    <div class="card pad" style="margin-top:18px">
+      <div class="sec-h" style="margin-bottom:10px"><h3>Journal de maintenance</h3></div>
+      <div style="overflow-x:auto"><table class="audit-tbl" id="pilotMaintTbl"></table></div>
+    </div>
+  </section>
+
+  <!-- TABLEAU OPÉRATEUR INDUSTRIEL -->
+  <section class="view" id="v-opdash">
+    <div class="sec-h"><div><span class="eyebrow">Poste opérateur</span><h2>Tableau opérateur — stock & commandes</h2><div class="sub-muted">Site rattaché : Jorf Lasfar (hub central)</div></div></div>
+    <div class="kpis" id="opKpis"></div>
+    <div class="grid2" style="margin-top:18px">
+      <div class="card pad">
+        <div class="sec-h"><h3>Stock du site</h3><span class="hint">seuil d'alerte 50 kg</span></div>
+        <div id="opStock"></div>
+      </div>
+      <div class="card pad">
+        <div class="sec-h"><h3>Commandes entrantes</h3><span class="hint">réservation stock → expédition</span></div>
+        <div id="opOrders"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMINISTRATION (RBAC) -->
+  <section class="view" id="v-admin">
+    <div class="sec-h"><div><span class="eyebrow">Gouvernance plateforme</span><h2>Administration — gestion des accès</h2><div class="sub-muted">Activez ou retirez, par rôle, l'accès à chaque écran — la navigation du rôle concerné se met à jour instantanément</div></div>
+      <button class="btn ghost sm" onclick="resetPermissions()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Réinitialiser</button>
+    </div>
+    <div class="card pad" style="overflow-x:auto">
+      <table class="audit-tbl rbac-tbl" id="rbacTbl"></table>
+    </div>
+    <div class="card pad" style="margin-top:16px;background:var(--green-50);border-color:var(--green-100)"><div style="font-size:12.5px;color:var(--green-800)"><b>Démonstration en direct.</b> Décochez par exemple « Logistique & CO₂ » pour le rôle Coordinateur, puis basculez sur la vue Coordinateur dans le sélecteur en haut à droite : l'onglet disparaît immédiatement de sa navigation.</div></div>
+  </section>
+
   <!-- INTEGRATIONS -->
   <section class="view" id="v-integ">
     <div class="sec-h"><div><span class="eyebrow">Architecture SI</span><h2>Intégrations · Landing Zone Nutricrops</h2></div></div>
@@ -646,6 +721,26 @@
 
 <div class="scrim" id="scrim"><div id="modalHost"></div></div>
 <div class="toast-wrap" id="toasts"></div>
+
+<!-- ASSISTANT DOCUMENTAIRE -->
+<button class="chat-fab" id="chatFab" onclick="toggleChat()" aria-label="Ouvrir l'assistant documentaire">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>
+</button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div style="display:flex;align-items:center;gap:9px"><div class="chat-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></div><div><div style="font-weight:700;font-size:13.5px">Assistant Crop Cart</div><div style="font-size:10.5px;color:rgba(255,255,255,.8)">Navigation & recherche documentaire</div></div></div>
+    <button class="m-x" style="color:#fff" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <div class="chat-input-row">
+    <label class="chat-attach" title="Joindre un document (simulation locale)">
+      <input type="file" id="chatFile" style="display:none" onchange="handleChatUpload(event)"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.4 11.1 12.7 19.8a4.5 4.5 0 0 1-6.4-6.4l8.7-8.7a3 3 0 0 1 4.2 4.2l-8.7 8.7a1.5 1.5 0 0 1-2.1-2.1l7.4-7.4"/></svg>
+    </label>
+    <input id="chatInput" placeholder="Poser une question, ou une réf. (ex. REQ-2025-0714)…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="chat-send" onclick="sendChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+  </div>
+</div>
 
 <script>
 /* ================= DONNÉES ================= */
@@ -678,6 +773,18 @@ function productFlags(p){
 function approvalEnd(dateStr){
   const [y,m]=dateStr.split("-").map(Number);
   return String(y+APPROVAL_VALIDITY_YEARS).padStart(4,"0")+"-"+String(m).padStart(2,"0");
+}
+// Contexte business régional — prix, conformité et disponibilité par marché (illustratif, à connecter
+// au référentiel Pricing/Trade & Regulatory Affairs officiel avant mise en production).
+const PRODUCT_BASE_PRICE={"00 40 00 10S":390,"MAP 11-52 Special Low Cd":615,"5 38 9S":405,"3 30 7S Low Cd":410,"TSP 0-46-0":455}; // $/t FOB Jorf Lasfar
+const REGION_PRICE_ADJ={Ghana:0,Cameroun:.01,Nigeria:.02,"Côte d'Ivoire":.01,Kenya:.04,Ethiopia:.05,Poland:.09,France:.10,Germany:.10,Bresil:.07,Argentina:.08,Indonesia:.11};
+function regionalPrice(code,country){const base=PRODUCT_BASE_PRICE[code]; if(base==null)return null; return Math.round(base*(1+(REGION_PRICE_ADJ[country]||0)));}
+function complianceRegime(country){
+  const bits=[];
+  if(IMPORT_LICENSE_COUNTRIES.includes(country))bits.push("Licence d'importation requise");
+  if(CD_LIMITS[country]!=null)bits.push("Plafond cadmium "+CD_LIMITS[country]+" mg/kg");
+  if(MOISTURE_LIMITS[country]!=null)bits.push("Seuil humidité "+MOISTURE_LIMITS[country]+"%");
+  return bits.length?bits.join(" · "):"Aucune règle spécifique enregistrée";
 }
 function productByCode(c){return PRODUCTS.find(p=>p.code===c);}
 const STOCK={
@@ -965,12 +1072,32 @@ let AUDIT=[
 ];
 
 let ROLE="demandeur";
-const CURRENT_USER={demandeur:{nom:"Ibrahim Owusu",role:"Sales Agronomist"},coord:{nom:"Youssef Amrani",role:"Sample Coordinator"},direction:{nom:"Salma Bennani",role:"Portfolio Manager"}};
-const ROLES={
-  demandeur:{lab:"Demandeur",tabs:["dash","nouvelle","mesdemandes","feedback","formules"],banner:"Vous naviguez en tant que <b>demandeur</b> — soumettez une demande et suivez son avancement jusqu'au retour terrain."},
-  coord:{lab:"Coordinateur",tabs:["dash","file","catalogue","feedback","reglementaire","logistique","formules"],banner:"Vous agissez en <b>coordinateur</b> — traitez le contrôle réglementaire, le stock, la logistique et les réceptions."},
-  direction:{lab:"Direction",tabs:["globe","dash","classements","intelligence","reglementaire","logistique","formules","integ"],banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain, à l'échelle mondiale."},
+const CURRENT_USER={
+  demandeur:{nom:"Ibrahim Owusu",role:"Sales Agronomist"},
+  coord:{nom:"Youssef Amrani",role:"Sample Coordinator"},
+  direction:{nom:"Salma Bennani",role:"Portfolio Manager"},
+  operateur:{nom:"Rachid El Fassi",role:"Opérateur industriel — Jorf Lasfar"},
+  admin:{nom:"Nadia Squalli",role:"System Administrator"},
 };
+const ROLES={
+  demandeur:{lab:"Demandeur",banner:"Vous naviguez en tant que <b>demandeur</b> — soumettez une demande et suivez son avancement jusqu'au retour terrain."},
+  coord:{lab:"Coordinateur",banner:"Vous agissez en <b>coordinateur</b> — traitez le contrôle réglementaire, le stock, la logistique et les réceptions."},
+  direction:{lab:"Direction",banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain, à l'échelle mondiale."},
+  operateur:{lab:"Opérateur industriel",banner:"Vous naviguez en tant qu'<b>opérateur industriel</b> — stock site, commandes entrantes et indicateurs de production."},
+  admin:{lab:"Administrateur",banner:"Vous naviguez en tant qu'<b>administrateur plateforme</b> — gestion des accès par rôle et supervision de la ligne pilote."},
+};
+/* Registre de tous les onglets existants et matrice de droits d'accès par rôle (RBAC) — modifiable en direct depuis l'onglet Admin */
+const ALL_TABS=["dash","globe","nouvelle","mesdemandes","file","feedback","catalogue","intelligence","reglementaire","logistique","classements","formules","indus","opdash","pilote","admin","integ"];
+const DEFAULT_PERMISSIONS={
+  demandeur:["dash","nouvelle","mesdemandes","feedback","formules"],
+  coord:["dash","file","catalogue","feedback","reglementaire","logistique","formules"],
+  direction:["globe","dash","classements","intelligence","reglementaire","logistique","formules","indus","integ"],
+  operateur:["opdash","catalogue","logistique"],
+  admin:["admin","pilote","integ"],
+};
+let PERMISSIONS={};
+Object.keys(ROLES).forEach(r=>{PERMISSIONS[r]={}; ALL_TABS.forEach(t=>PERMISSIONS[r][t]=DEFAULT_PERMISSIONS[r].includes(t));});
+function tabsFor(role){return ALL_TABS.filter(t=>PERMISSIONS[role]&&PERMISSIONS[role][t]);}
 /* Icônes agri-métier dessinées à la main (remplacent les glyphes génériques) */
 const ICONS={
   wheat:'<path d="M12 22V9"/><path d="M12 6c-1.8 0-3 1-3.4 2.4C9.8 9.2 10.8 10 12 10s2.2-.8 3.4-1.6C15 7 13.8 6 12 6z"/><path d="M12 3c-1.8 0-3 .8-3.4 2C9.8 5.6 10.8 6.3 12 6.3s2.2-.7 3.4-1.3C15 3.8 13.8 3 12 3z"/><path d="M9 12.5c-1.6.3-2.6 1.3-2.8 2.7.9.6 2 .5 3.1 0 .5-.7.4-1.8-.3-2.7z"/><path d="M15 12.5c1.6.3 2.6 1.3 2.8 2.7-.9.6-2 .5-3.1 0-.5-.7-.4-1.8.3-2.7z"/><path d="M9 17c-1.6.3-2.6 1.3-2.8 2.7.9.6 2 .5 3.1 0 .5-.7.4-1.8-.3-2.7z"/><path d="M15 17c1.6.3 2.6 1.3 2.8 2.7-.9.6-2 .5-3.1 0-.5-.7-.4-1.8.3-2.7z"/>',
@@ -988,6 +1115,11 @@ const ICONS={
   globeLeaf:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/><path d="M9 15c3-1 4.5-2.5 5.5-5.5-3 .3-4.7 2-5.5 5.5z"/>',
   trophy:'<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/>',
   passport:'<rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="9" r="3"/><path d="M8 17c0-2 1.8-3 4-3s4 1 4 3"/><path d="M8 6h.01M16 6h.01"/>',
+  shield:'<path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/><path d="M9 12l2 2 4-4"/>',
+  factory:'<path d="M3 21V10l6 4V10l6 4V9l6-3v15z"/><path d="M3 21h18"/>',
+  gauge:'<path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18z"/><path d="M12 12l4-4"/><path d="M8 12h.01M16 12h.01M12 8h.01"/>',
+  boxes:'<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/>',
+  chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/>',
 };
 /* Icônes cultures — pour surligner sur la carte la culture la plus performante par marché */
 const CROP_ICONS={
@@ -1024,6 +1156,10 @@ const TAB_META={
   logistique:["Logistique & CO₂",ICONS.ship],
   classements:["Classements",ICONS.trophy],
   formules:["Bibliothèque formules",ICONS.passport],
+  indus:["Opérations industrielles",ICONS.factory],
+  opdash:["Tableau opérateur",ICONS.boxes],
+  pilote:["Ligne pilote",ICONS.gauge],
+  admin:["Administration",ICONS.shield],
   integ:["Intégrations SI",ICONS.gear],
 };
 
@@ -1045,14 +1181,15 @@ function requestFlags(r){
 
 /* ================= ROLE / NAV ================= */
 function setRole(r){
-  ROLE=r; const R=ROLES[r]; const u=CURRENT_USER[r];
+  ROLE=r; const R=ROLES[r]; const u=CURRENT_USER[r]; const tabs=tabsFor(r);
   $("#meName").innerHTML=u.nom+"<span>"+u.role+"</span>"; $("#meAv").textContent=initials(u.nom);
   $("#roleBanner").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>${R.banner}</span>`;
-  $("#tabs").innerHTML=R.tabs.map(t=>{
+  $("#tabs").innerHTML=tabs.map(t=>{
     const badge=t==="file"?`<span class="n">${queueItems().length}</span>`:"";
     return `<button data-v="${t}" onclick="go('${t}')">${`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${TAB_META[t][1]}</svg>`}${TAB_META[t][0]}${badge}</button>`;
   }).join("");
-  go(R.tabs[0]);
+  if(tabs.length)go(tabs[0]);
+  else document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
 }
 function go(v){
   document.querySelectorAll(".view").forEach(s=>s.classList.remove("active"));
@@ -1070,6 +1207,10 @@ function go(v){
   if(v==="logistique")renderLogistique();
   if(v==="classements")renderRankings();
   if(v==="formules")renderFormulesLib();
+  if(v==="indus")renderIndus();
+  if(v==="opdash")renderOpDash();
+  if(v==="pilote")renderPilote();
+  if(v==="admin")renderAdmin();
   if(v==="integ")renderInteg();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -1427,6 +1568,11 @@ function renderFormulesLib(){
       <div style="margin-top:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Homologations par pays</div>
       ${p.approved.map(c=>{const since=p.approvedSince[c]; return `<div class="passport-stamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--green-700);flex:0 0 16px">${ICONS.check}</svg><span class="ps-country">${c}</span><span class="ps-valid">${since?"depuis "+fmtMonthYear(since)+" · valide jusqu'à "+fmtMonthYear(approvalEnd(since)):"—"}</span></div>`;}).join("")}
       </div>
+      <div style="margin-top:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Contexte régional — pricing & conformité</div>
+      <div style="overflow-x:auto"><table class="audit-tbl"><tr><th>Marché</th><th>Prix indicatif</th><th>Régime de conformité</th><th>Disponibilité échantillon</th></tr>
+      ${p.approved.map(c=>`<tr><td style="font-weight:600">${c}</td><td>${regionalPrice(p.code,c)} $/t FOB</td><td style="font-size:11.5px">${complianceRegime(c)}</td><td>≤ ${sampleThreshold(c)} kg</td></tr>`).join("")}
+      </table></div>
+      </div>
       ${flags.length?`<div style="margin-top:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Signaux d'alerte par pays</div>
       ${flags.map(f=>`<div class="flag-card ${f.c==='warn'?'warn':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex:0 0 16px"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><div><h5>${f.country} — ${f.title}</h5><p>${f.cause}</p></div></div>`).join("")}
       </div>`:""}
@@ -1738,11 +1884,154 @@ function renderLogistique(){
   $("#co2List").innerHTML=impacts.map(({r,imp})=>`<div class="co2-row"><span>${r.ref} — ${r.country} (${TRANSPORT_LABEL[r.shipMethod]})</span><span class="cv">−${imp.co2Avoided} kg CO₂</span></div>`).join("")||`<div style="color:var(--muted);font-size:13px;padding:10px 0">Aucune donnée d'impact disponible.</div>`;
 }
 
+/* ================= OPÉRATIONS INDUSTRIELLES (JORF & SAFI) ================= */
+const INDUSTRIAL_SITES=[
+  {site:"Jorf Lasfar",capacity:"6 Mt/an (complexe phosphaté)",production:[
+    {product:"00 40 00 10S",line:"Ligne granulation 3",qty:"4 200 t",start:"2026-09-10",end:"2026-09-16",status:"En cours"},
+    {product:"TSP 0-46-0",line:"Ligne granulation 1",qty:"2 800 t",start:"2026-09-17",end:"2026-09-22",status:"Planifié"},
+  ]},
+  {site:"Safi",capacity:"3 Mt/an (complexe phosphaté)",production:[
+    {product:"5 38 9S",line:"Ligne granulation 2",qty:"3 100 t",start:"2026-09-08",end:"2026-09-14",status:"Terminé"},
+    {product:"MAP 11-52 Special Low Cd",line:"Ligne granulation 1",qty:"1 500 t",start:"2026-09-15",end:"2026-09-19",status:"En cours"},
+  ]},
+];
+const VESSEL_SCHEDULE=[
+  {vessel:"MV Atlas Trader",site:"Jorf Lasfar",productCode:"00 40 00 10S",qty:"25 000 t",price:"412 $/t FOB",freight:"38 $/t",incoterm:"FOB",client:"Distributeur régional — Afrique de l'Ouest",eta:"2026-09-18"},
+  {vessel:"MV Sofia Star",site:"Safi",productCode:"5 38 9S",qty:"18 000 t",price:"398 $/t CFR",freight:"45 $/t",incoterm:"CFR",client:"Coopérative importatrice — Brésil",eta:"2026-09-21"},
+  {vessel:"MV Green Horizon",site:"Jorf Lasfar",productCode:"TSP 0-46-0",qty:"22 000 t",price:"405 $/t FOB",freight:"41 $/t",incoterm:"FOB",client:"Négociant — Asie du Sud-Est",eta:"2026-09-26"},
+];
+const PROD_STATUS_CLS={"En cours":"blue","Planifié":"warn","Terminé":"ok"};
+function renderIndus(){
+  $("#indusSites").innerHTML=INDUSTRIAL_SITES.map(s=>`<div class="card pad" style="margin-bottom:14px">
+    <div class="sec-h" style="margin-bottom:10px"><div><h3 style="font-size:16px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:17px;height:17px;vertical-align:-3px;margin-right:6px;color:var(--green-700)">${ICONS.factory}</svg>${s.site}</h3><div class="sub-muted">${s.capacity}</div></div></div>
+    <div style="overflow-x:auto"><table class="audit-tbl"><tr><th>Produit</th><th>Ligne</th><th>Tonnage</th><th>Début</th><th>Fin</th><th>Statut</th></tr>
+    ${s.production.map(p=>`<tr><td style="font-weight:600">${productByCode(p.product)?productByCode(p.product).label:p.product}</td><td>${p.line}</td><td>${p.qty}</td><td>${fmtDate(p.start)}</td><td>${fmtDate(p.end)}</td><td><span class="pill ${PROD_STATUS_CLS[p.status]}">${p.status}</span></td></tr>`).join("")}
+    </table></div>
+  </div>`).join("");
+  $("#vesselTbl").innerHTML=`<tr><th>Navire</th><th>Site</th><th>Produit</th><th>Tonnage</th><th>Prix indicatif</th><th>Fret</th><th>Incoterm</th><th>Client assigné</th><th>ETA</th></tr>`+
+    VESSEL_SCHEDULE.map(v=>`<tr><td style="font-weight:600">${v.vessel}</td><td>${v.site}</td><td>${productByCode(v.productCode)?productByCode(v.productCode).label:v.productCode}</td><td>${v.qty}</td><td>${v.price}</td><td>${v.freight}</td><td><span class="pill blue">${v.incoterm}</span></td><td>${v.client}</td><td>${fmtDate(v.eta)}</td></tr>`).join("");
+}
+
+/* ================= LIGNE PILOTE (ADMIN) ================= */
+const PILOT_LINE={
+  capacity:"80 kg/jour (petits lots d'essai, 3 formules qualifiées)",
+  utilization:62,
+  status:"En service",
+  maintenance:[
+    {d:"2026-09-02",type:"Préventive",desc:"Étalonnage doseur granulation",who:"Équipe maintenance Jorf",statut:"Terminée"},
+    {d:"2026-09-10",type:"Corrective",desc:"Remplacement joint convoyeur — arrêt 4h",who:"Équipe maintenance Jorf",statut:"Terminée"},
+    {d:"2026-09-24",type:"Préventive",desc:"Révision trimestrielle ligne pilote",who:"Équipe maintenance Jorf",statut:"Planifiée"},
+  ],
+};
+function renderPilote(){
+  $("#piloteKpis").innerHTML=[
+    [PILOT_LINE.status,"Statut opérationnel"],
+    [PILOT_LINE.utilization+"%","Taux d'utilisation (30 derniers jours)"],
+    [PILOT_LINE.capacity,"Capacité nominale"],
+    [PILOT_LINE.maintenance.filter(m=>m.statut==="Planifiée").length,"Intervention(s) planifiée(s)"],
+  ].map(k=>`<div class="card kpi"><div class="v" style="font-size:18px">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
+  $("#pilotMaintTbl").innerHTML=`<tr><th>Date</th><th>Type</th><th>Description</th><th>Équipe</th><th>Statut</th></tr>`+
+    PILOT_LINE.maintenance.map(m=>`<tr><td style="white-space:nowrap">${fmtDate(m.d)}</td><td>${m.type}</td><td>${m.desc}</td><td>${m.who}</td><td><span class="pill ${m.statut==='Terminée'?'ok':'warn'}">${m.statut}</span></td></tr>`).join("");
+}
+
+/* ================= TABLEAU OPÉRATEUR INDUSTRIEL ================= */
+function renderOpDash(){
+  const site=WAREHOUSES[0];
+  const lowStock=Object.entries(site.items).filter(([,v])=>v>0&&v<LOW_STOCK_THRESHOLD);
+  const outStock=Object.entries(site.items).filter(([,v])=>v===0);
+  const incoming=REQUESTS.filter(r=>["stock","shipped"].includes(r.stage));
+  $("#opKpis").innerHTML=[
+    [Object.values(site.items).reduce((a,b)=>a+b,0).toLocaleString("fr-FR")+" kg","Stock total site"],
+    [lowStock.length,"Alertes stock bas"],
+    [outStock.length,"Rupture(s) de stock"],
+    [incoming.length,"Commande(s) en traitement"],
+  ].map(k=>`<div class="card kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
+  $("#opStock").innerHTML=`<div class="wh-row" style="border:none;padding-top:0"><div class="whn">${site.loc}</div>${Object.entries(site.items).map(([p,v])=>{const low=v>0&&v<LOW_STOCK_THRESHOLD;const out=v===0;return `<div class="wh-item"><span class="win">${p}</span><span class="wb"><i style="width:${Math.min(v/1500*100,100)}%;background:${out?'var(--bad)':low?'var(--warn)':'var(--green-600)'}"></i></span><span class="wv" style="color:${out?'var(--bad)':low?'var(--warn)':'var(--ink)'}">${v} kg</span></div>`;}).join("")}</div>`;
+  $("#opOrders").innerHTML=incoming.map(r=>`<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${ICONS.boxes}</svg></div><div class="qm"><div class="qt">${r.ref} — ${r.country}</div><div class="qd">${productByCode(r.productCode).label} · ${r.qty} kg</div></div><span class="pill ${stageIdx(r.stage)>=stageIdx('shipped')?'ok':'blue'}">${stageById(r.stage).lab}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Aucune commande en traitement.</div>';
+}
+
+/* ================= ADMINISTRATION — RBAC ================= */
+function renderAdmin(){
+  $("#rbacTbl").innerHTML=`<tr><th>Écran</th>${Object.keys(ROLES).map(r=>`<th>${ROLES[r].lab}</th>`).join("")}</tr>`+
+    ALL_TABS.map(t=>`<tr><td style="font-weight:600;white-space:nowrap">${TAB_META[t][0]}</td>${Object.keys(ROLES).map(r=>`<td><input type="checkbox" ${PERMISSIONS[r][t]?"checked":""} onchange="togglePermission('${r}','${t}',this.checked)"/></td>`).join("")}</tr>`).join("");
+}
+function togglePermission(role,tab,val){
+  PERMISSIONS[role][tab]=val;
+  toast((val?"Accès accordé — ":"Accès retiré — ")+TAB_META[tab][0]+" · "+ROLES[role].lab,"●");
+  if(ROLE===role)setRole(ROLE);
+}
+function resetPermissions(){
+  Object.keys(ROLES).forEach(r=>{ALL_TABS.forEach(t=>PERMISSIONS[r][t]=DEFAULT_PERMISSIONS[r].includes(t));});
+  renderAdmin(); setRole(ROLE); toast("Droits réinitialisés aux valeurs par défaut","●");
+}
+
 function refreshAll(){ const active=document.querySelector("#tabs button.active"); if(active)go(active.dataset.v); const b=document.querySelector('#tabs button[data-v="file"] .n'); if(b)b.textContent=queueItems().length; }
 
 /* ================= MODAL ================= */
 function closeModal(){$("#scrim").classList.remove("open");$("#modalHost").innerHTML="";}
 $("#scrim").addEventListener("click",e=>{if(e.target===$("#scrim"))closeModal();});
+
+/* ================= ASSISTANT DOCUMENTAIRE (règles, 100% local) ================= */
+function chatGreeting(){
+  return "Bonjour "+CURRENT_USER[ROLE].nom.split(" ")[0]+" — je peux vous aider à retrouver une demande (ex. <b>REQ-2025-0714</b>), un pays, un statut réglementaire, ou déposer un document. Que puis-je faire pour vous ?";
+}
+function addChatMsg(html,who){
+  const el=document.createElement("div"); el.className="chat-bubble "+(who||"bot"); el.innerHTML=html;
+  $("#chatMsgs").appendChild(el); $("#chatMsgs").scrollTop=$("#chatMsgs").scrollHeight;
+}
+let chatOpened=false;
+function toggleChat(){
+  const p=$("#chatPanel"); const opening=!p.classList.contains("open");
+  p.classList.toggle("open");
+  if(opening&&!chatOpened){chatOpened=true; addChatMsg(chatGreeting(),"bot");}
+}
+function sendChat(){
+  const inp=$("#chatInput"); const text=(inp.value||"").trim(); if(!text)return;
+  addChatMsg(text.replace(/</g,"&lt;"),"user"); inp.value="";
+  setTimeout(()=>addChatMsg(chatRespond(text),"bot"),250);
+}
+function chatRespond(text){
+  const t=text.toLowerCase();
+  const refMatch=text.match(/REQ-\d{4}-\d{4}/i);
+  if(refMatch){
+    const r=REQUESTS.find(x=>x.ref.toLowerCase()===refMatch[0].toLowerCase());
+    if(r){
+      const dc=docCompleteness(r);
+      return `Demande <b>${r.ref}</b> — ${r.country}, ${productByCode(r.productCode).label}, ${r.qty} kg.<br>Statut : ${stageById(r.stage).lab}${dc!=null?" · documents "+dc+"% complets":""}.<br><span class="cb-link" onclick="closeChatAndOpen('${r.id}')">Ouvrir le dossier</span>`;
+    }
+    return "Je ne trouve pas de demande avec la référence "+refMatch[0]+" dans le portefeuille actuel.";
+  }
+  const country=Object.keys(LATLON).find(c=>t.includes(c.toLowerCase()));
+  if(country){
+    const list=REQUESTS.filter(r=>r.country===country);
+    const best=bestCropByCountry(country);
+    return `<b>${country}</b> — ${presenceBadge(country)} · ${list.length} demande(s) suivie(s).${best?" Culture la plus performante : <b>"+best.crop+"</b> ("+best.satisfaction+"/5).":""}<br><span class="cb-link" onclick="closeChatAndGo('globe')">Voir sur la carte</span>`;
+  }
+  if(/coa|coc|\bsds\b|\btds\b|\bhm\b|document|certificat/.test(t))
+    return "Les documents qualité (COA, COC, HM, TDS, SDS) sont rattachés à chaque demande — donnez-moi une référence (ex. REQ-2025-0714) pour voir sa checklist, ou consultez <b>Bibliothèque de formules</b> pour les passeports produit par pays.";
+  if(/cadmium|réglement|reglement|homolog|conform/.test(t))
+    return `Le contrôle réglementaire (cadmium, seuil échantillon, licence import) est dans <b>Intelligence réglementaire</b>, et le détail par produit × pays dans <b>Bibliothèque de formules</b>.<br><span class="cb-link" onclick="closeChatAndGo('reglementaire')">Ouvrir Intelligence réglementaire</span>`;
+  if(/stock|disponib|entrepôt|entrepot|warehouse/.test(t))
+    return `Le stock par entrepôt et les alertes seuil bas sont dans <b>Logistique & CO₂</b> (ou <b>Tableau opérateur</b> côté site).<br><span class="cb-link" onclick="closeChatAndGo('logistique')">Ouvrir Logistique</span>`;
+  if(/nouvelle demande|soumettre|créer une demande|creer une demande|demander un échantillon/.test(t))
+    return `Pour soumettre une nouvelle demande d'échantillon, utilisez l'onglet <b>Nouvelle demande</b> — le formulaire vérifie automatiquement l'éligibilité réglementaire du couple produit × pays.<br><span class="cb-link" onclick="closeChatAndGo('nouvelle')">Ouvrir Nouvelle demande</span>`;
+  if(/accès|acces|droit|permission|admin/.test(t))
+    return "La gestion des droits d'accès par rôle se fait dans l'onglet <b>Administration</b> (réservé au rôle Administrateur) — chaque écran peut être activé ou retiré par rôle en un clic.";
+  if(/bonjour|salut|hello|merci|aide\b|help/.test(t))
+    return chatGreeting();
+  return "Je n'ai pas de réponse directe à cette question dans cette démo. Essayez une référence de demande (REQ-…), un nom de pays, ou des mots-clés comme « stock », « réglementaire », « nouvelle demande ». Pour un cas complexe, contactez votre coordinateur Crop Cart.";
+}
+function closeChatAndOpen(id){toggleChat(); openRequest(id);}
+function closeChatAndGo(v){
+  if(tabsFor(ROLE).includes(v)){toggleChat(); go(v);}
+  else addChatMsg("Cette vue n'est pas accessible depuis votre rôle actuel ("+ROLES[ROLE].lab+"). Changez de vue via le sélecteur en haut à droite, ou demandez à un administrateur de vous l'accorder.","bot");
+}
+function handleChatUpload(ev){
+  const f=ev.target.files&&ev.target.files[0]; if(!f)return;
+  addChatMsg("📎 "+f.name+" ("+Math.round(f.size/1024)+" Ko)","user");
+  setTimeout(()=>addChatMsg("Document reçu — <b>simulation locale uniquement dans ce prototype</b>, aucun envoi réseau. En production, il serait archivé via SharePoint / Azure Blob Storage avec traçabilité (qui, quand, sur quelle demande).","bot"),300);
+  ev.target.value="";
+}
 
 /* ================= INIT ================= */
 setRole("demandeur");
