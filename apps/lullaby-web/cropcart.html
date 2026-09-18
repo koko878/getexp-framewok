@@ -451,6 +451,7 @@
           <option value="direction">Vue : Direction / Board</option>
           <option value="operateur">Vue : Opérateur industriel</option>
           <option value="admin">Vue : Administrateur plateforme</option>
+          <option value="partenaire">Vue : Partenaire (externe)</option>
         </select>
       </div>
       <div class="me"><div class="mn" id="meName">Ibrahim Owusu<span id="meRole">Sales Agronomist</span></div><div class="av" id="meAv">IO</div></div>
@@ -488,6 +489,7 @@
       <div class="card decision-card" id="decisionPanel"></div>
       <div class="card decision-card" id="priorityActions"></div>
     </div>
+    <div class="card decision-card" id="partnerMsgsCard" style="display:none;margin-bottom:20px"></div>
     <div class="kpis" id="kpis"></div>
     <div class="sec-h" style="margin-top:22px"><div><h3 style="font-size:16px">Pipeline opérationnel</h3><span class="hint">cliquer une carte pour le détail complet</span></div></div>
     <div class="filters">
@@ -704,6 +706,47 @@
       <table class="audit-tbl rbac-tbl" id="rbacTbl"></table>
     </div>
     <div class="card pad" style="margin-top:16px;background:var(--green-50);border-color:var(--green-100)"><div style="font-size:12.5px;color:var(--green-800)"><b>Démonstration en direct.</b> Décochez par exemple « Logistique & CO₂ » pour le rôle Coordinateur, puis basculez sur la vue Coordinateur dans le sélecteur en haut à droite : l'onglet disparaît immédiatement de sa navigation.</div></div>
+  </section>
+
+  <!-- IMPORT MATÉRIEL DE TEST (STOCKAGE SÉGRÉGUÉ) -->
+  <section class="view" id="v-import">
+    <div class="sec-h"><div><span class="eyebrow">Ingestion contrôlée</span><h2>Import de matériel de test</h2><div class="sub-muted">Échantillons de sol, produits concurrents, matières premières — stockés en partition isolée, jamais mélangés au stock Lane 1</div></div></div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:15px">Nouvel import</h3></div>
+        <div class="field"><label>Type de matériel</label>
+          <div class="seg" id="imp-type-seg">
+            <button class="on" onclick="setImportType(this,'Échantillon de sol')">Sol</button>
+            <button onclick="setImportType(this,'Produit concurrent')">Concurrent</button>
+            <button onclick="setImportType(this,'Matière première')">Matière première</button>
+          </div>
+        </div>
+        <div class="field"><label>Désignation</label><input id="imp-label" placeholder="Ex. Sol argileux — parcelle témoin Kaduna"/></div>
+        <div class="field"><label>Origine / source</label><input id="imp-source" placeholder="Ex. Partenaire distributeur, Nigeria"/></div>
+        <div class="field"><label>Pays</label><select id="imp-country"></select></div>
+        <div class="field"><label>Association test / analyse</label><input id="imp-assoc" placeholder="Ex. Essai comparatif TSP vs concurrent — Q4 2026"/></div>
+        <div class="field"><label>Notes</label><textarea id="imp-notes" rows="2" placeholder="Contexte, précautions de manipulation…"></textarea></div>
+        <button class="btn" onclick="submitImport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M12 5v14M5 12h14"/></svg>Enregistrer l'import</button>
+      </div>
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:15px">Zones de stockage isolées</h3><span class="hint">partitions ségrégées — aucun contact avec le stock Lane 1</span></div>
+        <div id="quarantineZones"></div>
+      </div>
+    </div>
+    <div class="sec-h" style="margin-top:22px"><div><h3 style="font-size:16px">Historique & traçabilité des imports</h3><span class="hint">horodatage, source, association de test</span></div></div>
+    <div class="card pad"><div style="overflow-x:auto"><table class="audit-tbl" id="importHistTbl"></table></div></div>
+  </section>
+
+  <!-- PORTAIL PARTENAIRE (LECTURE SEULE, EXTERNE) -->
+  <section class="view" id="v-portail">
+    <div class="sec-h"><div><span class="eyebrow">Accès externe restreint</span><h2>Portail partenaire — portefeuille produits</h2><div class="sub-muted">Spécifications et statut d'homologation par pays — aucune information tarifaire, de production interne ou de développement produit</div></div></div>
+    <div class="prod-grid" id="partnerCatalog"></div>
+    <div class="sec-h" style="margin-top:22px"><div><h3 style="font-size:16px">Production — présentation non confidentielle</h3><span class="hint">imagerie masquée : aucune donnée de site, de client ou de prix</span></div></div>
+    <div id="partnerVideos" class="grid2"></div>
+    <div class="card pad" style="margin-top:18px;background:var(--green-50);border-color:var(--green-100);text-align:center">
+      <div style="font-size:13px;color:var(--green-800);margin-bottom:10px">Une question sur un produit ou une homologation ? Contactez directement l'équipe Crop Cart.</div>
+      <button class="btn" onclick="toggleChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>Contacter l'équipe Crop Cart</button>
+    </div>
   </section>
 
   <!-- INTEGRATIONS -->
@@ -1078,6 +1121,7 @@ const CURRENT_USER={
   direction:{nom:"Salma Bennani",role:"Portfolio Manager"},
   operateur:{nom:"Rachid El Fassi",role:"Opérateur industriel — Jorf Lasfar"},
   admin:{nom:"Nadia Squalli",role:"System Administrator"},
+  partenaire:{nom:"Lena Okoye",role:"Distributeur agréé — Afrique de l'Ouest"},
 };
 const ROLES={
   demandeur:{lab:"Demandeur",banner:"Vous naviguez en tant que <b>demandeur</b> — soumettez une demande et suivez son avancement jusqu'au retour terrain."},
@@ -1085,15 +1129,17 @@ const ROLES={
   direction:{lab:"Direction",banner:"Vous naviguez en <b>Direction / Crop Cart Board</b> — vision temps réel de bout en bout, de l'intention au résultat terrain, à l'échelle mondiale."},
   operateur:{lab:"Opérateur industriel",banner:"Vous naviguez en tant qu'<b>opérateur industriel</b> — stock site, commandes entrantes et indicateurs de production."},
   admin:{lab:"Administrateur",banner:"Vous naviguez en tant qu'<b>administrateur plateforme</b> — gestion des accès par rôle et supervision de la ligne pilote."},
+  partenaire:{lab:"Partenaire (externe)",banner:"Vous naviguez en tant que <b>partenaire externe</b> — accès en lecture seule au portefeuille produits homologués et à l'équipe Crop Cart. Aucune information tarifaire ou confidentielle n'est visible depuis ce portail."},
 };
 /* Registre de tous les onglets existants et matrice de droits d'accès par rôle (RBAC) — modifiable en direct depuis l'onglet Admin */
-const ALL_TABS=["dash","globe","nouvelle","mesdemandes","file","feedback","catalogue","intelligence","reglementaire","logistique","classements","formules","indus","opdash","pilote","admin","integ"];
+const ALL_TABS=["dash","globe","nouvelle","mesdemandes","file","feedback","catalogue","intelligence","reglementaire","logistique","classements","formules","indus","opdash","pilote","admin","import","portail","integ"];
 const DEFAULT_PERMISSIONS={
   demandeur:["dash","nouvelle","mesdemandes","feedback","formules"],
-  coord:["dash","file","catalogue","feedback","reglementaire","logistique","formules"],
+  coord:["dash","file","catalogue","feedback","reglementaire","logistique","formules","import"],
   direction:["globe","dash","classements","intelligence","reglementaire","logistique","formules","indus","integ"],
   operateur:["opdash","catalogue","logistique"],
-  admin:["admin","pilote","integ"],
+  admin:["admin","pilote","import","integ"],
+  partenaire:["portail"],
 };
 let PERMISSIONS={};
 Object.keys(ROLES).forEach(r=>{PERMISSIONS[r]={}; ALL_TABS.forEach(t=>PERMISSIONS[r][t]=DEFAULT_PERMISSIONS[r].includes(t));});
@@ -1120,6 +1166,8 @@ const ICONS={
   gauge:'<path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18z"/><path d="M12 12l4-4"/><path d="M8 12h.01M16 12h.01M12 8h.01"/>',
   boxes:'<path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/>',
   chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/>',
+  vial:'<path d="M10 2v6.5L4.8 18a2 2 0 0 0 1.7 3h11l-5.2-9.5V2"/><path d="M9 2h6"/><path d="M7 17h10"/>',
+  handshake:'<path d="M8 12l3 3a2 2 0 0 0 3 0l4-4"/><path d="M2 11l5-5 4 2 3-3 6 6-3 3"/><path d="M13 16l2 2a1.7 1.7 0 0 0 2.4-2.4"/><path d="M15.4 13.6a1.7 1.7 0 0 1 2.4 2.4"/>',
 };
 /* Icônes cultures — pour surligner sur la carte la culture la plus performante par marché */
 const CROP_ICONS={
@@ -1160,6 +1208,8 @@ const TAB_META={
   opdash:["Tableau opérateur",ICONS.boxes],
   pilote:["Ligne pilote",ICONS.gauge],
   admin:["Administration",ICONS.shield],
+  import:["Import matériel test",ICONS.vial],
+  portail:["Portail partenaire",ICONS.handshake],
   integ:["Intégrations SI",ICONS.gear],
 };
 
@@ -1211,6 +1261,8 @@ function go(v){
   if(v==="opdash")renderOpDash();
   if(v==="pilote")renderPilote();
   if(v==="admin")renderAdmin();
+  if(v==="import")renderImport();
+  if(v==="portail")renderPortail();
   if(v==="integ")renderInteg();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -1268,6 +1320,7 @@ function renderDash(){
   renderKpis();
   renderDecisionSupport();
   renderPriorityActions();
+  renderPartnerMsgs();
   $("#reqCount").textContent=REQUESTS.length;
   const regions=[...new Set(REQUESTS.map(r=>r.region))];
   const fr=$("#fRegion"); if(fr.options.length<=1)fr.innerHTML=`<option value="">Toutes régions</option>`+regions.map(r=>`<option>${r}</option>`).join("");
@@ -1965,6 +2018,71 @@ function resetPermissions(){
   renderAdmin(); setRole(ROLE); toast("Droits réinitialisés aux valeurs par défaut","●");
 }
 
+/* ================= IMPORT MATÉRIEL DE TEST (stockage ségrégué) ================= */
+const PARTITION_BY_TYPE={"Échantillon de sol":"QUARANTINE-SOL","Produit concurrent":"QUARANTINE-CONCURRENT","Matière première":"QUARANTINE-MATPREM"};
+let IMPORTED_MATERIALS=[
+  {id:"imp1",ref:"IMP-2026-0041",type:"Échantillon de sol",label:"Sol ferralitique — parcelle Ashanti",source:"Équipe agronomique terrain",country:"Ghana",assoc:"Calibration modèle N-P-K régional",notes:"Prélèvement standard 0–20 cm",date:"2026-08-02",partition:"QUARANTINE-SOL"},
+  {id:"imp2",ref:"IMP-2026-0052",type:"Produit concurrent",label:"NPK concurrent 15-15-15 (échantillon marché)",source:"Veille concurrentielle — Coordinateur",country:"Kenya",assoc:"Benchmark comparatif Starter phosphaté",notes:"Achat test en distribution locale",date:"2026-08-20",partition:"QUARANTINE-CONCURRENT"},
+  {id:"imp3",ref:"IMP-2026-0067",type:"Matière première",label:"Roche phosphatée — lot fournisseur alternatif",source:"Direction achats",country:"Bresil",assoc:"Qualification fournisseur secondaire",notes:"Lot pilote 25 kg",date:"2026-09-05",partition:"QUARANTINE-MATPREM"},
+];
+let importType="Échantillon de sol";
+function setImportType(btn,t){importType=t;document.querySelectorAll("#imp-type-seg button").forEach(b=>b.classList.remove("on"));btn.classList.add("on");}
+function submitImport(){
+  const label=$("#imp-label").value.trim();
+  if(!label){toast("Indiquez une désignation pour cet import",null,true);return;}
+  const source=$("#imp-source").value.trim()||"Non renseignée";
+  const country=$("#imp-country").value;
+  const assoc=$("#imp-assoc").value.trim()||"Aucune association de test à ce stade";
+  const notes=$("#imp-notes").value.trim();
+  const n=41+IMPORTED_MATERIALS.length;
+  const ref="IMP-2026-"+String(n).padStart(4,"0");
+  const partition=PARTITION_BY_TYPE[importType];
+  IMPORTED_MATERIALS.unshift({id:"imp"+(IMPORTED_MATERIALS.length+1),ref,type:importType,label,source,country,assoc,notes,date:"2026-09-18",partition});
+  AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER[ROLE].nom,act:"Import matériel de test enregistré",det:ref+" — "+label+" ("+importType+") — partition isolée "+partition});
+  $("#imp-label").value="";$("#imp-source").value="";$("#imp-assoc").value="";$("#imp-notes").value="";
+  toast("Import enregistré — stocké en partition isolée "+partition,"●");
+  renderImport();
+}
+function renderImport(){
+  if($("#imp-country").options.length===0)$("#imp-country").innerHTML=COUNTRIES.map(c=>`<option>${c}</option>`).join("");
+  const zones=Object.entries(PARTITION_BY_TYPE).map(([type,part])=>({type,part,items:IMPORTED_MATERIALS.filter(m=>m.partition===part)}));
+  $("#quarantineZones").innerHTML=zones.map(z=>`<div class="wh-row"><div class="whn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px;vertical-align:-3px;margin-right:5px;color:var(--warn)">${ICONS.vial}</svg>${z.part} — ${z.type} <span class="pill warn" style="margin-left:6px">${z.items.length} lot(s)</span></div>${z.items.map(m=>`<div class="wh-item"><span class="win">${m.ref} — ${m.label}</span><span style="margin-left:auto;font-size:11px;color:var(--muted)">${fmtDate(m.date)}</span></div>`).join("")||'<div style="font-size:12px;color:var(--muted);padding:4px 0">Aucun lot dans cette partition.</div>'}</div>`).join("");
+  $("#importHistTbl").innerHTML=`<tr><th>Réf.</th><th>Type</th><th>Désignation</th><th>Source</th><th>Pays</th><th>Association test</th><th>Partition</th><th>Date</th></tr>`+
+    IMPORTED_MATERIALS.map(m=>`<tr><td style="font-weight:600;white-space:nowrap">${m.ref}</td><td>${m.type}</td><td>${m.label}</td><td>${m.source}</td><td>${m.country}</td><td style="font-size:11.5px">${m.assoc}</td><td><span class="pill warn">${m.partition}</span></td><td style="white-space:nowrap">${fmtDate(m.date)}</td></tr>`).join("");
+}
+
+/* ================= PORTAIL PARTENAIRE (lecture seule, externe) ================= */
+function renderPortail(){
+  $("#partnerCatalog").innerHTML=PRODUCTS.map(p=>`<div class="card prod-card">
+    <div class="pcode">${p.code}</div><div class="pfam">${p.family}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;font-size:12px">
+      <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Forme</div>${p.form}</div>
+      <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Granulométrie</div>${p.particleSize}</div>
+      <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Conditionnement</div>${p.packaging}</div>
+      <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Durée de vie</div>${p.shelfLife}</div>
+    </div>
+    <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Statut d'homologation</div>
+    ${p.approved.map(c=>`<div class="passport-stamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--green-700);flex:0 0 16px">${ICONS.check}</svg><span class="ps-country">${c}</span><span class="ps-valid">Homologué</span></div>`).join("")}
+    </div>
+  </div>`).join("");
+  const showcases=[
+    {t:"Ligne de granulation",d:"Procédé de granulation en continu — schéma de principe (imagerie de site masquée)."},
+    {t:"Contrôle qualité laboratoire",d:"Étapes de contrôle avant libération d'un lot — schéma de principe."},
+    {t:"Conditionnement & expédition",d:"Flux de conditionnement et de mise en conteneur — schéma de principe."},
+  ];
+  $("#partnerVideos").innerHTML=showcases.map(s=>`<div class="card pad">
+    <svg viewBox="0 0 220 110" style="width:100%;height:auto;border-radius:8px;background:var(--green-50)">
+      <rect width="220" height="110" fill="var(--green-50)"/>
+      <text x="110" y="26" text-anchor="middle" font-family="var(--serif)" font-size="13" fill="var(--green-800)" font-weight="700">${s.t}</text>
+      <path d="M20 55 h180" stroke="var(--green-300)" stroke-width="2" stroke-dasharray="5 4"/>
+      <circle cx="30" cy="55" r="6" fill="var(--green-700)"/><circle cx="80" cy="55" r="6" fill="var(--green-700)"/><circle cx="130" cy="55" r="6" fill="var(--green-700)"/><circle cx="180" cy="55" r="6" fill="var(--green-700)"/>
+      <rect x="18" y="75" width="184" height="16" rx="4" fill="none" stroke="var(--green-300)" stroke-width="1.5"/>
+      <text x="110" y="87" text-anchor="middle" font-size="9" fill="var(--muted)">schéma de principe</text>
+    </svg>
+    <div style="font-size:12px;color:var(--muted);margin-top:8px">${s.d}</div>
+  </div>`).join("")+`<div class="card pad" style="grid-column:1/-1;background:var(--amber-bg);border-color:#fde5b0"><div style="font-size:12.5px;color:#7c4a06"><b>Présentation non confidentielle.</b> Ces schémas de principe remplacent, pour ce prototype, des vidéos réelles hébergées (Azure Blob Storage / Stream) — aucune image de site, de personnel ou de client n'est incluse, conformément à la politique de confidentialité du portail partenaire.</div></div>`;
+}
+
 function refreshAll(){ const active=document.querySelector("#tabs button.active"); if(active)go(active.dataset.v); const b=document.querySelector('#tabs button[data-v="file"] .n'); if(b)b.textContent=queueItems().length; }
 
 /* ================= MODAL ================= */
@@ -1972,8 +2090,34 @@ function closeModal(){$("#scrim").classList.remove("open");$("#modalHost").inner
 $("#scrim").addEventListener("click",e=>{if(e.target===$("#scrim"))closeModal();});
 
 /* ================= ASSISTANT DOCUMENTAIRE (règles, 100% local) ================= */
+/* Messages entrants du portail partenaire — visibles en interne (Coordinateur/Direction), avec accusé de réception automatique */
+let PARTNER_MESSAGES=[
+  {id:"pm1",ref:"MSG-1000",from:"Amara Boateng — Distributeur, Ghana",text:"Le TSP 0-46-0 est-il homologué pour le marché ivoirien ?",date:"2026-09-12",status:"Traité"},
+];
 function chatGreeting(){
+  if(ROLE==="partenaire")return "Bonjour "+CURRENT_USER.partenaire.nom.split(" ")[0]+" — posez votre question sur nos produits homologués, ou laissez un message : un coordinateur Crop Cart vous répondra sous 24h ouvrées.";
   return "Bonjour "+CURRENT_USER[ROLE].nom.split(" ")[0]+" — je peux vous aider à retrouver une demande (ex. <b>REQ-2025-0714</b>), un pays, un statut réglementaire, ou déposer un document. Que puis-je faire pour vous ?";
+}
+function chatRespondPartner(text){
+  const t=text.toLowerCase();
+  const match=PRODUCTS.find(p=>t.includes(p.code.toLowerCase())||t.includes(p.label.toLowerCase()));
+  const n=1001+PARTNER_MESSAGES.length;
+  const ref="MSG-"+n;
+  PARTNER_MESSAGES.unshift({id:"pm"+n,ref,from:CURRENT_USER.partenaire.nom+" — "+CURRENT_USER.partenaire.role,text,date:"2026-09-18",status:"Nouveau"});
+  const productNote=match?` À propos de <b>${match.label}</b> : homologué dans ${match.approved.length} marché(s) — voir le détail dans le portail ci-dessus.`:"";
+  return `Merci, votre message a été transmis à l'équipe Crop Cart (réf. <b>${ref}</b>).${productNote} Un coordinateur vous recontactera sous 24h ouvrées.`;
+}
+function renderPartnerMsgs(){
+  const card=$("#partnerMsgsCard");
+  if(ROLE!=="coord"&&ROLE!=="admin"){card.style.display="none";return;}
+  card.style.display="";
+  const pending=PARTNER_MESSAGES.filter(m=>m.status==="Nouveau");
+  card.innerHTML=`<div class="dc-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${ICONS.handshake}</svg><h3>Messages partenaires</h3>${pending.length?`<span class="pill warn" style="margin-left:auto">${pending.length} nouveau(x)</span>`:""}</div>
+    ${PARTNER_MESSAGES.map(m=>`<div class="dc-row ${m.status==='Nouveau'?'warn':'ok'}"><span class="dc-dot"></span><div class="dc-txt"><b>${m.from}</b> — ${m.text}<div style="font-size:10.5px;color:var(--muted);margin-top:2px">${fmtDate(m.date)} · réf. ${m.ref}</div></div>${m.status==="Nouveau"?`<button class="btn ghost sm" onclick="markPartnerMsgHandled('${m.id}')">Marquer traité</button>`:'<span class="pill ok">Traité</span>'}</div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Aucun message partenaire pour le moment.</div>'}`;
+}
+function markPartnerMsgHandled(id){
+  const m=PARTNER_MESSAGES.find(x=>x.id===id); if(m)m.status="Traité";
+  toast("Message partenaire marqué traité","●"); renderPartnerMsgs();
 }
 function addChatMsg(html,who){
   const el=document.createElement("div"); el.className="chat-bubble "+(who||"bot"); el.innerHTML=html;
@@ -1988,7 +2132,7 @@ function toggleChat(){
 function sendChat(){
   const inp=$("#chatInput"); const text=(inp.value||"").trim(); if(!text)return;
   addChatMsg(text.replace(/</g,"&lt;"),"user"); inp.value="";
-  setTimeout(()=>addChatMsg(chatRespond(text),"bot"),250);
+  setTimeout(()=>addChatMsg(ROLE==="partenaire"?chatRespondPartner(text):chatRespond(text),"bot"),250);
 }
 function chatRespond(text){
   const t=text.toLowerCase();
