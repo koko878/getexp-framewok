@@ -556,6 +556,7 @@
   <section class="view" id="v-feedback">
     <div class="sec-h"><div><span class="eyebrow">Étape 7 — Feedback & Intelligence</span><h2>Retours terrain</h2></div></div>
     <div class="kpis" style="margin-bottom:18px" id="fbKpis"></div>
+    <div class="card pad" id="followupBox" style="margin-bottom:20px;display:none"></div>
     <div id="feedbackList"></div>
   </section>
 
@@ -613,9 +614,35 @@
     <div id="formuleGrid" class="prod-grid"></div>
   </section>
 
+  <!-- ANALYSE SOL -->
+  <section class="view" id="v-sol">
+    <div class="sec-h"><div><span class="eyebrow">Aide à la décision agronomique</span><h2>Analyse sol — compatibilité formule × marché</h2><div class="sub-muted">Données de laboratoire (pH, humidité, texture) croisées avec le passeport réglementaire de chaque formule</div></div></div>
+    <div class="filters">
+      <div class="field" style="flex:1;min-width:160px;margin:0"><label>Marché</label><select id="sol-country" onchange="renderSoil()"></select></div>
+      <div class="field" style="flex:1;min-width:160px;margin:0"><label>Formule</label><select id="sol-product" onchange="renderSoil()"></select></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:15px">Profil de sol — laboratoire</h3><span class="hint">illustratif</span></div>
+        <div id="soilProfileBox"></div>
+      </div>
+      <div class="card pad" style="text-align:center">
+        <div class="sec-h" style="margin-bottom:6px"><h3 style="font-size:15px">Compatibilité formule × sol</h3></div>
+        <svg id="soilRadar" viewBox="0 0 320 320" style="width:100%;max-width:340px;height:auto"></svg>
+      </div>
+    </div>
+    <div class="card pad" style="margin-top:16px" id="soilRegBox"></div>
+    <div class="card pad" style="margin-top:14px;background:var(--amber-bg);border-color:#fde5b0"><div style="font-size:12.5px;color:#7c4a06"><b>Données illustratives.</b> Profils de sol et scores de compatibilité configurés à titre représentatif pour la démonstration — à connecter aux relevés de laboratoire réels (réseau de stations agronomiques OCP) avant mise en production.</div></div>
+  </section>
+
   <!-- INTELLIGENCE TERRAIN -->
   <section class="view" id="v-intelligence">
     <div class="sec-h"><div><span class="eyebrow">Apprentissage organisationnel</span><h2>Intelligence terrain — essais & discussions</h2></div></div>
+    <div class="card pad" style="margin-bottom:20px">
+      <div class="sec-h" style="margin-bottom:4px"><h3 style="font-size:15px">La boucle Crop Cart — 12 étapes</h3><span class="hint">Need → Capture → Match → Request → Availability → Gates → Route → Fulfill → Receipt → Follow-up → Intelligence → Action</span></div>
+      <p class="sub-muted" style="margin-bottom:12px">Une demande ne se clôture (état « Clôturée ») que si le retour terrain a été capturé <b>et</b> converti en action suivante exploitable — c'est ce qui referme la boucle et transforme un échantillon livré en apprentissage réutilisable, pas seulement en dossier archivé.</p>
+      <div class="globe-wrap"><svg id="loopSvg" viewBox="0 0 420 420"></svg></div>
+    </div>
     <div id="threadList"></div>
   </section>
 
@@ -697,9 +724,19 @@
     </div>
   </section>
 
-  <!-- ADMINISTRATION (RBAC) -->
+  <!-- ADMINISTRATION (RBAC + PILOTAGE) -->
   <section class="view" id="v-admin">
-    <div class="sec-h"><div><span class="eyebrow">Gouvernance plateforme</span><h2>Administration — gestion des accès</h2><div class="sub-muted">Activez ou retirez, par rôle, l'accès à chaque écran — la navigation du rôle concerné se met à jour instantanément</div></div>
+    <div class="sec-h"><div><span class="eyebrow">Pilotage plateforme — réservé Administrateur</span><h2>Performance Crop Cart — 5 indicateurs clés</h2><div class="sub-muted">Performance du <b>processus</b> Crop Cart et performance <b>produit / terrain</b> délibérément séparées — ne pas confondre vitesse d'exécution et qualité agronomique</div></div></div>
+    <div class="sec-h" style="margin-top:4px;margin-bottom:2px"><h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)">Performance du processus Crop Cart</h3></div>
+    <div class="kpis" id="adminKpisProcess"></div>
+    <div class="card pad" id="timeToSampleCard" style="margin-top:14px"></div>
+    <div class="sec-h" style="margin-top:20px;margin-bottom:2px"><h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)">Performance produit / terrain</h3></div>
+    <div class="kpis" id="adminKpisProduct"></div>
+
+    <div class="sec-h" style="margin-top:20px;margin-bottom:2px"><h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)">Traçabilité de bout en bout</h3></div>
+    <div class="card pad" id="traceabilityKpiBox"></div>
+
+    <div class="sec-h" style="margin-top:28px"><div><h2 style="font-size:21px">Gestion des accès (RBAC)</h2><div class="sub-muted">Activez ou retirez, par rôle, l'accès à chaque écran — la navigation du rôle concerné se met à jour instantanément</div></div>
       <button class="btn ghost sm" onclick="resetPermissions()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Réinitialiser</button>
     </div>
     <div class="card pad" style="overflow-x:auto">
@@ -886,17 +923,32 @@ function regChecks(r){
 const DOC_KEYS=["coa","coc","hm","tds","sds"];
 const DOC_LABELS={coa:"COA",coc:"COC",hm:"HM",tds:"TDS",sds:"SDS"};
 
+/* Modèle de statuts — 10 états cœur (parcours nominal) + 5 états d'exception, conformes au brief client.
+   Le champ historique `stage` sur chaque demande conserve son nom pour limiter les risques de régression,
+   mais porte désormais exclusivement ce nouveau vocabulaire. */
 const STAGES=[
-  {k:"submitted",lab:"Soumise",ic:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>',c:"#8a978f"},
-  {k:"review",lab:"Routage",ic:'<path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/>',c:"#2563EB"},
-  {k:"gate",lab:"Contrôle réglementaire",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',c:"#D97706"},
-  {k:"stock",lab:"Stock & mise en œuvre",ic:'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>',c:"#7C3AED"},
-  {k:"shipped",lab:"Expédiée",ic:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>',c:"#0891B2"},
-  {k:"delivered",lab:"Livrée",ic:'<path d="M20 6 9 17l-5-5"/>',c:"#2E7D32"},
-  {k:"feedback",lab:"Retour terrain",ic:'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>',c:"#1B5E20"},
+  {k:"draft",lab:"Brouillon",ic:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',c:"#8a978f"},
+  {k:"needs_info",lab:"Infos manquantes",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>',c:"#D97706"},
+  {k:"submitted",lab:"Soumise",ic:'<path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>',c:"#2563EB"},
+  {k:"under_review",lab:"En revue",ic:'<path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/>',c:"#2563EB"},
+  {k:"approved",lab:"Approuvée",ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',c:"#388E3C"},
+  {k:"stock_reserved",lab:"Stock réservé",ic:'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>',c:"#7C3AED"},
+  {k:"dispatched",lab:"Prête / expédiée",ic:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>',c:"#0891B2"},
+  {k:"delivered",lab:"Livrée / réceptionnée",ic:'<path d="M20 6 9 17l-5-5"/>',c:"#2E7D32"},
+  {k:"feedback_due",lab:"Retour attendu",ic:'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>',c:"#D97706"},
+  {k:"closed",lab:"Clôturée",ic:'<circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/>',c:"#1B5E20"},
 ];
-function stageById(k){return STAGES.find(s=>s.k===k)||{k:"obsolete",lab:"Obsolète",c:"var(--bad)"};}
+const EXCEPTION_STATES=[
+  {k:"rejected",lab:"Rejetée",ic:'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>',c:"#B91C1C"},
+  {k:"blocked",lab:"Bloquée",ic:'<rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',c:"#B91C1C"},
+  {k:"cancelled",lab:"Annulée",ic:'<circle cx="12" cy="12" r="9"/><path d="M8 8l8 8M16 8l-8 8"/>',c:"#5c6b62"},
+  {k:"unfulfilled",lab:"Non honorée",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>',c:"#B91C1C"},
+  {k:"delivery_exception",lab:"Incident livraison",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',c:"#B91C1C"},
+];
+const ALL_STATES=[...STAGES,...EXCEPTION_STATES];
+function stageById(k){return ALL_STATES.find(s=>s.k===k)||{k:"unknown",lab:"Inconnu",ic:'<circle cx="12" cy="12" r="9"/>',c:"var(--muted)"};}
 function stageIdx(k){return STAGES.findIndex(s=>s.k===k);}
+function isException(k){return EXCEPTION_STATES.some(s=>s.k===k);}
 
 function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
 function fmtDate(iso){if(!iso)return "—";const m=["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];const d=new Date(iso);return d.getDate()+" "+m[d.getMonth()]+" "+d.getFullYear();}
@@ -911,22 +963,22 @@ function docCompleteness(r){
 // 9 demandes — 4 réelles (fichier client) + 5 synthétiques pour couvrir les 7 étapes + 1 cas obsolète
 let REQUESTS=[
   {id:"r1",ref:"REQ-2025-0714",date:"2025-07-14",spoc:"Ibrahim Owusu",bu:"Customization",region:"Africa",country:"Ghana",productCode:"00 40 00 10S",qty:1000,priority:"High",reqType:"Agronomic testing",crop:"Maïs",soil:"Sol ferralitique acide",outcome:"Évaluer la réponse du maïs à un apport starter phosphaté-soufré en sol acide.",
-   rawStatus:"Shipped",stage:"delivered",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Shipped",stage:"feedback_due",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    shipDate:"2026-01-01",shipMethod:"Container",trackingRef:"MSCU-771042-GH",receiptConfirmed:true,receiptDate:"2026-02-18",receiptCondition:"Conforme",
    feedback:null},
 
   {id:"r2",ref:"REQ-2026-0303",date:"2026-03-03",spoc:"Katarzyna Nowak",bu:"Customization",region:"Europe",country:"Poland",productCode:"MAP 11-52 Special Low Cd",qty:50,priority:"Critical",reqType:"Agronomic testing",crop:"Blé d'hiver",soil:"Sol limoneux, pH 6.8",outcome:"Comparer la disponibilité du phosphore en sol froid de printemps.",
-   rawStatus:"Packaging",stage:"stock",riCheck:"Compliant",docs:{coa:"no",coc:"yes",hm:"no",tds:"yes",sds:"yes"},
+   rawStatus:"Packaging",stage:"approved",riCheck:"Compliant",docs:{coa:"no",coc:"yes",hm:"no",tds:"yes",sds:"yes"},
    shipDate:null,shipMethod:"DHL",trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
   {id:"r3",ref:"REQ-2026-0409",date:"2026-04-09",spoc:"Carla Silva",bu:"Customization",region:"LATAM",country:"Bresil",productCode:"5 38 9S",qty:150,priority:"Critical",reqType:"Agronomic testing",crop:"Soja",soil:"Sol argileux tropical",outcome:"Tester l'apport starter NPS sur soja en 1ère année.",
-   rawStatus:"Shipped",stage:"shipped",riCheck:"Compliant",docs:{coa:"no",coc:"na",hm:"no",tds:"yes",sds:"yes"},
+   rawStatus:"Shipped",stage:"dispatched",riCheck:"Compliant",docs:{coa:"no",coc:"na",hm:"no",tds:"yes",sds:"yes"},
    shipDate:"2026-07-08",shipMethod:"Container",trackingRef:"MSCU-559981-BR",receiptConfirmed:false,
    feedback:null},
 
   {id:"r4",ref:"REQ-2026-0616",date:"2026-06-16",spoc:"Ibrahim Owusu",bu:"Customization",region:"Africa",country:"Cameroun",productCode:"3 30 7S Low Cd",qty:5,priority:"Critical",reqType:"Registration",crop:"Cacao",soil:"Sol ferralitique",outcome:"Constituer le dossier d'homologation — analyses réglementaires.",
-   rawStatus:"Quality check validation",stage:"gate",riCheck:"Compliant",docs:{coa:"no",coc:"no",hm:"no",tds:"yes",sds:"yes"},
+   rawStatus:"Quality check validation",stage:"under_review",routed:true,riCheck:"Compliant",docs:{coa:"no",coc:"no",hm:"no",tds:"yes",sds:"yes"},
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
@@ -936,65 +988,65 @@ let REQUESTS=[
    feedback:null},
 
   {id:"r6",ref:"REQ-2026-0905",date:"2026-09-05",spoc:"Fatou Diarra",bu:"Customization",region:"Africa",country:"Côte d'Ivoire",productCode:"00 40 00 10S",qty:300,priority:"Medium",reqType:"Agronomic testing",crop:"Banane plantain",soil:"Sol alluvial",outcome:"Évaluer la vigueur du plantain avec un apport starter en sol alluvial.",
-   rawStatus:"Routed",stage:"review",riCheck:null,docs:{},
+   rawStatus:"Routed",stage:"under_review",routed:false,riCheck:null,docs:{},
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
   {id:"r7",ref:"REQ-2026-0908",date:"2026-09-08",spoc:"Chidi Okafor",bu:"Customization",region:"Africa",country:"Nigeria",productCode:"5 38 9S",qty:80,priority:"High",reqType:"Agronomic testing",crop:"Riz irrigué",soil:"Sol hydromorphe",outcome:"Tester le démarrage du riz irrigué avec un starter NPS.",
-   rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit « 5 38 9S » non homologué pour le Nigeria (hors périmètre Lane 1 pour ce pays).",
+   rawStatus:"Blocked",stage:"blocked",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit « 5 38 9S » non homologué pour le Nigeria (hors périmètre Lane 1 pour ce pays).",
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
   {id:"r8",ref:"REQ-2026-0512",date:"2026-05-12",spoc:"Élodie Marchand",bu:"Customization",region:"Europe",country:"France",productCode:"MAP 11-52 Special Low Cd",qty:25,priority:"Medium",reqType:"Agronomic testing",crop:"Colza",soil:"Limon battant",outcome:"Comparer la disponibilité du phosphore en sol froid vs référence standard.",
-   rawStatus:"Closed",stage:"feedback",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Closed",stage:"closed",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    shipDate:"2026-06-02",shipMethod:"DHL",trackingRef:"DHL-4471002-FR",receiptConfirmed:true,receiptDate:"2026-06-09",receiptCondition:"Conforme",
-   feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"Levée plus rapide et meilleure vigueur initiale vs référence (+12% de biomasse à 30 jours).",satisfaction:5,opportunity:"Opportunité commerciale identifiée — intérêt confirmé pour un test élargi en 2027."}},
+   feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"Levée plus rapide et meilleure vigueur initiale vs référence (+12% de biomasse à 30 jours).",satisfaction:5,opportunity:"Opportunité commerciale identifiée — intérêt confirmé pour un test élargi en 2027."},adopted:true},
 
   {id:"r9",ref:"REQ-2025-1102",date:"2025-11-02",spoc:"Amara Otieno",bu:"Standard",region:"Africa",country:"Kenya",productCode:"3 30 7S Low Cd",qty:10,priority:"Medium",reqType:"Agronomic testing",crop:"Thé",soil:"Sol volcanique",outcome:"Tester l'apport starter sur jeunes plants de théier.",
-   rawStatus:"Abandonné",stage:"obsolete",riCheck:"Compliant",docs:{coa:"no",coc:"no",hm:"na",tds:"yes",sds:"yes"},obsoleteReason:"87 jours sans mouvement en contrôle réglementaire, aucune relance — demande abandonnée par le terrain.",
+   rawStatus:"Abandonné",stage:"unfulfilled",riCheck:"Compliant",docs:{coa:"no",coc:"no",hm:"na",tds:"yes",sds:"yes"},obsoleteReason:"87 jours sans mouvement en contrôle réglementaire, aucune relance — demande abandonnée par le terrain.",
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
   {id:"r10",ref:"REQ-2026-0910",date:"2026-09-10",spoc:"Klaus Richter",bu:"Customization",region:"Europe",country:"Germany",productCode:"5 38 9S",qty:60,priority:"High",reqType:"Agronomic testing",crop:"Orge de printemps",soil:"Sol limono-sableux",outcome:"Tester le démarrage de l'orge de printemps avec un starter NPS standard.",
-   rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Teneur en cadmium du produit (48 mg/kg P₂O₅) supérieure au plafond réglementaire allemand (20 mg/kg P₂O₅). Homologué pour l'Allemagne, mais non conforme en l'état — proposer la variante Low Cd.",
+   rawStatus:"Blocked",stage:"blocked",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Teneur en cadmium du produit (48 mg/kg P₂O₅) supérieure au plafond réglementaire allemand (20 mg/kg P₂O₅). Homologué pour l'Allemagne, mais non conforme en l'état — proposer la variante Low Cd.",
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
   // Élargissement international (15-20 opérations) — pays vérifiés avant peuplement, cf. PRESENCE_INFO. Maroc exclu.
   {id:"r11",ref:"REQ-2026-0210",date:"2026-02-10",spoc:"Bekele Girma",bu:"Customization",region:"Africa",country:"Ethiopia",productCode:"00 40 00 10S",qty:400,priority:"High",reqType:"Agronomic testing",crop:"Teff",soil:"Sol volcanique d'altitude",outcome:"Évaluer la réponse du teff à un starter phosphaté-soufré en altitude.",transportMode:"Camion",distanceKm:5200,
-   rawStatus:"Shipped",stage:"shipped",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Shipped",stage:"dispatched",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    shipDate:"2026-04-02",shipMethod:"Camion",trackingRef:"RD-ETH-40021",receiptConfirmed:false,
    feedback:null},
 
   {id:"r12",ref:"REQ-2025-1120",date:"2025-11-20",spoc:"Bekele Girma",bu:"Customization",region:"Africa",country:"Ethiopia",productCode:"3 30 7S Low Cd",qty:60,priority:"Medium",reqType:"Agronomic testing",crop:"Teff",soil:"Sol volcanique",outcome:"Comparer la formulation Low Cd sur teff en sol volcanique.",transportMode:"Camion",distanceKm:5200,
-   rawStatus:"Closed",stage:"feedback",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Closed",stage:"closed",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    shipDate:"2025-12-15",shipMethod:"Camion",trackingRef:"RD-ETH-39880",receiptConfirmed:true,receiptDate:"2026-01-10",receiptCondition:"Conforme",
    feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"+9% de biomasse en sol volcanique vs référence locale, tallage plus homogène.",satisfaction:4,opportunity:"Approche jugée réplicable sur les sols volcaniques comparables du Kenya."}},
 
   {id:"r13",ref:"REQ-2026-0820",date:"2026-08-20",spoc:"Lindiwe Nkosi",bu:"Standard",region:"Africa",country:"South Africa",productCode:"MAP 11-52 Special Low Cd",qty:40,priority:"Medium",reqType:"Registration",crop:"Maïs",soil:"Sol sablo-limoneux",outcome:"Constituer un dossier d'entrée sur un marché non encore homologué.",
-   rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit non homologué pour l'Afrique du Sud — marché sans filiale confirmée. Une demande de dérogation d'entrée est en cours (cf. Intelligence réglementaire).",
+   rawStatus:"Blocked",stage:"blocked",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit non homologué pour l'Afrique du Sud — marché sans filiale confirmée. Une demande de dérogation d'entrée est en cours (cf. Intelligence réglementaire).",
    pendingExemption:{filedDate:"2026-08-25",expectedDate:"2026-09-29",authority:"Department of Agriculture — Fertilizers, Farm Feeds Act"},
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
   {id:"r14",ref:"REQ-2025-0918",date:"2025-09-18",spoc:"Sari Wulandari",bu:"Customization",region:"Asia",country:"Indonesia",productCode:"TSP 0-46-0",qty:120,priority:"High",reqType:"Agronomic testing",crop:"Riz",soil:"Sol volcanique irrigué",outcome:"Évaluer l'apport de phosphore concentré sur riz irrigué en sol volcanique.",transportMode:"DHL",distanceKm:11800,
-   rawStatus:"Closed",stage:"feedback",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Closed",stage:"closed",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    shipDate:"2025-10-05",shipMethod:"DHL",trackingRef:"DHL-8820134-ID",receiptConfirmed:true,receiptDate:"2025-10-14",receiptCondition:"Conforme",
-   feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"+12% de rendement riz vs référence TSP standard, meilleure disponibilité P en sol volcanique.",satisfaction:5,opportunity:"Résultat jugé réplicable — approche à tester au Vietnam et aux Philippines."}},
+   feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"+12% de rendement riz vs référence TSP standard, meilleure disponibilité P en sol volcanique.",satisfaction:5,opportunity:"Résultat jugé réplicable — approche à tester au Vietnam et aux Philippines."},adopted:true},
 
   {id:"r15",ref:"REQ-2026-0901",date:"2026-09-01",spoc:"Pham Thi Lan",bu:"Customization",region:"Asia",country:"Vietnam",productCode:"TSP 0-46-0",qty:100,priority:"High",reqType:"Registration",crop:"Riz",soil:"Sol alluvial du delta",outcome:"Répliquer l'essai TSP riz mené en Indonésie sur le delta du Mékong.",
-   rawStatus:"Blocked",stage:"gate",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit TSP 0-46-0 non encore homologué pour le Vietnam — dossier d'enregistrement à engager avant expédition.",
+   rawStatus:"Blocked",stage:"blocked",riCheck:"Non conforme",docs:{},gateBlocked:true,gateReason:"Produit TSP 0-46-0 non encore homologué pour le Vietnam — dossier d'enregistrement à engager avant expédition.",
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
   {id:"r16",ref:"REQ-2026-0822",date:"2026-08-22",spoc:"Carla Silva",bu:"Customization",region:"LATAM",country:"Bresil",productCode:"00 40 00 10S",qty:600,priority:"Critical",reqType:"Agronomic testing",crop:"Maïs",soil:"Sol argileux tropical",outcome:"Étendre les essais starter phosphaté-soufré au maïs après le succès sur soja.",
-   rawStatus:"Production check",stage:"stock",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Production check",stage:"approved",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    supplyNote:"Pénurie de soufre signalée sur la ligne de formulation 00-40-00-10S — alerte procurement en cours (cf. Intelligence terrain).",
    shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,
    feedback:null},
 
   {id:"r17",ref:"REQ-2026-0715",date:"2026-07-15",spoc:"Martín Fernández",bu:"Customization",region:"LATAM",country:"Argentina",productCode:"5 38 9S",qty:90,priority:"Medium",reqType:"Agronomic testing",crop:"Blé",soil:"Sol limoneux pampéen",outcome:"Tester le starter NPS sur blé d'hiver dans la pampa humide.",transportMode:"Container",distanceKm:10600,
-   rawStatus:"Shipped",stage:"shipped",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Shipped",stage:"dispatched",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    shipDate:"2026-08-10",shipMethod:"Container",trackingRef:"MSCU-660214-AR",receiptConfirmed:false,
    feedback:null},
 
@@ -1004,14 +1056,22 @@ let REQUESTS=[
    feedback:null},
 
   {id:"r19",ref:"REQ-2026-0730",date:"2026-07-30",spoc:"Chidi Okafor",bu:"Customization",region:"Africa",country:"Nigeria",productCode:"00 40 00 10S",qty:250,priority:"Medium",reqType:"Agronomic testing",crop:"Sorgho",soil:"Sol ferrugineux tropical",outcome:"Valider l'apport starter sur sorgho en zone soudano-sahélienne.",transportMode:"Camion",distanceKm:4300,
-   rawStatus:"Shipped",stage:"shipped",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Shipped",stage:"dispatched",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    shipDate:"2026-08-20",shipMethod:"Camion",trackingRef:"RD-NGA-55210",receiptConfirmed:false,
    feedback:null},
 
   {id:"r20",ref:"REQ-2026-0110",date:"2026-01-10",spoc:"Katarzyna Nowak",bu:"Customization",region:"Europe",country:"Poland",productCode:"5 38 9S",qty:40,priority:"Medium",reqType:"Agronomic testing",crop:"Blé de printemps",soil:"Sol froid, pH 6.5",outcome:"Tester le starter NPS sur blé de printemps en sol froid.",transportMode:"DHL",distanceKm:2900,
-   rawStatus:"Closed",stage:"feedback",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
+   rawStatus:"Closed",stage:"closed",riCheck:"Compliant",docs:{coa:"yes",coc:"yes",hm:"yes",tds:"yes",sds:"yes"},
    shipDate:"2026-02-05",shipMethod:"DHL",trackingRef:"DHL-4402210-PL",receiptConfirmed:true,receiptDate:"2026-02-12",receiptCondition:"Conforme",
    feedback:{used:"Oui, sur parcelle d'essai dédiée",cropResponse:"Résultat en dessous des attentes : +2% de biomasse seulement en sol froid (objectif +8%) — absorption ralentie par les températures basses.",satisfaction:2,opportunity:"Aucune à ce stade — recommander une reformulation ou un décalage de la fenêtre d'application avant nouvel essai."}},
+
+  {id:"r21",ref:"REQ-2026-0916",date:"2026-09-16",spoc:"Élodie Marchand",bu:"Customization",region:"Europe",country:"France",productCode:"MAP 11-52 Special Low Cd",qty:60,priority:"Medium",reqType:"Agronomic testing",crop:"Colza",soil:"Sol limoneux-argileux",outcome:"Évaluer la formulation Low Cd sur colza d'automne avant campagne 2027.",
+   rawStatus:"Draft",stage:"draft",riCheck:null,docs:{},
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,feedback:null},
+
+  {id:"r22",ref:"REQ-2026-0917",date:"2026-09-17",spoc:"Amara Otieno",bu:"Standard",region:"Africa",country:"Kenya",productCode:"TSP 0-46-0",qty:150,priority:"Medium",reqType:"Agronomic testing",crop:"Café",soil:"",outcome:"",
+   rawStatus:"Needs info",stage:"needs_info",riCheck:null,docs:{},exceptionReason:"Contexte agronomique incomplet — merci de préciser le type de sol et le résultat attendu avant transmission au coordinateur.",
+   shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,feedback:null},
 ];
 
 // ================= INTELLIGENCE TERRAIN — fils de discussion (positifs & négatifs) =================
@@ -1132,11 +1192,11 @@ const ROLES={
   partenaire:{lab:"Partenaire (externe)",banner:"Vous naviguez en tant que <b>partenaire externe</b> — accès en lecture seule au portefeuille produits homologués et à l'équipe Crop Cart. Aucune information tarifaire ou confidentielle n'est visible depuis ce portail."},
 };
 /* Registre de tous les onglets existants et matrice de droits d'accès par rôle (RBAC) — modifiable en direct depuis l'onglet Admin */
-const ALL_TABS=["dash","globe","nouvelle","mesdemandes","file","feedback","catalogue","intelligence","reglementaire","logistique","classements","formules","indus","opdash","pilote","admin","import","portail","integ"];
+const ALL_TABS=["dash","globe","nouvelle","mesdemandes","file","feedback","catalogue","intelligence","reglementaire","logistique","classements","formules","sol","indus","opdash","pilote","admin","import","portail","integ"];
 const DEFAULT_PERMISSIONS={
-  demandeur:["dash","nouvelle","mesdemandes","feedback","formules"],
-  coord:["dash","file","catalogue","feedback","reglementaire","logistique","formules","import"],
-  direction:["globe","dash","classements","intelligence","reglementaire","logistique","formules","indus","integ"],
+  demandeur:["dash","nouvelle","mesdemandes","feedback","formules","sol"],
+  coord:["dash","file","catalogue","feedback","reglementaire","logistique","formules","sol","import"],
+  direction:["globe","dash","classements","intelligence","reglementaire","logistique","formules","sol","indus","integ"],
   operateur:["opdash","catalogue","logistique"],
   admin:["admin","pilote","import","integ"],
   partenaire:["portail"],
@@ -1168,6 +1228,7 @@ const ICONS={
   chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/>',
   vial:'<path d="M10 2v6.5L4.8 18a2 2 0 0 0 1.7 3h11l-5.2-9.5V2"/><path d="M9 2h6"/><path d="M7 17h10"/>',
   handshake:'<path d="M8 12l3 3a2 2 0 0 0 3 0l4-4"/><path d="M2 11l5-5 4 2 3-3 6 6-3 3"/><path d="M13 16l2 2a1.7 1.7 0 0 0 2.4-2.4"/><path d="M15.4 13.6a1.7 1.7 0 0 1 2.4 2.4"/>',
+  soil:'<path d="M3 20c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M12 10V3"/><path d="M9 6l3-3 3 3"/>',
 };
 /* Icônes cultures — pour surligner sur la carte la culture la plus performante par marché */
 const CROP_ICONS={
@@ -1204,6 +1265,7 @@ const TAB_META={
   logistique:["Logistique & CO₂",ICONS.ship],
   classements:["Classements",ICONS.trophy],
   formules:["Bibliothèque formules",ICONS.passport],
+  sol:["Analyse sol",ICONS.soil],
   indus:["Opérations industrielles",ICONS.factory],
   opdash:["Tableau opérateur",ICONS.boxes],
   pilote:["Ligne pilote",ICONS.gauge],
@@ -1221,11 +1283,11 @@ function priorityCls(p){return p==="Critical"?"bad":p==="High"?"warn":"blue";}
 function requestFlags(r){
   const flags=[];
   const dc=docCompleteness(r);
-  if(r.stage!=="submitted"&&r.stage!=="review"&&r.stage!=="obsolete"&&dc!==null&&dc<100)flags.push({t:"Documents incomplets ("+dc+"%)",c:"warn",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'});
+  if(r.stage!=="submitted"&&r.stage!=="under_review"&&!isException(r.stage)&&dc!==null&&dc<100)flags.push({t:"Documents incomplets ("+dc+"%)",c:"warn",ic:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>'});
   if(r.gateBlocked)flags.push({t:"Bloqué — réglementaire",c:"bad",ic:'<circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/>'});
-  if(r.stage==="shipped"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45)flags.push({t:"Réception en retard",c:"bad",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'});
-  if(r.stage==="delivered"&&!r.feedback)flags.push({t:"Feedback manquant",c:"warn",ic:'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>'});
-  if(r.stage==="obsolete")flags.push({t:"Obsolète",c:"bad",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>'});
+  if(r.stage==="dispatched"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45)flags.push({t:"Réception en retard",c:"bad",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'});
+  if(r.stage==="feedback_due"&&!r.feedback)flags.push({t:"Feedback manquant",c:"warn",ic:'<path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/>'});
+  if(isException(r.stage))flags.push({t:stageById(r.stage).lab,c:"bad",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>'});
   return flags;
 }
 
@@ -1257,6 +1319,7 @@ function go(v){
   if(v==="logistique")renderLogistique();
   if(v==="classements")renderRankings();
   if(v==="formules")renderFormulesLib();
+  if(v==="sol")renderSoil();
   if(v==="indus")renderIndus();
   if(v==="opdash")renderOpDash();
   if(v==="pilote")renderPilote();
@@ -1271,14 +1334,14 @@ function go(v){
 function computeKpis(){
   const withShip=REQUESTS.filter(r=>r.shipDate);
   const avgLead=withShip.length?Math.round(withShip.reduce((s,r)=>s+daysBetween(r.date,r.shipDate),0)/withShip.length):0;
-  const eligible=REQUESTS.filter(r=>["shipped","delivered","feedback"].includes(r.stage));
+  const eligible=REQUESTS.filter(r=>["dispatched","delivered","feedback_due","closed"].includes(r.stage));
   const withFeedback=eligible.filter(r=>r.feedback);
   const feedbackRate=eligible.length?Math.round(withFeedback.length/eligible.length*100):0;
-  const gateReached=REQUESTS.filter(r=>!["submitted","review"].includes(r.stage));
+  const gateReached=REQUESTS.filter(r=>!["draft","needs_info","submitted","under_review"].includes(r.stage));
   const docRates=gateReached.map(r=>docCompleteness(r)).filter(v=>v!==null);
   const avgDocRate=docRates.length?Math.round(docRates.reduce((a,b)=>a+b,0)/docRates.length):0;
-  const obsolete=REQUESTS.filter(r=>r.stage==="obsolete").length;
-  const terminal=REQUESTS.filter(r=>["shipped","delivered","feedback","obsolete"].includes(r.stage)).length;
+  const obsolete=REQUESTS.filter(r=>isException(r.stage)).length;
+  const terminal=REQUESTS.filter(r=>["dispatched","delivered","feedback_due","closed"].includes(r.stage)||isException(r.stage)).length;
   const obsRate=terminal?Math.round(obsolete/terminal*100):0;
   return {avgLead,feedbackRate,avgDocRate,obsRate,withFeedback:withFeedback.length,eligible:eligible.length,obsolete,terminal};
 }
@@ -1295,10 +1358,10 @@ function renderKpis(){
 function renderDecisionSupport(){
   const k=computeKpis();
   const recs=[];
-  const cdBlocked=REQUESTS.filter(r=>r.stage==="gate"&&(regChecks(r).cdOk===false));
-  const overdue=REQUESTS.filter(r=>r.stage==="shipped"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45);
-  const integrityGap=REQUESTS.filter(r=>!["submitted","review","obsolete"].includes(r.stage)&&docCompleteness(r)!==null&&docCompleteness(r)<100&&stageIdx(r.stage)>=stageIdx("stock"));
-  const missingFeedback=REQUESTS.filter(r=>r.stage==="delivered"&&!r.feedback);
+  const cdBlocked=REQUESTS.filter(r=>r.stage==="blocked"&&(regChecks(r).cdOk===false));
+  const overdue=REQUESTS.filter(r=>r.stage==="dispatched"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45);
+  const integrityGap=REQUESTS.filter(r=>!["submitted","under_review"].includes(r.stage)&&!isException(r.stage)&&docCompleteness(r)!==null&&docCompleteness(r)<100&&stageIdx(r.stage)>=stageIdx("approved"));
+  const missingFeedback=REQUESTS.filter(r=>r.stage==="feedback_due"&&!r.feedback);
   if(cdBlocked.length)recs.push({t:cdBlocked.length+" demande(s) bloquée(s) sur la teneur en cadmium ("+cdBlocked.map(r=>r.country).join(", ")+") — statuer sur une variante Low Cd avant relance.",c:"bad"});
   if(overdue.length)recs.push({t:overdue.length+" expédition(s) sans confirmation de réception depuis plus de 45 jours (ex. "+overdue[0].ref+", "+overdue[0].country+") — relancer le client/transitaire.",c:"bad"});
   if(integrityGap.length)recs.push({t:integrityGap.length+" dossier(s) ont progressé en stock/logistique malgré une documentation incomplète — compléter avant la prochaine étape.",c:"warn"});
@@ -1332,7 +1395,7 @@ function renderKanban(){
   let list=REQUESTS.filter(r=>!q||r.country.toLowerCase().includes(q)||r.productCode.toLowerCase().includes(q)||r.ref.toLowerCase().includes(q)||r.crop.toLowerCase().includes(q));
   if(region)list=list.filter(r=>r.region===region);
   if(prio)list=list.filter(r=>r.priority===prio);
-  const obsoleteList=list.filter(r=>r.stage==="obsolete");
+  const exceptionList=list.filter(r=>isException(r.stage));
   $("#kanban").innerHTML=STAGES.map(st=>{
     const items=list.filter(r=>r.stage===st.k);
     return `<div class="kcol"><div class="kcol-h"><span class="dot" style="background:${st.c}"></span><span class="kn">${st.lab}</span><span class="kc">${items.length}</span></div>
@@ -1341,7 +1404,7 @@ function renderKanban(){
         return `<div class="kcard" onclick="openRequest('${r.id}')"><div class="kref">${r.ref}</div><div class="kt">${r.country} · ${productByCode(r.productCode).label}</div><div class="kd">${r.qty} kg · ${r.priority}</div>
           <div class="kflags">${flags.map(f=>`<span class="flag-dot" style="background:var(--${f.c==='bad'?'bad-bg':'warn-bg'});color:var(--${f.c==='bad'?'bad':'warn'})" title="${f.t}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">${f.ic}</svg></span>`).join("")}</div></div>`;
       }).join("")||'<div style="font-size:12px;color:var(--muted);text-align:center;padding:14px">—</div>'}</div></div>`;
-  }).join("")+(obsoleteList.length?`<div class="kcol"><div class="kcol-h"><span class="dot" style="background:var(--bad)"></span><span class="kn">Obsolète</span><span class="kc">${obsoleteList.length}</span></div><div class="kcol-b">${obsoleteList.map(r=>`<div class="kcard" onclick="openRequest('${r.id}')" style="opacity:.75"><div class="kref">${r.ref}</div><div class="kt">${r.country} · ${productByCode(r.productCode).label}</div><div class="kd">${r.obsoleteReason}</div></div>`).join("")}</div></div>`:"");
+  }).join("")+(exceptionList.length?`<div class="kcol"><div class="kcol-h"><span class="dot" style="background:var(--bad)"></span><span class="kn">Exceptions</span><span class="kc">${exceptionList.length}</span></div><div class="kcol-b">${exceptionList.map(r=>`<div class="kcard" onclick="openRequest('${r.id}')" style="opacity:.85"><div class="kref">${r.ref}</div><div class="kt">${r.country} · ${productByCode(r.productCode).label}</div><div style="margin:4px 0"><span class="pill bad">${stageById(r.stage).lab}</span></div><div class="kd">${r.obsoleteReason||r.gateReason||r.exceptionReason||""}</div></div>`).join("")}</div></div>`:"");
 }
 
 /* ================= NOUVELLE DEMANDE ================= */
@@ -1391,7 +1454,7 @@ function requestRow(r){
   return `<div class="card pad" style="margin-bottom:12px;cursor:pointer" onclick="openRequest('${r.id}')">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
       <div><div style="font-family:var(--serif);font-weight:700;font-size:17px;color:var(--green-800)">${r.ref}</div><div style="font-size:13px;color:var(--muted);margin-top:2px">${r.country} · ${productByCode(r.productCode).label} · ${r.qty} kg</div></div>
-      <span class="pill ${r.stage==='obsolete'?'bad':(stageIdx(r.stage)>=stageIdx('feedback')?'ok':'blue')}">${st.lab}</span>
+      <span class="pill ${isException(r.stage)?'bad':(stageIdx(r.stage)>=stageIdx('closed')?'ok':'blue')}">${st.lab}</span>
     </div>
     ${flags.length?`<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">${flags.map(f=>`<span class="pill ${f.c}">${f.t}</span>`).join("")}</div>`:""}
   </div>`;
@@ -1399,18 +1462,17 @@ function requestRow(r){
 
 /* ================= FILE COORDINATEUR ================= */
 function queueItems(){
-  return REQUESTS.filter(r=>["review","gate","stock","shipped"].includes(r.stage)||(r.stage==="delivered"&&!r.feedback));
+  return REQUESTS.filter(r=>["under_review","approved","stock_reserved","dispatched"].includes(r.stage)||(r.stage==="feedback_due"&&!r.feedback));
 }
 function renderQueue(){
   const groups=[
-    {k:"review",lab:"À router",ic:'<path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14"/>'},
-    {k:"gate",lab:"Contrôle réglementaire à statuer",ic:'<path d="M9 11l3 3L22 4"/>'},
-    {k:"stock",lab:"Stock à confirmer",ic:'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>'},
-    {k:"shipped",lab:"Réception à relancer",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
+    {k:"route",lab:"À router",ic:'<path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14"/>',test:r=>r.stage==="under_review"&&!r.routed},
+    {k:"gate",lab:"Contrôle réglementaire à statuer",ic:'<path d="M9 11l3 3L22 4"/>',test:r=>r.stage==="under_review"&&r.routed},
+    {k:"stock",lab:"Stock à confirmer",ic:'<path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>',test:r=>r.stage==="approved"||r.stage==="stock_reserved"},
+    {k:"shipped",lab:"Réception à relancer",ic:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',test:r=>r.stage==="dispatched"&&!r.receiptConfirmed},
   ];
   $("#queueBox").innerHTML=groups.map(g=>{
-    let items=REQUESTS.filter(r=>r.stage===g.k);
-    if(g.k==="shipped")items=items.filter(r=>!r.receiptConfirmed);
+    let items=REQUESTS.filter(g.test);
     if(!items.length)return "";
     return `<div class="queue-group"><h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px">${g.ic}</svg>${g.lab} <span class="pill blue">${items.length}</span></h4>
       ${items.map(r=>{
@@ -1435,18 +1497,39 @@ function setDoc(id,k,v){const r=REQUESTS.find(x=>x.id===id);r.docs[k]=v;openRequ
 
 /* ================= DETAIL DE DEMANDE ================= */
 function pipelineHtml(r){
+  if(isException(r.stage)){
+    const s=stageById(r.stage);
+    return `<div class="empty-flag bad" style="margin-bottom:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${s.ic}</svg><div><b>${s.lab}.</b> ${r.obsoleteReason||r.gateReason||r.exceptionReason||""}</div></div>`;
+  }
   const idx=stageIdx(r.stage);
   return `<div class="pipeline">${STAGES.map((s,i)=>`<div class="pstep ${i<idx?'done':i===idx?'cur':''}"><div class="pb"></div><div class="pd">${i<idx?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${s.ic}</svg>`}</div><div class="pl">${s.lab}</div></div>`).join("")}</div>`;
 }
+function cancelBtn(r){
+  if(ROLE!=="demandeur"||!["draft","needs_info","submitted"].includes(r.stage))return "";
+  return `<button class="btn ghost sm" style="margin-top:10px" onclick="cancelRequest('${r.id}')">Annuler la demande</button>`;
+}
 function actionPanel(r){
-  if(r.stage==="obsolete"){
-    return `<div class="empty-flag bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><div><b>Demande obsolète.</b> ${r.obsoleteReason}</div></div>
-    <button class="btn ghost sm" onclick="reopenRequest('${r.id}')">Relancer la demande</button>`;
+  if(isException(r.stage)){
+    const s=stageById(r.stage);
+    const reason=r.obsoleteReason||r.gateReason||r.exceptionReason||"—";
+    const canReopen=["unfulfilled","blocked","delivery_exception"].includes(r.stage);
+    return `<div class="empty-flag bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${s.ic}</svg><div><b>${s.lab}.</b> ${reason}</div></div>
+    ${canReopen?`<button class="btn ghost sm" onclick="reopenRequest('${r.id}')">${r.stage==="delivery_exception"?"Marquer résolu — débloquer le feedback":"Relancer la demande"}</button>`:""}`;
   }
-  if(r.stage==="review"){
+  if(r.stage==="draft"){
+    return `<div class="card pad soft"><div style="font-size:13px;color:var(--green-800);margin-bottom:10px">Brouillon non soumis — complétez le formulaire pour lancer le traitement.</div><button class="btn" onclick="submitDraft('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Soumettre la demande</button></div>${cancelBtn(r)}`;
+  }
+  if(r.stage==="needs_info"){
+    return `<div class="empty-flag" style="background:var(--amber-bg);border-color:#fde5b0;color:#7c4a06"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><div>${r.exceptionReason||"Informations manquantes — le demandeur doit compléter le dossier avant transmission au coordinateur."}</div></div>
+      <button class="btn amber" onclick="submitDraft('${r.id}')">Marquer complété et soumettre</button>${cancelBtn(r)}`;
+  }
+  if(r.stage==="submitted"){
+    return `<div style="color:var(--muted);font-size:13px;padding:6px 0">En attente de routage automatique vers un coordinateur — SLA non encore démarré.</div>${cancelBtn(r)}`;
+  }
+  if(r.stage==="under_review"&&!r.routed){
     return `<div class="card pad soft"><div style="font-size:13px;color:var(--green-800);margin-bottom:10px">Requête reçue, en attente d'assignation au contrôle réglementaire & qualité.</div><button class="btn" onclick="advanceToGate('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>Assigner et lancer le contrôle réglementaire</button></div>`;
   }
-  if(r.stage==="gate"){
+  if(r.stage==="under_review"&&r.routed){
     const rc=regChecks(r);
     const allDocs=DOC_KEYS.every(k=>r.docs[k]&&r.docs[k]!=="no");
     const canApprove=rc.allOk&&allDocs;
@@ -1459,20 +1542,24 @@ function actionPanel(r){
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">RI Check</div><div style="font-weight:700;color:var(--green-800);margin-bottom:14px">${r.riCheck||'À vérifier'}</div>
       <div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:8px" class="caps">Documents réglementaires requis</div>
       <div class="doc-grid" style="margin-bottom:14px">${DOC_KEYS.map(k=>docToggleHtml(r,k)).join("")}</div>
-      ${r.gateBlocked?`<div class="empty-flag bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg><div>${r.gateReason}</div></div>`:''}
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn bad" onclick="blockRequest('${r.id}')">⚠ Bloquer avec motif</button><button class="btn" ${canApprove?'':'disabled title="Homologation, cadmium, quantité et documents requis"'} onclick="approveGate('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Approuver le contrôle</button></div>`;
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn ghost sm" onclick="rejectRequest('${r.id}')">Rejeter</button><button class="btn bad" onclick="blockRequest('${r.id}')">⚠ Bloquer avec motif</button><button class="btn" ${canApprove?'':'disabled title="Homologation, cadmium, quantité et documents requis"'} onclick="approveGate('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Approuver le contrôle</button></div>`;
   }
-  if(r.stage==="stock"){
+  if(r.stage==="approved"){
     const stk=STOCK[r.productCode]; const ok=stk.available>=r.qty;
     return `<div class="card pad" style="margin-bottom:14px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Lecture SAP (lecture seule) — ${stk.sapRef}</div>
         <div class="stock-box"><div class="sv" style="color:${ok?'var(--green-800)':'var(--bad)'}">${stk.available} kg</div><div class="stock-gauge"><i style="width:${Math.min(stk.available/Math.max(r.qty,1)*100,100)}%;background:${ok?'var(--green-600)':'var(--bad)'}"></i></div><div style="font-size:12.5px;color:var(--muted);white-space:nowrap">besoin : ${r.qty} kg</div></div>
         <div style="font-size:12px;color:var(--muted);margin-top:9px">${ok?'Stock suffisant pour réserver intégralement cette demande.':'Stock insuffisant — estimation de production requise.'}</div>
       </div>
-      ${ok?`<button class="btn" onclick="reserveStock('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Réserver le stock et passer à la logistique</button>`
+      ${ok?`<button class="btn" onclick="reserveStock('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Réserver le stock</button>`
           :`<div class="field"><label>Délai de production estimé (semaines)</label><input type="number" id="prodWeeks" value="6" min="1"/></div><button class="btn amber" onclick="logProduction('${r.id}')">Enregistrer l'estimation et notifier le demandeur</button>`}`;
   }
-  if(r.stage==="shipped"&&!r.receiptConfirmed){
+  if(r.stage==="stock_reserved"){
+    return `<div class="card pad soft" style="margin-bottom:14px"><div style="font-size:13px;color:var(--green-800)">Stock réservé — sélectionnez le mode de transport pour confirmer l'expédition.</div></div>
+      <div class="field"><label>Mode de transport</label><select id="shipMethodSel"><option value="Container">Container (fret maritime)</option><option value="DHL">DHL (fret aérien)</option><option value="Camion">Camion (fret routier)</option></select></div>
+      <button class="btn" onclick="dispatchShipment('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/></svg>Confirmer l'expédition</button>`;
+  }
+  if(r.stage==="dispatched"&&!r.receiptConfirmed){
     return `<div class="card pad soft" style="margin-bottom:14px">
         <div class="frow"><div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Méthode</div><div style="font-weight:700">${r.shipMethod}</div></div><div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Référence de suivi</div><div style="font-weight:700">${r.trackingRef||'—'}</div></div></div>
         <div style="margin-top:9px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Expédiée le</div><div style="font-weight:700">${fmtDate(r.shipDate)} · ${daysBetween(r.shipDate,"2026-09-14")} j écoulés</div></div>
@@ -1480,7 +1567,7 @@ function actionPanel(r){
       <div class="field"><label>Confirmation de réception</label><div class="seg"><button class="on" id="recYes" onclick="setRecOk(true)">Reçu conforme</button><button id="recNo" onclick="setRecOk(false)">Problème à la réception</button></div></div>
       <button class="btn" onclick="confirmReceipt('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M20 6 9 17l-5-5"/></svg>Enregistrer la confirmation</button>`;
   }
-  if(r.stage==="delivered"&&!r.feedback){
+  if(r.stage==="feedback_due"&&!r.feedback){
     return `<div class="empty-flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg><div><b>Échantillon livré, aucun retour terrain enregistré.</b> Sans Crop Cart, cette information aurait été perdue — c'est exactement le trou que le module feedback comble.</div></div>
       <button class="btn amber block" onclick="closeModal();openFeedbackForm('${r.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Compléter le feedback terrain</button>`;
   }
@@ -1489,26 +1576,93 @@ function actionPanel(r){
     return `<div class="fb-card card"><div class="fh"><div class="fav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 2l2.4 7.4H22l-6 4.5 2.3 7.1L12 16.7 5.7 21l2.3-7.1-6-4.5h7.6z"/></svg></div><div><div style="font-weight:700">Retour terrain</div><div class="stars">${'★'.repeat(f.satisfaction)}${'☆'.repeat(5-f.satisfaction)}</div></div></div>
       <div style="font-size:13px;margin-bottom:6px"><b>Échantillon utilisé :</b> ${f.used}</div>
       <div style="font-size:13px;margin-bottom:6px"><b>Réponse agronomique :</b> ${f.cropResponse}</div>
-      <div style="font-size:13px;color:var(--green-800)"><b>Opportunité :</b> ${f.opportunity}</div></div>`;
+      <div style="font-size:13px;color:var(--green-800)"><b>Opportunité :</b> ${f.opportunity}</div>
+      ${r.nextAction?`<div style="font-size:13px;color:var(--green-900);margin-top:8px;padding-top:8px;border-top:1px solid var(--green-100)"><b>Prochaine action recommandée :</b> ${NEXT_ACTION_LABELS[r.nextAction]}
+        ${["convert","expand","repeat"].includes(r.nextAction)?(ROLE==="admin"?`<div style="margin-top:8px"><span class="pill ${r.adopted===true?'ok':r.adopted===false?'bad':'muted'}">${r.adopted===true?'Recommandation adoptée':r.adopted===false?'Non adoptée':'Adoption en attente'}</span> <button class="btn ghost sm" style="margin-left:8px" onclick="markAdopted('${r.id}',true)">Marquer adoptée</button><button class="btn ghost sm" onclick="markAdopted('${r.id}',false)">Marquer non adoptée</button></div>`:(r.adopted!=null?`<div style="margin-top:6px"><span class="pill ${r.adopted?'ok':'bad'}">${r.adopted?'Recommandation adoptée':'Non adoptée'}</span></div>`:"")):""}</div>`:""}</div>`;
   }
   return `<div style="color:var(--muted);font-size:13px;padding:10px 0">Aucune action requise — étape en cours de traitement.</div>`;
 }
+/* Historique de statuts synthétisé — responsable, date de décision et preuve à chaque jalon (point 31) */
+const STATE_OWNER={draft:"Demandeur",needs_info:"Demandeur",submitted:"Demandeur",under_review:"Coordinateur",approved:"Spécialiste réglementaire",stock_reserved:"Coordinateur",dispatched:"Coordinateur logistique",delivered:"Destinataire",feedback_due:"Demandeur",closed:"Coordinateur",rejected:"Coordinateur",blocked:"Spécialiste réglementaire",cancelled:"Demandeur",unfulfilled:"Coordinateur",delivery_exception:"Coordinateur logistique"};
+function evidenceFor(state,r){
+  switch(state){
+    case "submitted":return "Formulaire de demande structuré";
+    case "under_review":return r.routed?"Contrôle réglementaire & qualité en cours":"Routage automatique vers coordinateur — SLA démarré";
+    case "approved":return "Contrôle réglementaire conforme"+(r.riCheck?" (RI Check "+r.riCheck+")":"");
+    case "stock_reserved":return "Disponibilité confirmée (lecture SAP / saisie manuelle)";
+    case "dispatched":return r.trackingRef?("Expédition "+(r.shipMethod||"")+" — réf. "+r.trackingRef):"Expédition confirmée";
+    case "delivered":return r.receiptCondition?("Réception confirmée — "+r.receiptCondition):"Réception confirmée par le destinataire";
+    case "feedback_due":return "Formulaire de retour terrain débloqué";
+    case "closed":return r.feedback?("Retour terrain capturé — satisfaction "+r.feedback.satisfaction+"/5"):"—";
+    case "rejected":return r.exceptionReason||"Demande rejetée";
+    case "blocked":return r.gateReason||"Contrôle réglementaire bloquant";
+    case "cancelled":return r.exceptionReason||"Annulée par le demandeur";
+    case "unfulfilled":return r.obsoleteReason||"Aucun mouvement prolongé";
+    case "delivery_exception":return r.exceptionReason||"Incident signalé à la réception";
+    default:return "—";
+  }
+}
+function computeStatusHistory(r){
+  const path=[{state:"submitted",date:r.date}];
+  if(isException(r.stage)){
+    if(r.stage==="delivery_exception"){["under_review","approved","stock_reserved","dispatched"].forEach(s=>path.push({state:s,date:r.shipDate||r.date}));}
+    else if(r.stage!=="cancelled"){path.push({state:"under_review",date:r.date});}
+    path.push({state:r.stage,date:r.receiptDate||r.shipDate||r.date});
+  } else {
+    const order=["submitted","under_review","approved","stock_reserved","dispatched","delivered","feedback_due","closed"];
+    const idx=order.indexOf(r.stage);
+    for(let i=1;i<=idx;i++){
+      let d=r.date;
+      if(order[i]==="dispatched"&&r.shipDate)d=r.shipDate;
+      if((order[i]==="delivered"||order[i]==="feedback_due")&&r.receiptDate)d=r.receiptDate;
+      path.push({state:order[i],date:d});
+    }
+  }
+  return path.map(p=>({state:p.state,date:p.date,who:STATE_OWNER[p.state]||r.spoc,evidence:evidenceFor(p.state,r)}));
+}
+/* ================= TRAÇABILITÉ DE BOUT EN BOUT (point 33) ================= */
+function lotId(r){return "LOT-"+r.productCode.replace(/[^A-Z0-9]/gi,"").slice(0,8).toUpperCase()+"-"+r.ref.replace("REQ-","");}
+function traceabilityCoverage(r){
+  const checks=[!!r.date,!!r.spoc&&!!r.country,!!r.qty];
+  if(stageIdx(r.stage)>=stageIdx("dispatched")||r.stage==="delivery_exception")checks.push(!!r.trackingRef&&!!r.shipMethod);
+  if(stageIdx(r.stage)>=stageIdx("feedback_due")||r.stage==="closed")checks.push(!!r.receiptCondition);
+  const ok=checks.filter(Boolean).length;
+  return {ok,total:checks.length,complete:ok===checks.length};
+}
+function traceabilityKpi(){
+  const results=REQUESTS.map(traceabilityCoverage);
+  const complete=results.filter(r=>r.complete).length;
+  return {complete,total:REQUESTS.length,rate:REQUESTS.length?Math.round(complete/REQUESTS.length*100):0};
+}
+function findSimilarPastRequests(r){
+  return REQUESTS.filter(x=>x.id!==r.id&&x.country===r.country&&x.productCode===r.productCode&&x.feedback);
+}
+function traceabilityHtml(r){
+  const tc=traceabilityCoverage(r);
+  const route=[HUB_LATLON?"Jorf Lasfar (hub)":"",r.shipMethod?TRANSPORT_LABEL[r.shipMethod]||r.shipMethod:null,r.country].filter(Boolean).join(" → ");
+  const similar=findSimilarPastRequests(r);
+  return `<div class="card pad" style="margin:16px 0">
+    <div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:14px">Fiche de traçabilité</h3><span class="pill ${tc.complete?'ok':'warn'}">${tc.ok}/${tc.total} — ${tc.complete?'Chaîne complète':'Chaîne partielle'}</span></div>
+    <div class="frow">
+      <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Identité du lot</div><div style="font-weight:700;font-family:var(--serif)">${lotId(r)}</div></div>
+      <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Quantité</div><div style="font-weight:700">${r.qty} kg</div></div>
+      <div><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Destinataire</div><div style="font-weight:700">${r.spoc} — ${r.country}</div></div>
+    </div>
+    <div style="margin-top:10px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Itinéraire d'exécution</div><div style="font-weight:600;font-size:13px">${route||"Non encore déterminé"}${r.trackingRef?" · réf. "+r.trackingRef:""}</div></div>
+    <div style="margin-top:10px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted)">Preuve</div><div style="font-weight:600;font-size:13px">${r.receiptCondition?"Réception "+r.receiptCondition+(r.receiptDate?" le "+fmtDate(r.receiptDate):""):"Confirmation de réception en attente"}</div></div>
+    ${similar.length?`<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Cas antérieurs similaires — ${r.country} × ${productByCode(r.productCode).label}</div>
+      ${similar.map(s=>`<div class="queue-row" onclick="closeModal();openRequest('${s.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${ICONS.microscope}</svg></div><div class="qm"><div class="qt">${s.ref} — satisfaction ${s.feedback.satisfaction}/5</div><div class="qd">${s.feedback.cropResponse}</div></div></div>`).join("")}
+      </div>`:""}
+  </div>`;
+}
 function openRequest(id){
   const r=REQUESTS.find(x=>x.id===id); const p=productByCode(r.productCode);
-  const trail=[
-    {lab:"Soumise",who:r.spoc,d:r.date,done:true},
-    stageIdx(r.stage)>=stageIdx("review")?{lab:"Routée vers coordinateur",who:"Système",d:r.date,done:true}:null,
-    stageIdx(r.stage)>=stageIdx("gate")?{lab:"Contrôle réglementaire & qualité",who:CURRENT_USER.coord.nom,d:r.date,done:stageIdx(r.stage)>stageIdx("gate")}:null,
-    stageIdx(r.stage)>=stageIdx("stock")?{lab:"Vérification stock",who:CURRENT_USER.coord.nom,d:r.date,done:stageIdx(r.stage)>stageIdx("stock")}:null,
-    r.shipDate?{lab:"Expédiée — "+r.shipMethod+" ("+(r.trackingRef||'réf. en attente')+")",who:CURRENT_USER.coord.nom,d:r.shipDate,done:true}:null,
-    r.receiptConfirmed?{lab:"Réception confirmée — "+r.receiptCondition,who:r.spoc,d:r.receiptDate,done:true}:null,
-    r.feedback?{lab:"Retour terrain complété",who:r.spoc,d:r.receiptDate,done:true}:null,
-  ].filter(Boolean);
+  const trail=computeStatusHistory(r);
   const dc=docCompleteness(r);
   $("#modalHost").innerHTML=`<div class="modal wide">
     <div class="m-head">
       <div><h3>${r.ref}</h3><p>${r.country} · ${p.label} · ${r.qty} kg · ${r.spoc}</p></div>
-      <span class="pill ${r.stage==='obsolete'?'bad':'blue'}" style="margin-top:2px">${stageById(r.stage).lab}</span>
+      <span class="pill ${isException(r.stage)?'bad':'blue'}" style="margin-top:2px">${stageById(r.stage).lab}</span>
       <button class="m-x" onclick="closeModal()">✕</button>
     </div>
     <div class="m-body">
@@ -1519,26 +1673,103 @@ function openRequest(id){
       </div>
       <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Action</div>
       ${actionPanel(r)}
-      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px">Audit trail</div>
-      ${trail.map(n=>`<div class="audit"><div class="ad" style="background:${n.done?'var(--green-600)':'#fff'};border:${n.done?'none':'1.5px solid var(--line)'}"></div><div><div class="at">${n.lab} <span style="font-weight:400;color:var(--muted)">— ${n.who}</span></div><div class="atm">${fmtDate(n.d)}</div></div></div>`).join("")}
+      <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px">Historique de statuts — responsable, date, preuve</div>
+      ${trail.map(n=>`<div class="audit"><div class="ad" style="background:var(--green-600)"></div><div><div class="at">${stageById(n.state).lab} <span style="font-weight:400;color:var(--muted)">— ${n.who}</span></div><div class="atm">${fmtDate(n.date)} · ${n.evidence}</div></div></div>`).join("")}
+      ${traceabilityHtml(r)}
     </div>
     <div class="m-foot"><button class="btn ghost" onclick="closeModal()">Fermer</button></div>
   </div>`;
   $("#scrim").classList.add("open");
 }
-function reopenRequest(id){const r=REQUESTS.find(x=>x.id===id);r.stage="review";toast("Demande relancée — nouveau SLA démarré","→");AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Relance manuelle",det:r.ref+" — sortie du statut obsolète"});closeModal();refreshAll();}
-function advanceToGate(id){const r=REQUESTS.find(x=>x.id===id);r.stage="gate";AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Routage effectué",det:r.ref+" assignée — contrôle réglementaire démarré"});toast("Assignée — contrôle réglementaire démarré","→");openRequest(id);refreshAll();}
-function approveGate(id){const r=REQUESTS.find(x=>x.id===id);r.stage="stock";r.gateBlocked=false;AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Contrôle réglementaire approuvé",det:r.ref});toast("Contrôle approuvé — passage au stock","●");openRequest(id);refreshAll();}
-function blockRequest(id){const r=REQUESTS.find(x=>x.id===id);const reason=prompt("Motif du blocage :","Documents réglementaires manquants");if(!reason)return;r.gateBlocked=true;r.gateReason=reason;AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Demande bloquée",det:r.ref+" — "+reason});toast("Demandeur notifié du blocage","⚠",true);openRequest(id);refreshAll();}
-function reserveStock(id){const r=REQUESTS.find(x=>x.id===id);STOCK[r.productCode].available-=r.qty;r.stage="shipped";r.shipDate="2026-09-14";r.shipMethod=r.shipMethod||"Container";r.trackingRef="TRK-"+Math.floor(100000+Math.random()*899999);AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Stock réservé et expédition enregistrée",det:r.ref+" — "+r.trackingRef});toast("Stock réservé — expédition enregistrée","●");openRequest(id);refreshAll();}
-function logProduction(id){const w=$("#prodWeeks")?$("#prodWeeks").value:6;const r=REQUESTS.find(x=>x.id===id);AUDIT.unshift({d:"2026-09-14 —",who:CURRENT_USER.coord.nom,act:"Estimation de production enregistrée",det:r.ref+" — délai estimé "+w+" semaines, demandeur notifié"});toast("Demandeur notifié du délai de production estimé");openRequest(id);}
+function reopenRequest(id){
+  const r=REQUESTS.find(x=>x.id===id); const prevLab=stageById(r.stage).lab;
+  if(r.stage==="delivery_exception"){
+    r.stage="feedback_due";r.receiptCondition="Conforme après résolution";
+    AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Incident résolu",det:r.ref+" — passage au retour terrain"});
+    toast("Incident résolu — retour terrain débloqué","●");
+  } else {
+    r.stage="under_review";r.routed=true;r.gateBlocked=false;
+    AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Relance manuelle",det:r.ref+" — sortie du statut "+prevLab});
+    toast("Demande relancée — nouveau SLA démarré","→");
+  }
+  closeModal();refreshAll();
+}
+function submitDraft(id){const r=REQUESTS.find(x=>x.id===id);r.stage="under_review";r.routed=false;AUDIT.unshift({d:"2026-09-18 —",who:r.spoc,act:"Demande soumise",det:r.ref+" — routage automatique effectué, SLA démarré"});toast("Demande soumise — routée automatiquement vers un coordinateur","●");openRequest(id);refreshAll();}
+function cancelRequest(id){const r=REQUESTS.find(x=>x.id===id);const reason=prompt("Motif d'annulation :","Besoin réévalué en interne");if(!reason)return;r.stage="cancelled";r.exceptionReason=reason;AUDIT.unshift({d:"2026-09-18 —",who:r.spoc,act:"Demande annulée",det:r.ref+" — "+reason});toast("Demande annulée",null,true);closeModal();refreshAll();}
+function rejectRequest(id){const r=REQUESTS.find(x=>x.id===id);const reason=prompt("Motif du rejet :","Besoin non éligible au périmètre Lane 1");if(!reason)return;r.stage="rejected";r.exceptionReason=reason;AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Demande rejetée",det:r.ref+" — "+reason});toast("Demandeur notifié du rejet",null,true);openRequest(id);refreshAll();}
+function advanceToGate(id){const r=REQUESTS.find(x=>x.id===id);r.routed=true;AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Routage effectué",det:r.ref+" assignée — contrôle réglementaire démarré"});toast("Assignée — contrôle réglementaire démarré","→");openRequest(id);refreshAll();}
+function approveGate(id){const r=REQUESTS.find(x=>x.id===id);r.stage="approved";r.gateBlocked=false;AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Contrôle réglementaire approuvé",det:r.ref});toast("Contrôle approuvé — vérification stock","●");openRequest(id);refreshAll();}
+function blockRequest(id){const r=REQUESTS.find(x=>x.id===id);const reason=prompt("Motif du blocage :","Documents réglementaires manquants");if(!reason)return;r.stage="blocked";r.gateBlocked=true;r.gateReason=reason;AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Demande bloquée",det:r.ref+" — "+reason});toast("Demandeur notifié du blocage","⚠",true);openRequest(id);refreshAll();}
+function reserveStock(id){const r=REQUESTS.find(x=>x.id===id);STOCK[r.productCode].available-=r.qty;r.stage="stock_reserved";AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Stock réservé",det:r.ref+" — disponibilité confirmée"});toast("Stock réservé — logistique à organiser","●");openRequest(id);refreshAll();}
+function logProduction(id){const w=$("#prodWeeks")?$("#prodWeeks").value:6;const r=REQUESTS.find(x=>x.id===id);AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Estimation de production enregistrée",det:r.ref+" — délai estimé "+w+" semaines, demandeur notifié"});toast("Demandeur notifié du délai de production estimé");openRequest(id);}
+function dispatchShipment(id){
+  const method=$("#shipMethodSel")?$("#shipMethodSel").value:"Container";
+  const r=REQUESTS.find(x=>x.id===id);
+  r.stage="dispatched";r.shipDate="2026-09-18";r.shipMethod=method;r.trackingRef="TRK-"+Math.floor(100000+Math.random()*899999);
+  AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.coord.nom,act:"Expédition enregistrée",det:r.ref+" — "+method+" · "+r.trackingRef});
+  toast("Expédition enregistrée — suivi activé","●");openRequest(id);refreshAll();
+}
 let recOk=true;
 function setRecOk(v){recOk=v;const y=$("#recYes"),n=$("#recNo");if(y){y.classList.toggle("on",v);n.classList.toggle("on",!v);}}
-function confirmReceipt(id){const r=REQUESTS.find(x=>x.id===id);r.receiptConfirmed=true;r.receiptDate="2026-09-14";r.receiptCondition=recOk?"Conforme":"Anomalie signalée";r.stage="delivered";AUDIT.unshift({d:"2026-09-14 —",who:r.spoc,act:"Réception confirmée",det:r.ref+" — "+r.receiptCondition});toast("Réception confirmée — formulaire de feedback débloqué","●");openRequest(id);refreshAll();}
+function confirmReceipt(id){
+  const r=REQUESTS.find(x=>x.id===id);
+  r.receiptConfirmed=true;r.receiptDate="2026-09-18";
+  if(recOk===false){
+    r.stage="delivery_exception";r.receiptCondition="Anomalie signalée";r.exceptionReason="Anomalie signalée à la réception — investigation en cours.";
+    AUDIT.unshift({d:"2026-09-18 —",who:r.spoc,act:"Incident de livraison signalé",det:r.ref});
+    toast("Incident de livraison enregistré",null,true);
+  } else {
+    r.receiptCondition="Conforme";r.stage="feedback_due";
+    AUDIT.unshift({d:"2026-09-18 —",who:r.spoc,act:"Réception confirmée",det:r.ref+" — Conforme"});
+    toast("Réception confirmée — formulaire de feedback débloqué","●");
+  }
+  openRequest(id);refreshAll();
+}
 
 /* ================= FEEDBACK ================= */
+/* ================= MOTEUR DE RELANCES AUTOMATIQUES (point 32) ================= */
+const FOLLOWUP_REMINDER_DAYS=7,FOLLOWUP_ESCALATE_DAYS=21;
+function followupStatus(r){
+  if(r.stage!=="feedback_due")return null;
+  const days=daysBetween(r.receiptDate||r.shipDate||r.date,"2026-09-18");
+  if(r.escalatedAt)return {level:"escalated",days};
+  if(days>=FOLLOWUP_ESCALATE_DAYS)return {level:"due_escalate",days};
+  if(days>=FOLLOWUP_REMINDER_DAYS)return {level:"reminder",days};
+  return {level:"pending",days};
+}
+function followupQueue(){return REQUESTS.filter(r=>r.stage==="feedback_due").map(r=>({r,fu:followupStatus(r)})).sort((a,b)=>b.fu.days-a.fu.days);}
+function sendReminder(id){
+  const r=REQUESTS.find(x=>x.id===id);
+  r.reminderCount=(r.reminderCount||0)+1;r.lastReminderAt="2026-09-18";
+  AUDIT.unshift({d:"2026-09-18 —",who:"Système",act:"Relance automatique envoyée",det:r.ref+" — rappel #"+r.reminderCount+" au demandeur "+r.spoc});
+  toast("Relance envoyée à "+r.spoc,"●");renderFeedbackView();
+}
+function escalateFollowup(id){
+  const r=REQUESTS.find(x=>x.id===id);
+  r.escalatedAt="2026-09-18";r.escalatedTo=CURRENT_USER.coord.nom;
+  AUDIT.unshift({d:"2026-09-18 —",who:"Système",act:"Retour terrain escaladé",det:r.ref+" — sans réponse depuis "+daysBetween(r.receiptDate||r.shipDate||r.date,"2026-09-18")+" j, escaladé à "+r.escalatedTo});
+  toast("Escaladé à "+r.escalatedTo,"⚠",true);renderFeedbackView();
+}
+function renderFollowup(){
+  const q=followupQueue(); const box=$("#followupBox");
+  if(!q.length){box.style.display="none";return;}
+  box.style.display="";
+  box.innerHTML=`<div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:15px">Moteur de relances automatiques</h3><span class="hint">J+${FOLLOWUP_REMINDER_DAYS} rappel · J+${FOLLOWUP_ESCALATE_DAYS} escalade au coordinateur</span></div>`+
+    q.map(({r,fu})=>{
+      const cls=fu.level==="escalated"||fu.level==="due_escalate"?"bad":fu.level==="reminder"?"warn":"blue";
+      const label=fu.level==="escalated"?"Escaladé à "+r.escalatedTo:fu.level==="due_escalate"?"À escalader":fu.level==="reminder"?"Rappel dû":"Dans les délais";
+      return `<div class="queue-row" onclick="openRequest('${r.id}')">
+        <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${ICONS.star}</svg></div>
+        <div class="qm"><div class="qt">${r.ref} — ${r.country}</div><div class="qd">${r.spoc} · J+${fu.days}${r.reminderCount?" · "+r.reminderCount+" relance(s) envoyée(s)":""}</div></div>
+        <span class="pill ${cls}">${label}</span>
+        ${fu.level!=="escalated"?`<button class="btn ghost sm" style="margin-left:8px" onclick="event.stopPropagation();sendReminder('${r.id}')">Relancer</button>`:""}
+        ${fu.level==="due_escalate"?`<button class="btn bad sm" style="margin-left:6px" onclick="event.stopPropagation();escalateFollowup('${r.id}')">Escalader</button>`:""}
+      </div>`;
+    }).join("");
+}
 function renderFeedbackView(){
-  const eligible=REQUESTS.filter(r=>["shipped","delivered","feedback"].includes(r.stage));
+  renderFollowup();
+  const eligible=REQUESTS.filter(r=>["dispatched","delivered","feedback_due","closed"].includes(r.stage));
   const withFb=eligible.filter(r=>r.feedback).length;
   $("#fbKpis").innerHTML=[
     [eligible.length,"Échantillons livrés/expédiés suivis"],
@@ -1578,9 +1809,10 @@ function saveFeedback(id){
   const r=REQUESTS.find(x=>x.id===id);
   const resp=$("#fb-resp").value.trim()||"Observation en cours de consolidation.";
   r.feedback={used:$("#fb-used").value,cropResponse:resp,satisfaction:fbSat,opportunity:$("#fb-opp").value.trim()||"Aucune opportunité identifiée à ce stade."};
-  r.stage="feedback";
-  AUDIT.unshift({d:"2026-09-14 —",who:r.spoc,act:"Feedback terrain complété",det:r.ref+" — satisfaction "+fbSat+"/5"});
-  closeModal(); toast("Retour terrain enregistré — dashboard mis à jour","●"); refreshAll();
+  r.nextAction=computeNextAction(r);
+  r.stage="closed";
+  AUDIT.unshift({d:"2026-09-14 —",who:r.spoc,act:"Feedback terrain complété",det:r.ref+" — satisfaction "+fbSat+"/5 · action suivante : "+NEXT_ACTION_LABELS[r.nextAction]});
+  closeModal(); toast("Retour terrain enregistré — boucle Crop Cart clôturée","●"); refreshAll();
 }
 
 /* ================= CATALOGUE ================= */
@@ -1631,6 +1863,80 @@ function renderFormulesLib(){
       </div>`:""}
     </div>`;
   }).join("")+`<div class="card pad" style="grid-column:1/-1;background:var(--amber-bg);border-color:#fde5b0"><div style="font-size:12.5px;color:#7c4a06"><b>Passeports illustratifs.</b> Dates d'homologation, durée de validité et seuils d'humidité sont configurés à titre représentatif — à connecter au référentiel Regulatory Affairs / Quality OCP officiel avant mise en production.</div></div>`;
+}
+
+/* ================= ANALYSE SOL (point 30) ================= */
+// Profils de sol de laboratoire — illustratifs, à connecter au réseau de stations agronomiques réel.
+const SOIL_PROFILES={
+  Ghana:{ph:5.8,texture:"Argilo-sableux",organicMatter:2.1,moisture:22,type:"Sol ferralitique"},
+  Poland:{ph:6.6,texture:"Limoneux",organicMatter:1.8,moisture:18,type:"Sol brun lessivé"},
+  Bresil:{ph:5.2,texture:"Argileux tropical",organicMatter:2.6,moisture:26,type:"Ferralsol"},
+  Cameroun:{ph:5.5,texture:"Ferralitique",organicMatter:2.3,moisture:24,type:"Sol ferralitique"},
+  Kenya:{ph:6.1,texture:"Volcanique",organicMatter:3.2,moisture:20,type:"Andosol volcanique"},
+  Nigeria:{ph:5.9,texture:"Sablo-argileux",organicMatter:1.6,moisture:19,type:"Sol ferrugineux tropical"},
+  "Côte d'Ivoire":{ph:5.6,texture:"Ferralitique",organicMatter:2.4,moisture:23,type:"Sol ferralitique"},
+  France:{ph:6.8,texture:"Limono-argileux",organicMatter:2.0,moisture:17,type:"Sol brun calcaire"},
+  Argentina:{ph:6.3,texture:"Limoneux profond",organicMatter:3.5,moisture:21,type:"Mollisol (pampa)"},
+  Germany:{ph:6.5,texture:"Limoneux",organicMatter:1.9,moisture:16,type:"Sol brun lessivé"},
+  Ethiopia:{ph:5.7,texture:"Volcanique",organicMatter:2.8,moisture:19,type:"Andosol volcanique d'altitude"},
+  "South Africa":{ph:6.0,texture:"Sablo-limoneux",organicMatter:1.5,moisture:15,type:"Sol ferrallitique"},
+  Indonesia:{ph:5.4,texture:"Argileux volcanique",organicMatter:3.0,moisture:28,type:"Andosol irrigué"},
+  Vietnam:{ph:5.3,texture:"Argilo-limoneux",organicMatter:2.7,moisture:27,type:"Sol alluvial"},
+};
+const SOIL_AXES=[
+  {k:"ph",lab:"pH"},
+  {k:"humidite",lab:"Humidité"},
+  {k:"cadmium",lab:"Cadmium"},
+  {k:"matiereOrg",lab:"Mat. organique"},
+  {k:"homologation",lab:"Homologation"},
+];
+function soilCompatScore(p,country){
+  const soil=SOIL_PROFILES[country]; if(!soil)return null;
+  const phScore=Math.max(0,Math.min(100,100-Math.abs(soil.ph-6.2)*40));
+  const mLim=MOISTURE_LIMITS[country];
+  const humScore=mLim==null?85:Math.max(0,Math.min(100,100-Math.max(0,p.moisture-mLim)*30));
+  const cdLim=CD_LIMITS[country];
+  const cdScore=cdLim==null?90:Math.max(0,Math.min(100,100-Math.max(0,p.cdContent-cdLim)*2));
+  const omScore=Math.max(0,Math.min(100,soil.organicMatter*28));
+  const homScore=p.approved.includes(country)?100:20;
+  return {ph:Math.round(phScore),humidite:Math.round(humScore),cadmium:Math.round(cdScore),matiereOrg:Math.round(omScore),homologation:homScore};
+}
+function renderSoil(){
+  const countrySel=$("#sol-country"), productSel=$("#sol-product");
+  if(countrySel.options.length===0)countrySel.innerHTML=Object.keys(SOIL_PROFILES).map(c=>`<option>${c}</option>`).join("");
+  if(productSel.options.length===0)productSel.innerHTML=PRODUCTS.map(p=>`<option value="${p.code}">${p.label}</option>`).join("");
+  const country=countrySel.value||Object.keys(SOIL_PROFILES)[0];
+  const p=productByCode(productSel.value)||PRODUCTS[0];
+  const soil=SOIL_PROFILES[country];
+  $("#soilProfileBox").innerHTML=`<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px">${country} — ${soil.type}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
+      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">pH</div><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--green-800)">${soil.ph}</div></div>
+      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Humidité sol</div><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--green-800)">${soil.moisture}%</div></div>
+      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Texture</div><div style="font-weight:600">${soil.texture}</div></div>
+      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Mat. organique</div><div style="font-weight:600">${soil.organicMatter}%</div></div>
+    </div>`;
+  const scores=soilCompatScore(p,country);
+  const cx=160,cy=155,R=110,n=SOIL_AXES.length;
+  const pts=SOIL_AXES.map((a,i)=>{const ang=(i/n)*2*Math.PI-Math.PI/2;return {ang,x:cx+R*Math.cos(ang),y:cy+R*Math.sin(ang)};});
+  let svg="";
+  [0.25,0.5,0.75,1].forEach(f=>{
+    const ring=pts.map(pt=>`${(cx+(pt.x-cx)*f).toFixed(1)},${(cy+(pt.y-cy)*f).toFixed(1)}`).join(" ");
+    svg+=`<polygon points="${ring}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
+  });
+  pts.forEach(pt=>svg+=`<line x1="${cx}" y1="${cy}" x2="${pt.x.toFixed(1)}" y2="${pt.y.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`);
+  const valPts=SOIL_AXES.map((a,i)=>{const s=scores[a.k]/100;return {x:cx+(pts[i].x-cx)*s,y:cy+(pts[i].y-cy)*s};});
+  svg+=`<polygon points="${valPts.map(v=>v.x.toFixed(1)+","+v.y.toFixed(1)).join(" ")}" fill="var(--green-600)" fill-opacity=".35" stroke="var(--green-700)" stroke-width="2"/>`;
+  valPts.forEach(v=>svg+=`<circle cx="${v.x.toFixed(1)}" cy="${v.y.toFixed(1)}" r="3.5" fill="var(--green-800)"/>`);
+  SOIL_AXES.forEach((a,i)=>{
+    const labelR=R+26; const lx=cx+labelR*Math.cos(pts[i].ang), ly=cy+labelR*Math.sin(pts[i].ang);
+    const anchor=Math.cos(pts[i].ang)>0.3?"start":Math.cos(pts[i].ang)<-0.3?"end":"middle";
+    svg+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" font-size="10.5" font-weight="700" fill="var(--ink)">${a.lab} · ${scores[a.k]}</text>`;
+  });
+  $("#soilRadar").innerHTML=svg;
+  const overall=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/SOIL_AXES.length);
+  const rc=regChecks({country,productCode:p.code,qty:1});
+  $("#soilRegBox").innerHTML=`<div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:15px">Lecture combinée — score global ${overall}/100</h3><span class="pill ${overall>=70?'ok':overall>=45?'warn':'bad'}">${overall>=70?'Compatible':overall>=45?'Vigilance':'Non recommandé'}</span></div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:8px">${p.label} sur ${country} (${soil.type}, pH ${soil.ph}) — ${rc.registered?"produit homologué pour ce marché":"produit non homologué pour ce marché à ce jour"}${rc.cdLimit!=null?(rc.cdOk?", teneur cadmium conforme au plafond local":", teneur cadmium au-delà du plafond local — envisager une variante Low Cd"):""}.</p>`;
 }
 
 /* ================= INTEGRATIONS ================= */
@@ -1731,7 +2037,7 @@ function openGlobeCountry(country){
     ${best?`<div class="empty-flag" style="background:var(--green-50);border-color:var(--green-100);color:var(--green-800)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${cropIcon(best.crop)}</svg><div>Culture la plus performante : <b>${best.crop}</b> (${best.product}) — satisfaction ${best.satisfaction}/5, réf. ${best.ref}</div></div>`:""}
     ${testi.map(t=>`<div class="empty-flag ${t.s==='neg'?'bad':''}" style="background:${t.s==='neg'?'':'var(--green-50)'};border-color:${t.s==='neg'?'':'var(--green-100)'};color:${t.s==='neg'?'':'var(--green-800)'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div>« ${t.q} »<div style="font-size:11px;margin-top:3px;opacity:.8">— ${t.who}</div></div></div>`).join("")}
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin:12px 0 8px">Demandes liées</div>
-    ${list.map(r=>`<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div><div class="qm"><div class="qt">${r.ref} — ${productByCode(r.productCode).label}</div><div class="qd">${r.crop} · ${r.qty} kg</div></div><span class="pill ${stageIdx(r.stage)>=stageIdx('feedback')?'ok':'blue'}">${stageById(r.stage).lab}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:10px 0">Aucune demande enregistrée pour ce marché.</div>'}
+    ${list.map(r=>`<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 7h-7l-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg></div><div class="qm"><div class="qt">${r.ref} — ${productByCode(r.productCode).label}</div><div class="qd">${r.crop} · ${r.qty} kg</div></div><span class="pill ${stageIdx(r.stage)>=stageIdx('closed')?'ok':'blue'}">${stageById(r.stage).lab}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:10px 0">Aucune demande enregistrée pour ce marché.</div>'}
   </div>`;
 }
 
@@ -1758,6 +2064,18 @@ function formulaRankings(){
     .sort((a,b)=>b.avg-a.avg||b.n-a.n);
 }
 function isCommercialOpportunity(fb){return fb&&fb.opportunity&&!/^aucune/i.test(fb.opportunity.trim());}
+/* Boucle Crop Cart (point 28) — la demande ne se CLÔTURE que si le retour terrain a été converti en
+   apprentissage réutilisable, matérialisé par une action suivante calculée automatiquement. */
+const NEXT_ACTION_LABELS={repeat:"Répéter l'essai",convert:"Convertir en opportunité commerciale",expand:"Étendre à d'autres marchés",investigate:"Investiguer la cause racine",stop:"Arrêter — non concluant"};
+function computeNextAction(r){
+  if(!r.feedback)return null;
+  const f=r.feedback, commercial=isCommercialOpportunity(f);
+  if(f.satisfaction>=4&&commercial)return "convert";
+  if(f.satisfaction>=4&&!commercial)return "expand";
+  if(f.satisfaction===3)return "repeat";
+  if(f.satisfaction<=2)return commercial?"investigate":"stop";
+  return "repeat";
+}
 function accountRankings(){
   const bySpoc={};
   REQUESTS.forEach(r=>{
@@ -1785,8 +2103,8 @@ function renderRankings(){
 /* ================= GÉNÉRATEUR DE RAPPORT ================= */
 function ownerFor(r){
   if(r.gateBlocked)return "Direction";
-  if(r.stage==="shipped"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45)return "Direction";
-  if(r.stage==="delivered"&&!r.feedback)return "Demandeur";
+  if(r.stage==="dispatched"&&!r.receiptConfirmed&&daysBetween(r.shipDate,"2026-09-14")>45)return "Direction";
+  if(r.stage==="feedback_due"&&!r.feedback)return "Demandeur";
   return "Coordinateur (Crop Cart)";
 }
 function urgencyFor(r){
@@ -1871,7 +2189,72 @@ function openReportModal(){
 }
 
 /* ================= INTELLIGENCE TERRAIN ================= */
+/* ================= BOUCLE CROP CART — 12 ÉTAPES (point 28) ================= */
+const LOOP_STEPS=[
+  {k:"need",lab:"Besoin",desc:"Identification terrain du besoin agronomique ou commercial"},
+  {k:"capture",lab:"Capture",desc:"Saisie structurée — formulaire d'intake Crop Cart"},
+  {k:"match",lab:"Mise en correspondance",desc:"Sélection d'un produit homologué (Lane 1) adapté au besoin"},
+  {k:"request",lab:"Demande",desc:"Demande formalisée — SPOC, BU, priorité renseignés"},
+  {k:"availability",lab:"Disponibilité",desc:"Vérification stock SAP ou faisabilité production"},
+  {k:"gates",lab:"Contrôles",desc:"Gate réglementaire & qualité — homologation, cadmium, documents"},
+  {k:"route",lab:"Routage",desc:"Assignation automatique au coordinateur, SLA démarré"},
+  {k:"fulfill",lab:"Exécution",desc:"Réservation stock, logistique, expédition"},
+  {k:"receipt",lab:"Réception",desc:"Confirmation de réception par le destinataire"},
+  {k:"followup",lab:"Suivi",desc:"Relance automatique du retour terrain"},
+  {k:"intelligence",lab:"Intelligence",desc:"Retour terrain structuré, classements, réalisations clés"},
+  {k:"action",lab:"Action",desc:"Décision : répliquer, convertir, étendre, investiguer ou arrêter"},
+];
+function loopStepCount(k){
+  switch(k){
+    case "need": return REQUESTS.length;
+    case "capture": return REQUESTS.filter(r=>r.stage!=="draft").length;
+    case "match": case "request": return REQUESTS.filter(r=>!["draft","needs_info"].includes(r.stage)).length;
+    case "availability": return REQUESTS.filter(r=>stageIdx(r.stage)>=stageIdx("approved")||["blocked","rejected","delivery_exception"].includes(r.stage)).length;
+    case "gates": return REQUESTS.filter(r=>(r.stage==="under_review"&&r.routed)||stageIdx(r.stage)>=stageIdx("approved")||r.stage==="blocked"||r.stage==="rejected").length;
+    case "route": return REQUESTS.filter(r=>r.stage==="under_review"||stageIdx(r.stage)>=stageIdx("approved")).length;
+    case "fulfill": return REQUESTS.filter(r=>stageIdx(r.stage)>=stageIdx("stock_reserved")||r.stage==="delivery_exception").length;
+    case "receipt": return REQUESTS.filter(r=>r.receiptConfirmed).length;
+    case "followup": return REQUESTS.filter(r=>r.stage==="feedback_due"||r.stage==="closed").length;
+    case "intelligence": return REQUESTS.filter(r=>r.feedback).length;
+    case "action": return REQUESTS.filter(r=>r.nextAction).length;
+    default: return 0;
+  }
+}
+function renderLoop(){
+  const el=$("#loopSvg"); if(!el)return;
+  const cx=210,cy=210,R=160,n=LOOP_STEPS.length;
+  let svg=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--green-100)" stroke-width="24"/>`;
+  const pts=LOOP_STEPS.map((s,i)=>{
+    const a=(i/n)*2*Math.PI-Math.PI/2;
+    return {x:cx+R*Math.cos(a),y:cy+R*Math.sin(a),a};
+  });
+  svg+=`<path d="M ${pts.map(p=>p.x.toFixed(1)+","+p.y.toFixed(1)).join(" L ")} Z" fill="none" stroke="var(--green-700)" stroke-width="2" stroke-dasharray="1 13" stroke-linecap="round"/>`;
+  LOOP_STEPS.forEach((s,i)=>{
+    const p=pts[i]; const n2=pts[(i+1)%n];
+    const mx=(p.x+n2.x)/2, my=(p.y+n2.y)/2;
+    const dx=mx-cx, dy=my-cy, len=Math.hypot(dx,dy);
+    const ax=cx+dx/len*R, ay=cy+dy/len*R;
+    svg+=`<path d="M${ax.toFixed(1)},${ay.toFixed(1)}l-4,-7l8,0z" fill="var(--green-600)" transform="rotate(${(Math.atan2(dy,dx)*180/Math.PI+90).toFixed(1)} ${ax.toFixed(1)} ${ay.toFixed(1)})"/>`;
+  });
+  const maxCount=Math.max(1,...LOOP_STEPS.map(s=>loopStepCount(s.k)));
+  LOOP_STEPS.forEach((s,i)=>{
+    const p=pts[i]; const count=loopStepCount(s.k); const isAction=s.k==="action";
+    const labelR=R+34;
+    const lx=cx+labelR*Math.cos(p.a), ly=cy+labelR*Math.sin(p.a);
+    const anchor=Math.cos(p.a)>0.3?"start":Math.cos(p.a)<-0.3?"end":"middle";
+    svg+=`<g style="cursor:default"><title>${s.lab} — ${s.desc} (${count} demande(s))</title>
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="13" fill="${isAction?'var(--green-900)':'var(--green-700)'}" stroke="#fff" stroke-width="2"/>
+      <text x="${p.x.toFixed(1)}" y="${(p.y+3.5).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">${count}</text>
+      <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" font-size="10.5" font-weight="700" fill="var(--ink)">${i+1}. ${s.lab}</text>
+    </g>`;
+  });
+  svg+=`<text x="${cx}" y="${cy-6}" text-anchor="middle" font-family="var(--serif)" font-size="15" font-weight="700" fill="var(--green-800)">${REQUESTS.filter(r=>r.stage==="closed").length}/${REQUESTS.length}</text>`;
+  svg+=`<text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9.5" fill="var(--muted)">boucles clôturées</text>`;
+  el.innerHTML=svg;
+}
+
 function renderIntelligence(){
+  renderLoop();
   $("#threadList").innerHTML=TRIAL_THREADS.map(t=>{
     const pos=t.sentiment==="positive";
     return `<div class="card thread">
@@ -1992,7 +2375,7 @@ function renderOpDash(){
   const site=WAREHOUSES[0];
   const lowStock=Object.entries(site.items).filter(([,v])=>v>0&&v<LOW_STOCK_THRESHOLD);
   const outStock=Object.entries(site.items).filter(([,v])=>v===0);
-  const incoming=REQUESTS.filter(r=>["stock","shipped"].includes(r.stage));
+  const incoming=REQUESTS.filter(r=>["approved","stock_reserved","dispatched"].includes(r.stage));
   $("#opKpis").innerHTML=[
     [Object.values(site.items).reduce((a,b)=>a+b,0).toLocaleString("fr-FR")+" kg","Stock total site"],
     [lowStock.length,"Alertes stock bas"],
@@ -2000,11 +2383,51 @@ function renderOpDash(){
     [incoming.length,"Commande(s) en traitement"],
   ].map(k=>`<div class="card kpi"><div class="v">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
   $("#opStock").innerHTML=`<div class="wh-row" style="border:none;padding-top:0"><div class="whn">${site.loc}</div>${Object.entries(site.items).map(([p,v])=>{const low=v>0&&v<LOW_STOCK_THRESHOLD;const out=v===0;return `<div class="wh-item"><span class="win">${p}</span><span class="wb"><i style="width:${Math.min(v/1500*100,100)}%;background:${out?'var(--bad)':low?'var(--warn)':'var(--green-600)'}"></i></span><span class="wv" style="color:${out?'var(--bad)':low?'var(--warn)':'var(--ink)'}">${v} kg</span></div>`;}).join("")}</div>`;
-  $("#opOrders").innerHTML=incoming.map(r=>`<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${ICONS.boxes}</svg></div><div class="qm"><div class="qt">${r.ref} — ${r.country}</div><div class="qd">${productByCode(r.productCode).label} · ${r.qty} kg</div></div><span class="pill ${stageIdx(r.stage)>=stageIdx('shipped')?'ok':'blue'}">${stageById(r.stage).lab}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Aucune commande en traitement.</div>';
+  $("#opOrders").innerHTML=incoming.map(r=>`<div class="queue-row" onclick="openRequest('${r.id}')"><div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${ICONS.boxes}</svg></div><div class="qm"><div class="qt">${r.ref} — ${r.country}</div><div class="qd">${productByCode(r.productCode).label} · ${r.qty} kg</div></div><span class="pill ${stageIdx(r.stage)>=stageIdx('dispatched')?'ok':'blue'}">${stageById(r.stage).lab}</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Aucune commande en traitement.</div>';
 }
 
 /* ================= ADMINISTRATION — RBAC ================= */
+/* ================= 5 KPIS ADMIN — PROCESSUS vs PRODUIT (point 29) ================= */
+function computeAdminKpis(){
+  const qualified=REQUESTS.filter(r=>r.stage!=="draft").length;
+  const s2s=REQUESTS.filter(r=>r.date&&r.shipDate);
+  const avgSubmitToShip=s2s.length?Math.round(s2s.reduce((s,r)=>s+daysBetween(r.date,r.shipDate),0)/s2s.length):0;
+  const s2r=REQUESTS.filter(r=>r.shipDate&&r.receiptDate);
+  const avgShipToReceipt=s2r.length?Math.round(s2r.reduce((s,r)=>s+daysBetween(r.shipDate,r.receiptDate),0)/s2r.length):0;
+  const full=REQUESTS.filter(r=>r.date&&r.receiptDate);
+  const avgSubmitToReceipt=full.length?Math.round(full.reduce((s,r)=>s+daysBetween(r.date,r.receiptDate),0)/full.length):0;
+  const k=computeKpis();
+  const actionable=REQUESTS.filter(r=>["convert","expand","repeat"].includes(r.nextAction));
+  const adopted=actionable.filter(r=>r.adopted===true);
+  const adoptionRate=actionable.length?Math.round(adopted.length/actionable.length*100):0;
+  const closedCount=REQUESTS.filter(r=>r.stage==="closed").length;
+  const converted=REQUESTS.filter(r=>r.nextAction==="convert").length;
+  const conversionRate=closedCount?Math.round(converted/closedCount*100):0;
+  return {qualified,total:REQUESTS.length,avgSubmitToShip,avgShipToReceipt,avgSubmitToReceipt,feedbackRate:k.feedbackRate,eligible:k.eligible,withFeedback:k.withFeedback,
+    actionableCount:actionable.length,adoptedCount:adopted.length,adoptionRate,converted,closedCount,conversionRate};
+}
+function markAdopted(id,val){const r=REQUESTS.find(x=>x.id===id);r.adopted=val;AUDIT.unshift({d:"2026-09-18 —",who:CURRENT_USER.admin.nom,act:"Recommandation "+(val?"marquée adoptée":"marquée non adoptée"),det:r.ref});toast(val?"Recommandation marquée adoptée":"Recommandation marquée non adoptée","●");openRequest(id);if(tabsFor(ROLE).includes("admin"))renderAdmin();}
+function renderAdminKpis(){
+  const k=computeAdminKpis();
+  $("#adminKpisProcess").innerHTML=[
+    {l:"Besoins qualifiés captés",v:k.qualified+"/"+k.total,tgt:"Demandes sorties de l'état brouillon — intake structuré"},
+    {l:"Complétude du retour terrain",v:k.feedbackRate+"%",tgt:"Objectif ≥ 60% · "+k.withFeedback+"/"+k.eligible+" échantillons livrés",c:k.feedbackRate<60?"var(--bad)":"var(--green-800)"},
+  ].map(c=>`<div class="card kpi"><div class="v" style="color:${c.c||'var(--green-800)'}">${c.v}</div><div class="l">${c.l}</div><div class="tgt">${c.tgt}</div></div>`).join("");
+  $("#timeToSampleCard").innerHTML=`<div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:14px">Time-to-Sample — décomposition par étape</h3><span class="hint">moyenne sur les demandes avec dates renseignées</span></div>
+    <div class="frow">
+      <div class="card pad soft"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Soumission → Expédition</div><div style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--green-800)">${k.avgSubmitToShip} j</div></div>
+      <div class="card pad soft"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Expédition → Réception</div><div style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--green-800)">${k.avgShipToReceipt} j</div></div>
+      <div class="card pad soft"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Total — Soumission → Réception</div><div style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--green-900)">${k.avgSubmitToReceipt} j</div></div>
+    </div>`;
+  $("#adminKpisProduct").innerHTML=[
+    {l:"Taux d'adoption des recommandations",v:k.actionableCount?k.adoptionRate+"%":"—",tgt:k.adoptedCount+"/"+k.actionableCount+" recommandation(s) actionnable(s) adoptée(s) par le métier"},
+    {l:"Taux de conversion échantillon → commercial",v:k.closedCount?k.conversionRate+"%":"—",tgt:k.converted+"/"+k.closedCount+" boucles clôturées ayant généré une opportunité commerciale"},
+  ].map(c=>`<div class="card kpi"><div class="v">${c.v}</div><div class="l">${c.l}</div><div class="tgt">${c.tgt}</div></div>`).join("");
+  const tk=traceabilityKpi();
+  $("#traceabilityKpiBox").innerHTML=`<div class="sec-h" style="margin-bottom:2px"><div><div style="font-family:var(--serif);font-size:26px;font-weight:700;color:${tk.rate>=90?'var(--green-800)':'var(--bad)'}">${tk.rate}%</div><div style="font-size:12.5px;color:var(--muted)">${tk.complete}/${tk.total} demandes reconstructibles de bout en bout (identité de lot, quantité, destinataire, itinéraire, preuve) — objectif ≥ 90%</div></div><span class="pill ${tk.rate>=90?'ok':'warn'}">${tk.rate>=90?'Objectif atteint':'Sous objectif'}</span></div>`;
+}
 function renderAdmin(){
+  renderAdminKpis();
   $("#rbacTbl").innerHTML=`<tr><th>Écran</th>${Object.keys(ROLES).map(r=>`<th>${ROLES[r].lab}</th>`).join("")}</tr>`+
     ALL_TABS.map(t=>`<tr><td style="font-weight:600;white-space:nowrap">${TAB_META[t][0]}</td>${Object.keys(ROLES).map(r=>`<td><input type="checkbox" ${PERMISSIONS[r][t]?"checked":""} onchange="togglePermission('${r}','${t}',this.checked)"/></td>`).join("")}</tr>`).join("");
 }
@@ -2178,6 +2601,7 @@ function handleChatUpload(ev){
 }
 
 /* ================= INIT ================= */
+REQUESTS.forEach(r=>{if(r.stage==="closed"&&!r.nextAction)r.nextAction=computeNextAction(r);});
 setRole("demandeur");
 </script>
 </body>
