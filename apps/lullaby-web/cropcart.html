@@ -519,6 +519,7 @@
           <div class="field"><label>Quantité (kg) <span class="req">*</span></label><input type="number" id="nf-qty" value="500" min="1" oninput="checkEligibility()"/></div>
           <div class="field"><label>Priorité <span class="req">*</span></label><select id="nf-prio"><option>Medium</option><option>High</option><option>Critical</option></select></div>
         </div>
+        <div class="field"><label>Conditionnement souhaité <span class="req">*</span></label><select id="nf-packaging"></select></div>
         <div class="field"><label>Type de demande <span class="req">*</span></label><div class="seg" id="nf-type"><button class="on" onclick="setReqType(this,'Agronomic testing')">Essai agronomique</button><button onclick="setReqType(this,'Registration')">Homologation / Registration</button></div></div>
         <div class="frow">
           <div class="field"><label>Culture <span class="req">*</span></label><input id="nf-crop" placeholder="Ex. Maïs, Café, Riz…"/></div>
@@ -628,11 +629,20 @@
       </div>
       <div class="card pad" style="text-align:center">
         <div class="sec-h" style="margin-bottom:6px"><h3 style="font-size:15px">Compatibilité formule × sol</h3></div>
-        <svg id="soilRadar" viewBox="0 0 320 320" style="width:100%;max-width:340px;height:auto"></svg>
+        <svg id="soilRadar" viewBox="0 0 380 380" style="width:100%;max-width:460px;height:auto"></svg>
       </div>
     </div>
     <div class="card pad" style="margin-top:16px" id="soilRegBox"></div>
     <div class="card pad" style="margin-top:14px;background:var(--amber-bg);border-color:#fde5b0"><div style="font-size:12.5px;color:#7c4a06"><b>Données illustratives.</b> Profils de sol et scores de compatibilité configurés à titre représentatif pour la démonstration — à connecter aux relevés de laboratoire réels (réseau de stations agronomiques OCP) avant mise en production.</div></div>
+
+    <div class="sec-h" style="margin-top:28px"><div><h3 style="font-size:16px">Base de données sol — exploitations</h3><span class="hint">géolocalisation, profil fermier, culture, taille de ferme, style d'agriculture — collecté via les unités mobiles Crop Cart</span></div></div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="sec-h" style="margin-bottom:8px"><h3 style="font-size:14px">Exploitations suivies</h3><span class="hint">cliquer pour la recommandation personnalisée</span></div>
+        <div id="farmerList"></div>
+      </div>
+      <div class="card pad" id="farmerDetail"><div style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0">Sélectionnez une exploitation pour voir son profil et la recommandation de formule personnalisée.</div></div>
+    </div>
   </section>
 
   <!-- INTELLIGENCE TERRAIN -->
@@ -829,6 +839,8 @@ const TODAY = new Date("2026-09-14");
 // des fertilisants phosphatés : homologation par pays, teneur en cadmium, seuil quantité échantillon
 // avant bascule en régime commercial). À faire valider par l'équipe Regulatory Affairs OCP avant mise en
 // production — ce ne sont pas les chiffres officiels OCP, faute de référentiel transmis.
+// Conditionnements disponibles — du sachet échantillon au big bag industriel.
+const PACKAGING_OPTIONS=["80 g","0.5 kg","1 kg","5 kg","15 kg","20 kg","25 kg","Big bag 1 t"];
 const PRODUCTS=[
   {code:"00 40 00 10S",label:"NPK 0-40-0 +10S",family:"Starter phosphaté soufré",approved:["Ghana","Cameroun","Nigeria","Côte d'Ivoire","Kenya","Ethiopia","Bresil"],cdContent:45,form:"Granulé",moisture:1.8,particleSize:"2–4 mm",packaging:"Sac 50 kg / big bag 1t",shelfLife:"24 mois (stockage sec)",approvedSince:{Ghana:"2022-03",Cameroun:"2022-09",Nigeria:"2023-01",Kenya:"2023-06",Ethiopia:"2024-02","Côte d'Ivoire":"2023-11",Bresil:"2024-05"}},
   {code:"MAP 11-52 Special Low Cd",label:"MAP 11-52 Special Low Cd",family:"MAP faible cadmium",approved:["Poland","France","Germany","Ghana"],cdContent:12,form:"Granulé",moisture:1.2,particleSize:"2–4 mm",packaging:"Big bag 500 kg / 1t",shelfLife:"36 mois (stockage sec)",approvedSince:{Poland:"2021-04",France:"2021-04",Germany:"2022-08",Ghana:"2023-10"}},
@@ -1277,6 +1289,41 @@ const TAB_META={
 
 /* ================= HELPERS ================= */
 const $=s=>document.querySelector(s);
+/* Mini-bibliothèque de graphiques SVG inline (point 34) — sans dépendance externe */
+function donutSvg(data,opts){
+  opts=opts||{}; const w=opts.w||170,h=w,r=w/2-10,cx=w/2,cy=h/2,inner=r*0.58;
+  const total=data.reduce((s,d)=>s+d.value,0)||1;
+  let angle=-Math.PI/2,svg="";
+  data.forEach(d=>{
+    const frac=d.value/total; if(frac<=0)return;
+    const a2=angle+Math.max(frac*2*Math.PI,0.001);
+    const x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
+    const x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    const ix1=cx+inner*Math.cos(angle),iy1=cy+inner*Math.sin(angle);
+    const ix2=cx+inner*Math.cos(a2),iy2=cy+inner*Math.sin(a2);
+    const large=(a2-angle)>Math.PI?1:0;
+    svg+=`<path d="M${ix1.toFixed(1)},${iy1.toFixed(1)} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large} 1 ${x2.toFixed(1)},${y2.toFixed(1)} L${ix2.toFixed(1)},${iy2.toFixed(1)} A${inner},${inner} 0 ${large} 0 ${ix1.toFixed(1)},${iy1.toFixed(1)} Z" fill="${d.color}"><title>${d.label} — ${Math.round(frac*100)}%</title></path>`;
+    angle=a2;
+  });
+  const label=opts.centerLabel||"";
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:${w}px;height:auto">${svg}${label?`<text x="${cx}" y="${cy+4}" text-anchor="middle" font-family="var(--serif)" font-size="15" font-weight="700" fill="var(--green-900)">${label}</text>`:""}</svg>`;
+}
+function hBarChart(data,opts){
+  // data: [{label,value,max,color,suffix}]
+  opts=opts||{}; const w=opts.w||400,barH=opts.barH||22,gap=opts.gap||14,pad=110;
+  const h=data.length*(barH+gap);
+  let svg="";
+  data.forEach((d,i)=>{
+    const y=i*(barH+gap);
+    const max=d.max||Math.max(...data.map(x=>x.max||x.value),1);
+    const bw=Math.max(2,(w-pad-40)*Math.min(1,d.value/max));
+    svg+=`<text x="0" y="${(y+barH/2+4).toFixed(1)}" font-size="12" font-weight="700" fill="var(--ink)">${d.label}</text>
+      <rect x="${pad}" y="${y}" width="${w-pad-40}" height="${barH}" rx="5" fill="var(--green-50)"/>
+      <rect x="${pad}" y="${y}" width="${bw.toFixed(1)}" height="${barH}" rx="5" fill="${d.color||'var(--green-700)'}"/>
+      <text x="${(pad+bw+8).toFixed(1)}" y="${(y+barH/2+4).toFixed(1)}" font-size="12.5" font-weight="700" fill="var(--green-900)">${d.value}${d.suffix||""}</text>`;
+  });
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto">${svg}</svg>`;
+}
 function toast(msg,ic,err){const t=document.createElement("div");t.className="toast"+(err?" err":"");t.innerHTML=`<span class="ti">${ic||"●"}</span><span>${msg}</span>`;$("#toasts").appendChild(t);setTimeout(()=>{t.style.opacity="0";t.style.transition="all .35s";t.style.transform="translateY(12px)";setTimeout(()=>t.remove(),350);},err?4200:3000);}
 function initials(n){return n.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();}
 function priorityCls(p){return p==="Critical"?"bad":p==="High"?"warn":"blue";}
@@ -1414,6 +1461,7 @@ function onRegionChange(){ populateCountries(); checkEligibility(); }
 function populateCountries(){
   $("#nf-country").innerHTML=COUNTRIES.map(c=>`<option>${c}</option>`).join("");
   $("#nf-product").innerHTML=PRODUCTS.map(p=>`<option value="${p.code}">${p.label} (${p.code})</option>`).join("");
+  if($("#nf-packaging").options.length===0)$("#nf-packaging").innerHTML=PACKAGING_OPTIONS.map(o=>`<option${o==="5 kg"?" selected":""}>${o}</option>`).join("");
 }
 function checkEligibility(){
   const country=$("#nf-country").value, code=$("#nf-product").value; const p=productByCode(code);
@@ -1437,7 +1485,7 @@ function submitRequest(){
   const country=$("#nf-country").value, code=$("#nf-product").value;
   const id="r"+Date.now();
   const ref="REQ-2026-"+String(Math.floor(1000+Math.random()*8999));
-  REQUESTS.unshift({id,ref,date:"2026-09-14",spoc,bu:$("#nf-bu").value,region:$("#nf-region").value,country,productCode:code,qty:+$("#nf-qty").value||1,priority:$("#nf-prio").value,reqType:selReqType,crop,soil:$("#nf-soil").value.trim()||"—",outcome,
+  REQUESTS.unshift({id,ref,date:"2026-09-14",spoc,bu:$("#nf-bu").value,region:$("#nf-region").value,country,productCode:code,qty:+$("#nf-qty").value||1,priority:$("#nf-prio").value,reqType:selReqType,crop,soil:$("#nf-soil").value.trim()||"—",outcome,packaging:$("#nf-packaging").value||PACKAGING_OPTIONS[0],
     rawStatus:"Submitted",stage:"submitted",riCheck:null,docs:{},shipDate:null,shipMethod:null,trackingRef:null,receiptConfirmed:false,feedback:null});
   AUDIT.unshift({d:"2026-09-14 —",who:spoc,act:"Nouvelle demande soumise",det:ref+" — "+country+" · "+productByCode(code).label});
   toast("Demande soumise — routage automatique en cours","→");
@@ -1668,7 +1716,7 @@ function openRequest(id){
     <div class="m-body">
       ${pipelineHtml(r)}
       <div class="frow" style="margin:16px 0">
-        <div class="card pad"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Contexte agronomique</div><div style="font-size:13px"><b>${r.crop}</b> · ${r.soil}<br><span style="color:var(--muted)">${r.outcome}</span></div></div>
+        <div class="card pad"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Contexte agronomique</div><div style="font-size:13px"><b>${r.crop}</b> · ${r.soil}<br><span style="color:var(--muted)">${r.outcome}</span>${r.packaging?`<br><span style="color:var(--green-800);font-weight:600">Conditionnement : ${r.packaging}</span>`:""}</div></div>
         <div class="card pad"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Statut source importé</div><div style="font-size:13px"><b>${r.rawStatus}</b>${dc!==null?` · complétude documentaire ${dc}%`:''}</div></div>
       </div>
       <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Action</div>
@@ -1847,9 +1895,10 @@ function renderFormulesLib(){
         <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Granulométrie</div>${p.particleSize}</div>
         <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Humidité</div>${p.moisture}%</div>
         <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Cadmium</div>${p.cdContent} mg/kg</div>
-        <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Conditionnement</div>${p.packaging}</div>
+        <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Conditionnement industriel</div>${p.packaging}</div>
         <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Durée de vie</div>${p.shelfLife}</div>
       </div>
+      <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Conditionnements échantillon disponibles</div>${PACKAGING_OPTIONS.map(o=>`<span class="country-chip">${o}</span>`).join("")}</div>
       <div style="margin-top:14px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Homologations par pays</div>
       ${p.approved.map(c=>{const since=p.approvedSince[c]; return `<div class="passport-stamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--green-700);flex:0 0 16px">${ICONS.check}</svg><span class="ps-country">${c}</span><span class="ps-valid">${since?"depuis "+fmtMonthYear(since)+" · valide jusqu'à "+fmtMonthYear(approvalEnd(since)):"—"}</span></div>`;}).join("")}
       </div>
@@ -1890,6 +1939,34 @@ const SOIL_AXES=[
   {k:"matiereOrg",lab:"Mat. organique"},
   {k:"homologation",lab:"Homologation"},
 ];
+// Base de données sol au niveau exploitation — géolocalisation, profil fermier, culture, taille de ferme,
+// style d'agriculture — collectée via les sondes/unités mobiles Crop Cart sur le terrain (illustratif).
+const FARMING_STYLES=["Conventionnel","Agroécologie","Semis direct","Agriculture de conservation","Biologique (transition)"];
+const FARMER_SOIL_RECORDS=[
+  {id:"fs1",farmerName:"Kwame Asante",country:"Ghana",lat:6.7,lon:-1.6,cropType:"Maïs",farmSize:3.5,farmingStyle:"Conventionnel",soil:{ph:5.7,moisture:23,texture:"Argilo-sableux",organicMatter:2.0},collectedVia:"Sonde connectée Crop Cart — unité mobile #04",date:"2026-08-14"},
+  {id:"fs2",farmerName:"Ama Owusu — Coopérative Ashanti",country:"Ghana",lat:6.9,lon:-1.4,cropType:"Cacao",farmSize:1.8,farmingStyle:"Agroécologie",soil:{ph:5.5,moisture:25,texture:"Ferralitique",organicMatter:2.6},collectedVia:"Application terrain Crop Cart (agent coopérative)",date:"2026-08-20"},
+  {id:"fs3",farmerName:"John Mwangi",country:"Kenya",lat:-0.4,lon:36.9,cropType:"Café",farmSize:2.2,farmingStyle:"Agroécologie",soil:{ph:6.0,moisture:19,texture:"Volcanique",organicMatter:3.4},collectedVia:"Sonde connectée Crop Cart — unité mobile #11",date:"2026-07-30"},
+  {id:"fs4",farmerName:"Ferme Highlands Ltd",country:"Kenya",lat:-0.7,lon:36.4,cropType:"Blé",farmSize:120,farmingStyle:"Conventionnel",soil:{ph:6.3,moisture:17,texture:"Volcanique",organicMatter:2.9},collectedVia:"Sonde connectée Crop Cart — unité mobile #11",date:"2026-08-02"},
+  {id:"fs5",farmerName:"Alemu Bekele",country:"Ethiopia",lat:8.9,lon:38.9,cropType:"Teff",farmSize:1.2,farmingStyle:"Semis direct",soil:{ph:5.6,moisture:20,texture:"Volcanique d'altitude",organicMatter:2.7},collectedVia:"Application terrain Crop Cart (agent coopérative)",date:"2026-08-11"},
+  {id:"fs6",farmerName:"Sari Wulandari",country:"Indonesia",lat:-6.9,lon:107.6,cropType:"Riz",farmSize:2.5,farmingStyle:"Agriculture de conservation",soil:{ph:5.3,moisture:29,texture:"Argileux volcanique",organicMatter:3.1},collectedVia:"Sonde connectée Crop Cart — unité mobile #22",date:"2026-07-18"},
+  {id:"fs7",farmerName:"Fazenda Boa Vista",country:"Bresil",lat:-22.9,lon:-47.1,cropType:"Soja",farmSize:340,farmingStyle:"Conventionnel",soil:{ph:5.1,moisture:24,texture:"Argileux tropical",organicMatter:2.5},collectedVia:"Sonde connectée Crop Cart — unité mobile #30",date:"2026-08-25"},
+  {id:"fs8",farmerName:"Katarzyna Nowak",country:"Poland",lat:51.1,lon:17.0,cropType:"Blé de printemps",farmSize:45,farmingStyle:"Conventionnel",soil:{ph:6.7,moisture:18,texture:"Limoneux",organicMatter:1.9},collectedVia:"Sonde connectée Crop Cart — unité mobile #08",date:"2026-06-28"},
+  {id:"fs9",farmerName:"Coopérative Nkolbisson",country:"Cameroun",lat:3.9,lon:11.4,cropType:"Cacao",farmSize:4.1,farmingStyle:"Biologique (transition)",soil:{ph:5.4,moisture:24,texture:"Ferralitique",organicMatter:2.3},collectedVia:"Application terrain Crop Cart (agent coopérative)",date:"2026-08-05"},
+];
+function farmerFormulaScore(p,farmer){
+  const soil=farmer.soil;
+  const phScore=Math.max(0,Math.min(100,100-Math.abs(soil.ph-6.2)*40));
+  const mLim=MOISTURE_LIMITS[farmer.country];
+  const humScore=mLim==null?85:Math.max(0,Math.min(100,100-Math.max(0,p.moisture-mLim)*30));
+  const cdLim=CD_LIMITS[farmer.country];
+  const cdScore=cdLim==null?90:Math.max(0,Math.min(100,100-Math.max(0,p.cdContent-cdLim)*2));
+  const omScore=Math.max(0,Math.min(100,soil.organicMatter*28));
+  const homScore=p.approved.includes(farmer.country)?100:20;
+  return Math.round((phScore+humScore+cdScore+omScore+homScore)/5);
+}
+function recommendFormulasForFarmer(farmer){
+  return PRODUCTS.map(p=>({product:p,score:farmerFormulaScore(p,farmer)})).sort((a,b)=>b.score-a.score);
+}
 function soilCompatScore(p,country){
   const soil=SOIL_PROFILES[country]; if(!soil)return null;
   const phScore=Math.max(0,Math.min(100,100-Math.abs(soil.ph-6.2)*40));
@@ -1908,35 +1985,72 @@ function renderSoil(){
   const country=countrySel.value||Object.keys(SOIL_PROFILES)[0];
   const p=productByCode(productSel.value)||PRODUCTS[0];
   const soil=SOIL_PROFILES[country];
-  $("#soilProfileBox").innerHTML=`<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px">${country} — ${soil.type}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px">
-      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">pH</div><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--green-800)">${soil.ph}</div></div>
-      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Humidité sol</div><div style="font-family:var(--serif);font-size:19px;font-weight:700;color:var(--green-800)">${soil.moisture}%</div></div>
-      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Texture</div><div style="font-weight:600">${soil.texture}</div></div>
-      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Mat. organique</div><div style="font-weight:600">${soil.organicMatter}%</div></div>
+  $("#soilProfileBox").innerHTML=`<div style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px">${country} — ${soil.type}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:14px">
+      <div><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">pH</div><div style="font-family:var(--serif);font-size:23px;font-weight:700;color:var(--green-900)">${soil.ph}</div></div>
+      <div><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Humidité sol</div><div style="font-family:var(--serif);font-size:23px;font-weight:700;color:var(--green-900)">${soil.moisture}%</div></div>
+      <div><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Texture</div><div style="font-weight:700;font-size:14.5px">${soil.texture}</div></div>
+      <div><div style="font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Mat. organique</div><div style="font-weight:700;font-size:14.5px">${soil.organicMatter}%</div></div>
     </div>`;
   const scores=soilCompatScore(p,country);
-  const cx=160,cy=155,R=110,n=SOIL_AXES.length;
+  const cx=190,cy=185,R=128,n=SOIL_AXES.length;
   const pts=SOIL_AXES.map((a,i)=>{const ang=(i/n)*2*Math.PI-Math.PI/2;return {ang,x:cx+R*Math.cos(ang),y:cy+R*Math.sin(ang)};});
   let svg="";
   [0.25,0.5,0.75,1].forEach(f=>{
     const ring=pts.map(pt=>`${(cx+(pt.x-cx)*f).toFixed(1)},${(cy+(pt.y-cy)*f).toFixed(1)}`).join(" ");
-    svg+=`<polygon points="${ring}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
+    svg+=`<polygon points="${ring}" fill="none" stroke="var(--muted-2)" stroke-width="1.2" opacity=".55"/>`;
   });
-  pts.forEach(pt=>svg+=`<line x1="${cx}" y1="${cy}" x2="${pt.x.toFixed(1)}" y2="${pt.y.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`);
+  pts.forEach(pt=>svg+=`<line x1="${cx}" y1="${cy}" x2="${pt.x.toFixed(1)}" y2="${pt.y.toFixed(1)}" stroke="var(--muted-2)" stroke-width="1.2" opacity=".55"/>`);
   const valPts=SOIL_AXES.map((a,i)=>{const s=scores[a.k]/100;return {x:cx+(pts[i].x-cx)*s,y:cy+(pts[i].y-cy)*s};});
-  svg+=`<polygon points="${valPts.map(v=>v.x.toFixed(1)+","+v.y.toFixed(1)).join(" ")}" fill="var(--green-600)" fill-opacity=".35" stroke="var(--green-700)" stroke-width="2"/>`;
-  valPts.forEach(v=>svg+=`<circle cx="${v.x.toFixed(1)}" cy="${v.y.toFixed(1)}" r="3.5" fill="var(--green-800)"/>`);
+  svg+=`<polygon points="${valPts.map(v=>v.x.toFixed(1)+","+v.y.toFixed(1)).join(" ")}" fill="var(--green-700)" fill-opacity=".45" stroke="var(--green-800)" stroke-width="3"/>`;
+  valPts.forEach(v=>svg+=`<circle cx="${v.x.toFixed(1)}" cy="${v.y.toFixed(1)}" r="5" fill="var(--green-900)" stroke="#fff" stroke-width="1.5"/>`);
   SOIL_AXES.forEach((a,i)=>{
-    const labelR=R+26; const lx=cx+labelR*Math.cos(pts[i].ang), ly=cy+labelR*Math.sin(pts[i].ang);
+    const labelR=R+44; const lx=cx+labelR*Math.cos(pts[i].ang), ly=cy+labelR*Math.sin(pts[i].ang);
     const anchor=Math.cos(pts[i].ang)>0.3?"start":Math.cos(pts[i].ang)<-0.3?"end":"middle";
-    svg+=`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" font-size="10.5" font-weight="700" fill="var(--ink)">${a.lab} · ${scores[a.k]}</text>`;
+    const tw=a.lab.length*7.2+26;
+    const bx=anchor==="start"?lx-6:anchor==="end"?lx-tw+6:lx-tw/2;
+    svg+=`<rect x="${bx.toFixed(1)}" y="${(ly-15).toFixed(1)}" width="${tw.toFixed(1)}" height="21" rx="10" fill="#fff" stroke="var(--green-100)" stroke-width="1"/>
+      <text x="${lx.toFixed(1)}" y="${(ly+1).toFixed(1)}" text-anchor="${anchor}" font-size="13" font-weight="700" fill="var(--ink)">${a.lab} · <tspan fill="var(--green-800)">${scores[a.k]}</tspan></text>`;
   });
   $("#soilRadar").innerHTML=svg;
   const overall=Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/SOIL_AXES.length);
   const rc=regChecks({country,productCode:p.code,qty:1});
   $("#soilRegBox").innerHTML=`<div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:15px">Lecture combinée — score global ${overall}/100</h3><span class="pill ${overall>=70?'ok':overall>=45?'warn':'bad'}">${overall>=70?'Compatible':overall>=45?'Vigilance':'Non recommandé'}</span></div>
     <p style="font-size:13px;color:var(--muted);margin-bottom:8px">${p.label} sur ${country} (${soil.type}, pH ${soil.ph}) — ${rc.registered?"produit homologué pour ce marché":"produit non homologué pour ce marché à ce jour"}${rc.cdLimit!=null?(rc.cdOk?", teneur cadmium conforme au plafond local":", teneur cadmium au-delà du plafond local — envisager une variante Low Cd"):""}.</p>`;
+  renderFarmerList();
+}
+/* ================= BASE DE DONNÉES SOL — EXPLOITATIONS (points 37-38) ================= */
+function renderFarmerList(){
+  const box=$("#farmerList"); if(!box)return;
+  box.innerHTML=FARMER_SOIL_RECORDS.map(f=>`<div class="queue-row" onclick="openFarmerRecord('${f.id}')">
+    <div class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${ICONS.soil}</svg></div>
+    <div class="qm"><div class="qt">${f.farmerName}</div><div class="qd">${f.country} · ${f.cropType} · ${f.farmSize} ha · ${f.farmingStyle}</div></div>
+    <span class="pill blue">${f.lat.toFixed(1)}, ${f.lon.toFixed(1)}</span>
+  </div>`).join("");
+}
+function openFarmerRecord(id){
+  const f=FARMER_SOIL_RECORDS.find(x=>x.id===id); if(!f)return;
+  const recs=recommendFormulasForFarmer(f);
+  const top=recs[0];
+  $("#farmerDetail").innerHTML=`
+    <div class="sec-h" style="margin-bottom:10px"><div><h3 style="font-size:15px">${f.farmerName}</h3><div class="sub-muted">${f.country} · géoloc. ${f.lat.toFixed(2)}, ${f.lon.toFixed(2)}</div></div><span class="pill blue">${f.farmingStyle}</span></div>
+    <div class="frow" style="margin-bottom:12px">
+      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Culture</div><div style="font-weight:700">${f.cropType}</div></div>
+      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">Taille de ferme</div><div style="font-weight:700">${f.farmSize} ha</div></div>
+      <div><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted)">pH sol</div><div style="font-weight:700">${f.soil.ph}</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Relevé sol</div>
+    <div style="font-size:12.5px;color:var(--ink);margin-bottom:10px">Texture ${f.soil.texture} · Humidité ${f.soil.moisture}% · Matière organique ${f.soil.organicMatter}%</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Collecté via ${f.collectedVia} — ${fmtDate(f.date)}</div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Recommandation de formule personnalisée</div>
+    <div class="card pad soft" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><div style="font-weight:700;font-family:var(--serif);font-size:16px;color:var(--green-800)">${top.product.label}</div><span class="pill ${top.score>=70?'ok':top.score>=45?'warn':'bad'}">${top.score}/100</span></div>
+      <div style="font-size:12.5px;color:var(--muted)">${top.score>=70?"Formule bien adaptée au profil de ce sol et à l'homologation locale.":top.score>=45?"Compatibilité correcte — vérifier la teneur en cadmium ou l'humidité avant recommandation ferme.":"Compatibilité faible — envisager une alternative homologuée pour ce marché."}</div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Alternatives classées</div>
+    ${recs.slice(1,4).map(r=>`<div class="rank-row"><div class="rank-m"><div class="rank-t">${r.product.label}</div></div><span class="rank-score">${r.score}/100</span></div>`).join("")}
+    <button class="btn ghost sm" style="margin-top:12px;width:100%" onclick="closeModal();go('nouvelle')">Créer une demande d'échantillon pour cette exploitation</button>
+  `;
 }
 
 /* ================= INTEGRATIONS ================= */
@@ -2093,8 +2207,10 @@ function keyAchievements(){
 }
 function renderRankings(){
   const countries=countryRankings(), formulas=formulaRankings(), accounts=accountRankings(), achievements=keyAchievements();
-  $("#rankCountries").innerHTML=countries.map((c,i)=>`<div class="rank-row" onclick="go('globe');setTimeout(()=>openGlobeCountry('${c.country}'),0)" style="cursor:pointer"><span class="rank-badge">${i+1}</span><div class="rank-m"><div class="rank-t">${c.country}</div><div class="rank-d">${c.n} retour(s) terrain noté(s)</div></div><span class="rank-score">${c.avg}/5</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Pas encore de retours notés.</div>';
-  $("#rankFormulas").innerHTML=formulas.map((f,i)=>`<div class="rank-row"><span class="rank-badge">${i+1}</span><div class="rank-m"><div class="rank-t">${f.label}</div><div class="rank-d">${f.n} retour(s) · ${f.countries.length} marché(s) : ${f.countries.join(", ")}</div></div><span class="rank-score">${f.avg}/5</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Pas encore de retours notés.</div>';
+  const countryChart=countries.length?`<div style="margin-bottom:14px">${hBarChart(countries.map(c=>({label:c.country,value:c.avg,max:5,suffix:"/5",color:"var(--green-700)"})),{barH:18,gap:10})}</div>`:"";
+  $("#rankCountries").innerHTML=countryChart+(countries.map((c,i)=>`<div class="rank-row" onclick="go('globe');setTimeout(()=>openGlobeCountry('${c.country}'),0)" style="cursor:pointer"><span class="rank-badge">${i+1}</span><div class="rank-m"><div class="rank-t">${c.country}</div><div class="rank-d">${c.n} retour(s) terrain noté(s)</div></div><span class="rank-score">${c.avg}/5</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Pas encore de retours notés.</div>');
+  const formulaChart=formulas.length?`<div style="margin-bottom:14px">${hBarChart(formulas.map(f=>({label:f.label,value:f.avg,max:5,suffix:"/5",color:"var(--green-600)"})),{barH:18,gap:10})}</div>`:"";
+  $("#rankFormulas").innerHTML=formulaChart+(formulas.map((f,i)=>`<div class="rank-row"><span class="rank-badge">${i+1}</span><div class="rank-m"><div class="rank-t">${f.label}</div><div class="rank-d">${f.n} retour(s) · ${f.countries.length} marché(s) : ${f.countries.join(", ")}</div></div><span class="rank-score">${f.avg}/5</span></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Pas encore de retours notés.</div>');
   $("#rankAccounts").innerHTML=`<tr><th>Porteur de compte</th><th>Demandes</th><th>Marchés</th><th>Satisfaction moy.</th><th>Opportunités identifiées</th></tr>`+
     accounts.map(a=>`<tr><td style="font-weight:600">${a.spoc}</td><td>${a.n}</td><td>${a.countries.join(", ")}</td><td>${a.avg!=null?a.avg+"/5":"—"}</td><td>${a.opportunities?`<span class="pill ok">${a.opportunities}</span>`:"—"}</td></tr>`).join("");
   $("#achievementList").innerHTML=achievements.map(a=>`<div class="card achv-card"><div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">${cropIcon(a.crop)}</svg></div><div><h4>${a.country} — ${a.product} sur ${a.crop} <span class="pill ok" style="margin-left:6px">${a.satisfaction}/5</span></h4><p>${a.text}</p><div class="opp">→ ${a.opportunity} (${a.ref})</div></div></div>`).join("")||'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Aucune réalisation commerciale identifiée pour le moment.</div>';
@@ -2300,7 +2416,11 @@ function renderLogistique(){
   const modeAgg={};
   shipped.forEach(r=>{ modeAgg[r.shipMethod]=modeAgg[r.shipMethod]||{n:0,qty:0,cost:0}; modeAgg[r.shipMethod].n++; modeAgg[r.shipMethod].qty+=r.qty; const imp=shipmentImpact(r); if(imp)modeAgg[r.shipMethod].cost+=imp.cost; });
   const modeIcons={Container:'<path d="M2 20h20M4 20V9l5 3V9l5 3V6l5 3v11"/>',DHL:'<path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/><rect x="3" y="3" width="7" height="7" rx="1"/>',Camion:'<path d="M5 17h14M6 17V9l2-4h8l2 4v8M8 9h8"/><circle cx="8" cy="17" r="1.5"/><circle cx="16" cy="17" r="1.5"/>'};
-  $("#modeBox").innerHTML=Object.entries(modeAgg).map(([m,a])=>`<div class="mode-row"><div class="mi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${modeIcons[m]||modeIcons.Container}</svg></div><div style="flex:1"><div style="font-weight:700;font-size:13.5px">${TRANSPORT_LABEL[m]||m}</div><div style="font-size:11.5px;color:var(--muted)">${a.n} expédition(s) · ${a.qty.toLocaleString("fr-FR")} kg</div></div><div style="font-weight:700;font-family:var(--serif);font-size:16px">$${a.cost.toLocaleString("fr-FR")}</div></div>`).join("")||`<div style="color:var(--muted);font-size:13px;padding:10px 0">Aucune expédition avec distance renseignée.</div>`;
+  const modeColors={Container:"#2E7D32",DHL:"#D97706",Camion:"#2563EB"};
+  const modeEntries=Object.entries(modeAgg);
+  const donutData=modeEntries.map(([m,a])=>({label:TRANSPORT_LABEL[m]||m,value:a.qty,color:modeColors[m]||"#8a978f"}));
+  $("#modeBox").innerHTML=(modeEntries.length?`<div style="display:flex;justify-content:center;margin-bottom:14px">${donutSvg(donutData,{w:170,centerLabel:modeEntries.reduce((s,[,a])=>s+a.qty,0).toLocaleString("fr-FR")+" kg"})}</div>`:"")+
+    modeEntries.map(([m,a])=>`<div class="mode-row"><div class="mi" style="background:${(modeColors[m]||'#8a978f')}22;color:${modeColors[m]||'#8a978f'}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${modeIcons[m]||modeIcons.Container}</svg></div><div style="flex:1"><div style="font-weight:700;font-size:13.5px">${TRANSPORT_LABEL[m]||m}</div><div style="font-size:11.5px;color:var(--muted)">${a.n} expédition(s) · ${a.qty.toLocaleString("fr-FR")} kg</div></div><div style="font-weight:700;font-family:var(--serif);font-size:16px">$${a.cost.toLocaleString("fr-FR")}</div></div>`).join("")||`<div style="color:var(--muted);font-size:13px;padding:10px 0">Aucune expédition avec distance renseignée.</div>`;
 
   const w=500,h=190,pad=24;
   const fVals=FREIGHT_TREND.map(d=>d.freight), fuVals=FREIGHT_TREND.map(d=>d.fuel);
@@ -2414,11 +2534,11 @@ function renderAdminKpis(){
     {l:"Complétude du retour terrain",v:k.feedbackRate+"%",tgt:"Objectif ≥ 60% · "+k.withFeedback+"/"+k.eligible+" échantillons livrés",c:k.feedbackRate<60?"var(--bad)":"var(--green-800)"},
   ].map(c=>`<div class="card kpi"><div class="v" style="color:${c.c||'var(--green-800)'}">${c.v}</div><div class="l">${c.l}</div><div class="tgt">${c.tgt}</div></div>`).join("");
   $("#timeToSampleCard").innerHTML=`<div class="sec-h" style="margin-bottom:10px"><h3 style="font-size:14px">Time-to-Sample — décomposition par étape</h3><span class="hint">moyenne sur les demandes avec dates renseignées</span></div>
-    <div class="frow">
-      <div class="card pad soft"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Soumission → Expédition</div><div style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--green-800)">${k.avgSubmitToShip} j</div></div>
-      <div class="card pad soft"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Expédition → Réception</div><div style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--green-800)">${k.avgShipToReceipt} j</div></div>
-      <div class="card pad soft"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Total — Soumission → Réception</div><div style="font-family:var(--serif);font-size:22px;font-weight:700;color:var(--green-900)">${k.avgSubmitToReceipt} j</div></div>
-    </div>`;
+    ${hBarChart([
+      {label:"Soumission → Expédition",value:k.avgSubmitToShip,max:Math.max(k.avgSubmitToShip,k.avgShipToReceipt,k.avgSubmitToReceipt,1),suffix:" j",color:"var(--green-600)"},
+      {label:"Expédition → Réception",value:k.avgShipToReceipt,max:Math.max(k.avgSubmitToShip,k.avgShipToReceipt,k.avgSubmitToReceipt,1),suffix:" j",color:"var(--green-700)"},
+      {label:"Total (bout en bout)",value:k.avgSubmitToReceipt,max:Math.max(k.avgSubmitToShip,k.avgShipToReceipt,k.avgSubmitToReceipt,1),suffix:" j",color:"var(--green-900)"},
+    ],{barH:24,gap:14})}`;
   $("#adminKpisProduct").innerHTML=[
     {l:"Taux d'adoption des recommandations",v:k.actionableCount?k.adoptionRate+"%":"—",tgt:k.adoptedCount+"/"+k.actionableCount+" recommandation(s) actionnable(s) adoptée(s) par le métier"},
     {l:"Taux de conversion échantillon → commercial",v:k.closedCount?k.conversionRate+"%":"—",tgt:k.converted+"/"+k.closedCount+" boucles clôturées ayant généré une opportunité commerciale"},
@@ -2481,9 +2601,10 @@ function renderPortail(){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;font-size:12px">
       <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Forme</div>${p.form}</div>
       <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Granulométrie</div>${p.particleSize}</div>
-      <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Conditionnement</div>${p.packaging}</div>
+      <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Conditionnement industriel</div>${p.packaging}</div>
       <div><div style="font-weight:700;text-transform:uppercase;color:var(--muted);font-size:10.5px">Durée de vie</div>${p.shelfLife}</div>
     </div>
+    <div style="margin-top:10px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Conditionnements échantillon disponibles</div>${PACKAGING_OPTIONS.map(o=>`<span class="country-chip">${o}</span>`).join("")}</div>
     <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Statut d'homologation</div>
     ${p.approved.map(c=>`<div class="passport-stamp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--green-700);flex:0 0 16px">${ICONS.check}</svg><span class="ps-country">${c}</span><span class="ps-valid">Homologué</span></div>`).join("")}
     </div>
